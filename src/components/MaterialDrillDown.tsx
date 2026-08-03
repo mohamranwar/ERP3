@@ -9,6 +9,7 @@ import {
   getVMaterialMonthlyProjection,
   getSafetyStockQty,
   getSafetyStockMonths,
+  hasSafetyStockOverride,
   SAFETY_SERVICE_FACTOR
 } from '../supabaseClient';
 import { Material, VMaterialMonthlyProjection, Supplier, MaterialCategory, MaterialAlternative } from '../types';
@@ -251,9 +252,15 @@ export default function MaterialDrillDown({
               <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-xs space-y-1">
                 <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Safety Stock Qty</span>
                 <h3 className="text-xl font-extrabold text-amber-700 font-mono">{Math.round(safetyStockUnits).toLocaleString()} units</h3>
-                <p className="text-[10px] text-gray-400 font-mono">
-                  {activeMaterial.total_lead_time_days}d lead x {SAFETY_SERVICE_FACTOR} service = {getSafetyStockMonths(activeMaterial).toFixed(1)} months of cover
-                </p>
+                {hasSafetyStockOverride(activeMaterial) ? (
+                  <p className="text-[10px] text-amber-600 font-mono">
+                    Manual override: {activeMaterial.safety_stock_months} months of cover
+                  </p>
+                ) : (
+                  <p className="text-[10px] text-gray-400 font-mono">
+                    {activeMaterial.total_lead_time_days}d lead x {SAFETY_SERVICE_FACTOR} service = {getSafetyStockMonths(activeMaterial).toFixed(1)} months of cover
+                  </p>
+                )}
               </div>
 
               <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-xs space-y-1">

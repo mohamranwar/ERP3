@@ -101,13 +101,13 @@ const INITIAL_MATERIAL_CATEGORIES: MaterialCategory[] = [
 ];
 
 const INITIAL_MATERIALS: Material[] = [
-  { id: 'MT1', name: 'GP Bleached Fluff Pulp', sku: 'RM-PLP-01', description: 'Southern Pine Fluff Pulp', category_id: 'MC1', supplier_id: 'S1', supplier_lead_time_days: 15, transit_days: 12, customs_clearance_days: 7, total_lead_time_days: 34, reorder_point_days: 45, safety_stock_months: 1.5, moq: 20000, max_usage: 1200, controller: 'Mohamed Amr', status: 'running', standard_cost: 1.5, cost_basis: 'standard' },
-  { id: 'MT2', name: 'Spunbond Top Sheet 15gsm', sku: 'RM-NWT-18', description: 'Hydrophilic Top Sheet nonwoven', category_id: 'MC2', supplier_id: 'S2', supplier_lead_time_days: 20, transit_days: 18, customs_clearance_days: 10, total_lead_time_days: 48, reorder_point_days: 60, safety_stock_months: 2.0, moq: 15000, max_usage: 800, controller: 'Mohamed Amr', status: 'running', standard_cost: 0.8, cost_basis: 'standard' },
-  { id: 'MT3', name: 'Teemo Printed Polybag Large', sku: 'PK-PLB-28', description: 'LDPE Printed Polybag Outer', category_id: 'MC3', supplier_id: 'S3', supplier_lead_time_days: 7, transit_days: 3, customs_clearance_days: 2, total_lead_time_days: 12, reorder_point_days: 20, safety_stock_months: 1.0, moq: 5000, max_usage: 500, controller: 'Amr Anwar', status: 'running', standard_cost: 0.3, cost_basis: 'standard' },
-  { id: 'MT4', name: 'Corrugated Master Carton Big', sku: 'PK-CTN-29', description: 'Double Wall Corrugated Box', category_id: 'MC4', supplier_id: 'S3', supplier_lead_time_days: 5, transit_days: 3, customs_clearance_days: 2, total_lead_time_days: 10, reorder_point_days: 15, safety_stock_months: 0.8, moq: 2000, max_usage: 300, controller: 'Amr Anwar', status: 'running', standard_cost: 1.2, cost_basis: 'weighted_avg' },
+  { id: 'MT1', name: 'GP Bleached Fluff Pulp', sku: 'RM-PLP-01', description: 'Southern Pine Fluff Pulp', category_id: 'MC1', supplier_id: 'S1', supplier_lead_time_days: 15, transit_days: 12, customs_clearance_days: 7, total_lead_time_days: 34, reorder_point_days: 45, safety_stock_months: 0, moq: 20000, max_usage: 1200, controller: 'Mohamed Amr', status: 'running', standard_cost: 1.5, cost_basis: 'standard' },
+  { id: 'MT2', name: 'Spunbond Top Sheet 15gsm', sku: 'RM-NWT-18', description: 'Hydrophilic Top Sheet nonwoven', category_id: 'MC2', supplier_id: 'S2', supplier_lead_time_days: 20, transit_days: 18, customs_clearance_days: 10, total_lead_time_days: 48, reorder_point_days: 60, safety_stock_months: 0, moq: 15000, max_usage: 800, controller: 'Mohamed Amr', status: 'running', standard_cost: 0.8, cost_basis: 'standard' },
+  { id: 'MT3', name: 'Teemo Printed Polybag Large', sku: 'PK-PLB-28', description: 'LDPE Printed Polybag Outer', category_id: 'MC3', supplier_id: 'S3', supplier_lead_time_days: 7, transit_days: 3, customs_clearance_days: 2, total_lead_time_days: 12, reorder_point_days: 20, safety_stock_months: 0, moq: 5000, max_usage: 500, controller: 'Amr Anwar', status: 'running', standard_cost: 0.3, cost_basis: 'standard' },
+  { id: 'MT4', name: 'Corrugated Master Carton Big', sku: 'PK-CTN-29', description: 'Double Wall Corrugated Box', category_id: 'MC4', supplier_id: 'S3', supplier_lead_time_days: 5, transit_days: 3, customs_clearance_days: 2, total_lead_time_days: 10, reorder_point_days: 15, safety_stock_months: 0, moq: 2000, max_usage: 300, controller: 'Amr Anwar', status: 'running', standard_cost: 1.2, cost_basis: 'weighted_avg' },
   { id: 'MT5', name: 'Sumitomo SAP High-Speed', sku: 'RM-SAP-12', description: 'Super Absorbent Polymer particles', category_id: 'MC5', supplier_id: 'S5', supplier_lead_time_days: 25, transit_days: 14, customs_clearance_days: 8, total_lead_time_days: 47, reorder_point_days: 55, safety_stock_months: 2.5, moq: 10000, max_usage: 1000, controller: 'Mohamed Amr', status: 'running', standard_cost: 2.2, cost_basis: 'standard' },
   // Alternatives for Top Sheet
-  { id: 'MT6', name: 'Local Spunbond Top Sheet', sku: 'RM-NWT-18-ALT', description: 'Local Hydrophilic Nonwoven alternative', category_id: 'MC2', supplier_id: 'S4', supplier_lead_time_days: 10, transit_days: 5, customs_clearance_days: 3, total_lead_time_days: 18, reorder_point_days: 25, safety_stock_months: 1.0, moq: 8000, max_usage: 700, controller: 'Mohamed Amr', status: 'running', standard_cost: 0.72, cost_basis: 'standard' }
+  { id: 'MT6', name: 'Local Spunbond Top Sheet', sku: 'RM-NWT-18-ALT', description: 'Local Hydrophilic Nonwoven alternative', category_id: 'MC2', supplier_id: 'S4', supplier_lead_time_days: 10, transit_days: 5, customs_clearance_days: 3, total_lead_time_days: 18, reorder_point_days: 25, safety_stock_months: 0, moq: 8000, max_usage: 700, controller: 'Mohamed Amr', status: 'running', standard_cost: 0.72, cost_basis: 'standard' }
 ];
 
 const INITIAL_ALTERNATIVES: MaterialAlternative[] = [
@@ -305,6 +305,10 @@ function getLocalDB() {
     users: INITIAL_USERS,
   };
 
+  // A browser that has never held this app needs seeding, not migrating - the
+  // seed is already at the current schema.
+  const isFreshInstall = !localStorage.getItem('sc_db_materials');
+
   const keys = Object.keys(db) as Array<keyof typeof db>;
   keys.forEach(k => {
     const key = `sc_db_${k}`;
@@ -312,6 +316,45 @@ function getLocalDB() {
       localStorage.setItem(key, JSON.stringify(db[k]));
     }
   });
+
+  if (isFreshInstall) {
+    localStorage.setItem(STORAGE_SCHEMA_KEY, String(SCHEMA_VERSION));
+  } else {
+    runLocalMigrations();
+  }
+}
+
+/** Bump when a released schema change needs existing local data adjusted. */
+const SCHEMA_VERSION = 2;
+const STORAGE_SCHEMA_KEY = 'sc_db_schema_version';
+
+/**
+ * Tables are seeded once and never overwritten, so a shipped semantic change
+ * has to be applied to data already sitting in a planner's browser.
+ */
+export function runLocalMigrations() {
+  const stored = Number(localStorage.getItem(STORAGE_SCHEMA_KEY) || '1');
+  if (stored >= SCHEMA_VERSION) return;
+
+  // v2: safety_stock_months stopped being the buffer formula and became an
+  // opt-in override, with 0 meaning "size it from lead time". Values stored
+  // before this release were formula inputs, not deliberate overrides - left
+  // alone they would silently pin every material to the old oversized buffer.
+  if (stored < 2) {
+    const key = 'sc_db_materials';
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      try {
+        const materials = JSON.parse(raw) as Material[];
+        materials.forEach(m => { m.safety_stock_months = 0; });
+        localStorage.setItem(key, JSON.stringify(materials));
+      } catch {
+        // Corrupt table: leave it for the normal read path to surface.
+      }
+    }
+  }
+
+  localStorage.setItem(STORAGE_SCHEMA_KEY, String(SCHEMA_VERSION));
 }
 
 // Ensure the local storage is seeded on first load
@@ -917,6 +960,14 @@ export function getSafetyStockQty(material: Material, avgMonthlyRequirement: num
   const dailyDemand = avgMonthlyRequirement > 0
     ? avgMonthlyRequirement / DAYS_PER_MONTH
     : (material.max_usage || 500);
+
+  // A planner who types a figure into `safety_stock_months` has made a
+  // deliberate call - a volatile item, a supplier on watch, a contractual
+  // minimum - and that beats the computed default.
+  if (hasSafetyStockOverride(material)) {
+    return material.safety_stock_months * dailyDemand * DAYS_PER_MONTH;
+  }
+
   const leadDays = material.total_lead_time_days > 0
     ? material.total_lead_time_days
     : FALLBACK_LEAD_TIME_DAYS;
@@ -924,11 +975,20 @@ export function getSafetyStockQty(material: Material, avgMonthlyRequirement: num
 }
 
 /**
- * Months of cover the lead-time buffer actually represents, for display.
- * Lets a planner compare the computed buffer against the `safety_stock_months`
- * still held in master data.
+ * Whether this material's buffer is pinned by hand. Zero (the default) means
+ * "size it from lead time"; any positive value is an explicit months-of-cover
+ * instruction from a planner.
+ */
+export function hasSafetyStockOverride(material: Material): boolean {
+  return material.safety_stock_months > 0;
+}
+
+/**
+ * Months of cover the buffer represents, for display. Reads back the
+ * override when one is set, otherwise the lead-time-derived figure.
  */
 export function getSafetyStockMonths(material: Material): number {
+  if (hasSafetyStockOverride(material)) return material.safety_stock_months;
   const leadDays = material.total_lead_time_days > 0
     ? material.total_lead_time_days
     : FALLBACK_LEAD_TIME_DAYS;

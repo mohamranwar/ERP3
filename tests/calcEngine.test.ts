@@ -9,6 +9,8 @@ import {
   getPlannedPeriods,
   getSafetyStockQty,
   getSafetyStockMonths,
+  hasSafetyStockOverride,
+  runLocalMigrations,
   SAFETY_SERVICE_FACTOR,
   DAYS_PER_MONTH,
   getPlanningPeriod,
@@ -402,6 +404,41 @@ describe('getSafetyStockQty - lead-time-based buffers', () => {
   });
 });
 
+describe('getSafetyStockQty - manual override', () => {
+  const auto = { total_lead_time_days: 34, max_usage: 1200, safety_stock_months: 0 } as any;
+  const pinned = { total_lead_time_days: 34, max_usage: 1200, safety_stock_months: 2.5 } as any;
+
+  it('treats zero months as "size it from lead time"', () => {
+    expect(hasSafetyStockOverride(auto)).toBe(false);
+    const daily = 1826280 / DAYS_PER_MONTH;
+    expect(getSafetyStockQty(auto, 1826280)).toBeCloseTo(daily * 34 * 1.25, 4);
+  });
+
+  it('honours a planner-set months figure over the lead-time default', () => {
+    expect(hasSafetyStockOverride(pinned)).toBe(true);
+    expect(getSafetyStockQty(pinned, 1826280)).toBeCloseTo(1826280 * 2.5, 4);
+  });
+
+  it('reports the override months back for display', () => {
+    expect(getSafetyStockMonths(pinned)).toBe(2.5);
+    expect(getSafetyStockMonths(auto)).toBeCloseTo((34 * SAFETY_SERVICE_FACTOR) / 30, 6);
+  });
+
+  it('applies the override inside a real MRP run', async () => {
+    // MT5 is seeded with an explicit 2.5-month buffer; MT1 is left on auto.
+    const { results } = await runMRP('2026-07-01', 1, 'month');
+    const mt5 = results.find(r => r.material_id === 'MT5')!;
+    const mt1Row = results.find(r => r.material_id === 'MT1')!;
+    // MT5's buffer is 2.5 months of its own demand, well above the ~1.96
+    // months its 47-day lead time would produce.
+    const mt5LeadMonths = (47 * SAFETY_SERVICE_FACTOR) / DAYS_PER_MONTH;
+    expect(2.5).toBeGreaterThan(mt5LeadMonths);
+    expect(mt5.safety_stock).toBeGreaterThan(0);
+    // MT1 stays on the lead-time formula.
+    expect(mt1Row.safety_stock).toBe(Math.round((1826280 / DAYS_PER_MONTH) * 34 * 1.25));
+  });
+});
+
 describe('runMRP - lead-time offset between release and receipt', () => {
   it('separates when an order must arrive from when it must be placed', async () => {
     const { results } = await runMRP('2026-07-01', 3, 'month');
@@ -463,5 +500,36 @@ describe('runMRP - weekly buckets prorate the monthly plan', () => {
     const m = monthly.results.find(r => r.material_id === 'MT1')!;
     // A week's requirement, scaled back up to a month, matches the month run.
     expect((w.gross_requirements || 0) * (31 / 7)).toBeCloseTo(m.gross_requirements || 0, -1);
+  });
+});
+
+describe('local schema migration - safety stock override semantics', () => {
+  it('resets pre-existing months values so they do not become silent overrides', () => {
+    // Before v2 this field *was* the buffer formula. A value stored then
+    // carried no override intent, so leaving it would pin every material back
+    // to the old oversized buffer the moment a planner reloaded the app.
+    const stored = JSON.parse(localStorage.getItem('sc_db_materials')!);
+    stored.forEach((m: any) => { m.safety_stock_months = 1.5; });
+    localStorage.setItem('sc_db_materials', JSON.stringify(stored));
+    localStorage.setItem('sc_db_schema_version', '1');
+
+    runLocalMigrations();
+
+    const after = JSON.parse(localStorage.getItem('sc_db_materials')!);
+    after.forEach((m: any) => expect(m.safety_stock_months).toBe(0));
+    expect(localStorage.getItem('sc_db_schema_version')).toBe('2');
+  });
+
+  it('does not touch data that is already at the current schema', () => {
+    const stored = JSON.parse(localStorage.getItem('sc_db_materials')!);
+    stored.forEach((m: any) => { m.safety_stock_months = 0; });
+    stored[0].safety_stock_months = 3.0; // a deliberate override set after v2
+    localStorage.setItem('sc_db_materials', JSON.stringify(stored));
+    localStorage.setItem('sc_db_schema_version', '2');
+
+    runLocalMigrations();
+
+    const after = JSON.parse(localStorage.getItem('sc_db_materials')!);
+    expect(after[0].safety_stock_months).toBe(3.0);
   });
 });
