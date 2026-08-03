@@ -202,7 +202,15 @@ export interface MRPResult {
   projected_available: number;
   safety_stock: number;
   net_requirements: number;
+  /** Quantity that must be *ordered* in this period to land a lead time later. */
   planned_order_releases: number;
+  /** Quantity that must *arrive* in this period to hold the safety level. */
+  planned_order_receipts?: number;
+  /**
+   * Receipts whose release date already fell before the run start - late on
+   * arrival, and not recoverable by ordering on time.
+   */
+  past_due_releases?: number;
   gross_requirements?: number;
   scheduled_receipts?: number;
 }

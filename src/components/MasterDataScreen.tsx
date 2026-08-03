@@ -122,7 +122,7 @@ export default function MasterDataScreen({
         supplier_lead_time_days: defaultSup?.default_lead_time_days || 15,
         transit_days: defaultSup?.default_transit_days || 10,
         customs_clearance_days: defaultSup?.default_customs_clearance_days || 5,
-        safety_stock_months: 1.0, moq: 10000, max_usage: 1000, controller: 'Mohamed Amr',
+        safety_stock_months: 0, moq: 10000, max_usage: 1000, controller: 'Mohamed Amr',
         status: 'running', standard_cost: 1.0, cost_basis: 'standard'
       });
     } else if (activeTab === 'suppliers') {
@@ -311,7 +311,7 @@ export default function MasterDataScreen({
         { key: 'supplier_lead_time_days', label: 'Supplier Lead Time Days', defaultValue: 15 },
         { key: 'transit_days', label: 'Transit Days', defaultValue: 10 },
         { key: 'customs_clearance_days', label: 'Customs Clearance Days', defaultValue: 5 },
-        { key: 'safety_stock_months', label: 'Safety Stock Months', defaultValue: 1.0 },
+        { key: 'safety_stock_months', label: 'Safety Stock Override (Months, 0 = auto)', defaultValue: 0 },
         { key: 'moq', label: 'MOQ Qty', defaultValue: 5000 },
         { key: 'max_usage', label: 'Max Daily Usage', defaultValue: 500 },
         { key: 'controller', label: 'Controller', defaultValue: 'Mohamed Amr' },
@@ -473,7 +473,11 @@ export default function MasterDataScreen({
                             {m.supplier_lead_time_days}d + {m.transit_days}d + {m.customs_clearance_days}d
                           </td>
                           <td className="px-4 py-2.5 text-right font-semibold font-mono">{m.total_lead_time_days}d</td>
-                          <td className="px-4 py-2.5 text-right font-mono">{m.safety_stock_months}</td>
+                          <td className="px-4 py-2.5 text-right font-mono">
+                            {m.safety_stock_months > 0
+                              ? m.safety_stock_months
+                              : <span className="text-gray-400 text-[10px] font-sans">auto</span>}
+                          </td>
                           <td className="px-4 py-2.5 text-right font-mono">{m.moq.toLocaleString()}</td>
                           <td className="px-4 py-2.5 text-right font-mono font-semibold">${m.standard_cost.toFixed(3)}</td>
                           <td className="px-4 py-2.5">
@@ -696,8 +700,9 @@ export default function MasterDataScreen({
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Safety Stock Level (Months)</label>
-                    <input type="number" step="0.1" value={editItem.safety_stock_months} onChange={e => setEditItem({ ...editItem, safety_stock_months: Number(e.target.value) })} className="w-full p-2 border border-gray-300 rounded-lg" />
+                    <label className="block text-xs font-semibold text-gray-700">Safety Stock Override (Months)</label>
+                    <input type="number" step="0.1" min="0" value={editItem.safety_stock_months} onChange={e => setEditItem({ ...editItem, safety_stock_months: Number(e.target.value) })} className="w-full p-2 border border-gray-300 rounded-lg" />
+                    <p className="text-[10px] text-gray-400">Leave at 0 to size the buffer from lead time. Any value above 0 pins it to that many months of cover.</p>
                   </div>
                   <div className="space-y-1">
                     <label className="block text-xs font-semibold text-gray-700">Minimum Order Qty (MOQ)</label>

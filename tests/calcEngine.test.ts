@@ -8,6 +8,11 @@ import {
   explodeBOM,
   getPlannedPeriods,
   getSafetyStockQty,
+  getSafetyStockMonths,
+  hasSafetyStockOverride,
+  runLocalMigrations,
+  SAFETY_SERVICE_FACTOR,
+  DAYS_PER_MONTH,
   getPlanningPeriod,
   setPlanningPeriod,
   formatPlanningPeriod,
@@ -330,17 +335,43 @@ describe('the active planning period', () => {
 });
 
 
-describe('getSafetyStockQty - demand-based buffers', () => {
-  const mt1 = { safety_stock_months: 1.5, max_usage: 1200 } as any;
+describe('getSafetyStockQty - lead-time-based buffers', () => {
+  // MT1: total_lead_time_days 34 (15 supplier + 12 transit + 7 customs).
+  const mt1 = { total_lead_time_days: 34, max_usage: 1200 } as any;
+  // MT3: total_lead_time_days 12 (7 + 3 + 2) - the same plan, a nearer supplier.
+  const mt3 = { total_lead_time_days: 12, max_usage: 500 } as any;
 
-  it('sizes the buffer off monthly consumption, not a daily rate', () => {
-    // MT1 July requirement is 1,826,280/month at 1.5 months of cover.
-    expect(getSafetyStockQty(mt1, 1826280)).toBeCloseTo(2739420, 4);
+  it('covers demand across the replenishment lead time', () => {
+    // MT1 July requirement is 1,826,280/month = 60,876/day over 34 days,
+    // with a 1.25 service factor.
+    const daily = 1826280 / DAYS_PER_MONTH;
+    expect(getSafetyStockQty(mt1, 1826280)).toBeCloseTo(daily * 34 * 1.25, 4);
+  });
+
+  it('holds less buffer for a short-lead-time material at identical demand', () => {
+    // The whole point of the change: a 12-day part should not carry the same
+    // cover as a 34-day one. Previously both were charged months of demand.
+    const long = getSafetyStockQty(mt1, 1826280);
+    const short = getSafetyStockQty({ ...mt3, max_usage: 1200 }, 1826280);
+    expect(short).toBeLessThan(long);
+    expect(short / long).toBeCloseTo(12 / 34, 6);
   });
 
   it('falls back to the master-data usage rate when the plan consumes nothing', () => {
-    // Obsolete or un-BOMed materials still need a target, not zero.
-    expect(getSafetyStockQty(mt1, 0)).toBeCloseTo(1.5 * 1200 * 30, 4);
+    // Obsolete or un-BOMed materials still need a target, not zero. max_usage
+    // is already a daily rate, so it is used directly.
+    expect(getSafetyStockQty(mt1, 0)).toBeCloseTo(1200 * 34 * 1.25, 4);
+  });
+
+  it('falls back to a 30-day lead time when the material records none', () => {
+    const noLeadTime = { total_lead_time_days: 0, max_usage: 1200 } as any;
+    const daily = 1826280 / DAYS_PER_MONTH;
+    expect(getSafetyStockQty(noLeadTime, 1826280)).toBeCloseTo(daily * 30 * 1.25, 4);
+  });
+
+  it('reports the months of cover the lead-time buffer represents', () => {
+    expect(getSafetyStockMonths(mt1)).toBeCloseTo((34 * SAFETY_SERVICE_FACTOR) / 30, 6);
+    expect(getSafetyStockMonths(mt3)).toBeCloseTo((12 * SAFETY_SERVICE_FACTOR) / 30, 6);
   });
 
   it('is a stock level, so it does not scale with the MRP bucket size', async () => {
@@ -350,10 +381,8 @@ describe('getSafetyStockQty - demand-based buffers', () => {
 
     const mFirst = monthly.results.find(r => r.material_id === 'MT1')!;
     const wFirst = weekly.results.find(r => r.material_id === 'MT1')!;
-    // Previously the monthly run's buffer was 4x the weekly run's for the
-    // same material and the same span, purely because of the bucket size.
     expect(mFirst.safety_stock).toBe(wFirst.safety_stock);
-    expect(mFirst.safety_stock).toBe(Math.round(1826280 * 1.5));
+    expect(mFirst.safety_stock).toBe(Math.round((1826280 / DAYS_PER_MONTH) * 34 * 1.25));
   });
 
   it('sizes the buffer over the months the run spans', async () => {
@@ -363,16 +392,144 @@ describe('getSafetyStockQty - demand-based buffers', () => {
     const threeMonths = await runMRP('2026-07-01', 3, 'month');
     const jul = oneMonth.results.find(r => r.material_id === 'MT1')!;
     const q3 = threeMonths.results.find(r => r.material_id === 'MT1')!;
-    expect(jul.safety_stock).toBe(Math.round(1826280 * 1.5));
-    expect(q3.safety_stock).toBe(Math.round(((1826280 + 1940400 + 1758510) / 3) * 1.5));
+    const avg = (1826280 + 1940400 + 1758510) / 3;
+    expect(jul.safety_stock).toBe(Math.round((1826280 / DAYS_PER_MONTH) * 34 * 1.25));
+    expect(q3.safety_stock).toBe(Math.round((avg / DAYS_PER_MONTH) * 34 * 1.25));
   });
 
-  it('drives MRP planned releases off a buffer proportional to demand', async () => {
+  it('holds a smaller buffer than the old months-of-demand formula', () => {
+    // MT1 previously carried safety_stock_months (1.5) x monthly demand.
+    const oldFormula = 1826280 * 1.5;
+    expect(getSafetyStockQty(mt1, 1826280)).toBeLessThan(oldFormula);
+  });
+});
+
+describe('getSafetyStockQty - manual override', () => {
+  const auto = { total_lead_time_days: 34, max_usage: 1200, safety_stock_months: 0 } as any;
+  const pinned = { total_lead_time_days: 34, max_usage: 1200, safety_stock_months: 2.5 } as any;
+
+  it('treats zero months as "size it from lead time"', () => {
+    expect(hasSafetyStockOverride(auto)).toBe(false);
+    const daily = 1826280 / DAYS_PER_MONTH;
+    expect(getSafetyStockQty(auto, 1826280)).toBeCloseTo(daily * 34 * 1.25, 4);
+  });
+
+  it('honours a planner-set months figure over the lead-time default', () => {
+    expect(hasSafetyStockOverride(pinned)).toBe(true);
+    expect(getSafetyStockQty(pinned, 1826280)).toBeCloseTo(1826280 * 2.5, 4);
+  });
+
+  it('reports the override months back for display', () => {
+    expect(getSafetyStockMonths(pinned)).toBe(2.5);
+    expect(getSafetyStockMonths(auto)).toBeCloseTo((34 * SAFETY_SERVICE_FACTOR) / 30, 6);
+  });
+
+  it('applies the override inside a real MRP run', async () => {
+    // MT5 is seeded with an explicit 2.5-month buffer; MT1 is left on auto.
+    const { results } = await runMRP('2026-07-01', 1, 'month');
+    const mt5 = results.find(r => r.material_id === 'MT5')!;
+    const mt1Row = results.find(r => r.material_id === 'MT1')!;
+    // MT5's buffer is 2.5 months of its own demand, well above the ~1.96
+    // months its 47-day lead time would produce.
+    const mt5LeadMonths = (47 * SAFETY_SERVICE_FACTOR) / DAYS_PER_MONTH;
+    expect(2.5).toBeGreaterThan(mt5LeadMonths);
+    expect(mt5.safety_stock).toBeGreaterThan(0);
+    // MT1 stays on the lead-time formula.
+    expect(mt1Row.safety_stock).toBe(Math.round((1826280 / DAYS_PER_MONTH) * 34 * 1.25));
+  });
+});
+
+describe('runMRP - lead-time offset between release and receipt', () => {
+  it('separates when an order must arrive from when it must be placed', async () => {
     const { results } = await runMRP('2026-07-01', 3, 'month');
-    const jul = results.find(r => r.material_id === 'MT1' && r.week_start_date === '2026-07-01')!;
-    // Avg monthly requirement over Jul/Aug/Sep, x 1.5 months.
-    const avg = (1826280 + 1940400 + 1758510) / 3;
-    expect(jul.safety_stock).toBe(Math.round(avg * 1.5));
-    expect(jul.safety_stock).toBeGreaterThan(1000000);
+    const rows = results.filter(r => r.material_id === 'MT3');
+    // MT3 has a 12-day lead time, so a receipt needed on the 1st of a month
+    // is released in the previous bucket - never in its own.
+    const receipts = rows.map(r => r.planned_order_receipts || 0);
+    const releases = rows.map(r => r.planned_order_releases);
+    expect(receipts.some(q => q > 0)).toBe(true);
+    for (let i = 0; i + 1 < rows.length; i++) {
+      expect(releases[i]).toBe(receipts[i + 1]);
+    }
+  });
+
+  it('conserves quantity - every receipt is released or flagged past due', async () => {
+    const { results } = await runMRP('2026-07-01', 4, 'month');
+    ['MT1', 'MT2', 'MT3', 'MT4', 'MT5'].forEach(id => {
+      const rows = results.filter(r => r.material_id === id);
+      const receipts = rows.reduce((s, r) => s + (r.planned_order_receipts || 0), 0);
+      const released = rows.reduce((s, r) => s + r.planned_order_releases, 0);
+      const pastDue = rows.reduce((s, r) => s + (r.past_due_releases || 0), 0);
+      expect(released + pastDue).toBe(receipts);
+    });
+  });
+
+  it('flags a receipt as past due when its release date precedes the run', async () => {
+    const { results } = await runMRP('2026-07-01', 3, 'month');
+    // MT2 has a 48-day lead time, so a July 1 receipt had to be ordered in
+    // mid-May - before this run begins. That cannot be recovered by planning.
+    const jul = results.find(r => r.material_id === 'MT2' && r.week_start_date === '2026-07-01')!;
+    expect(jul.planned_order_receipts).toBeGreaterThan(0);
+    expect(jul.past_due_releases).toBeGreaterThan(0);
+  });
+
+  it('does not credit stock in the period an order is released', async () => {
+    // The old engine added planned orders straight into the same bucket's
+    // ending stock, so a shortage could never propagate forward.
+    const { results } = await runMRP('2026-07-01', 3, 'month');
+    const rows = results.filter(r => r.material_id === 'MT2');
+    const releasedInOwnBucket = rows.filter(
+      r => r.planned_order_releases > 0 && r.planned_order_releases === (r.planned_order_receipts || 0)
+    );
+    expect(releasedInOwnBucket).toHaveLength(0);
+  });
+});
+
+describe('runMRP - weekly buckets prorate the monthly plan', () => {
+  it('splits a month by actual bucket days, not a flat quarter', async () => {
+    // July has 31 days, so a 7-day bucket is 7/31 of the month - not 1/4.
+    const { results } = await runMRP('2026-07-01', 1, 'week');
+    const wk = results.find(r => r.material_id === 'MT1')!;
+    expect(wk.gross_requirements).toBe(Math.round(1826280 * (7 / 31)));
+  });
+
+  it('keeps weekly and monthly runs on the same demand rate', async () => {
+    const weekly = await runMRP('2026-07-01', 1, 'week');
+    const monthly = await runMRP('2026-07-01', 1, 'month');
+    const w = weekly.results.find(r => r.material_id === 'MT1')!;
+    const m = monthly.results.find(r => r.material_id === 'MT1')!;
+    // A week's requirement, scaled back up to a month, matches the month run.
+    expect((w.gross_requirements || 0) * (31 / 7)).toBeCloseTo(m.gross_requirements || 0, -1);
+  });
+});
+
+describe('local schema migration - safety stock override semantics', () => {
+  it('resets pre-existing months values so they do not become silent overrides', () => {
+    // Before v2 this field *was* the buffer formula. A value stored then
+    // carried no override intent, so leaving it would pin every material back
+    // to the old oversized buffer the moment a planner reloaded the app.
+    const stored = JSON.parse(localStorage.getItem('sc_db_materials')!);
+    stored.forEach((m: any) => { m.safety_stock_months = 1.5; });
+    localStorage.setItem('sc_db_materials', JSON.stringify(stored));
+    localStorage.setItem('sc_db_schema_version', '1');
+
+    runLocalMigrations();
+
+    const after = JSON.parse(localStorage.getItem('sc_db_materials')!);
+    after.forEach((m: any) => expect(m.safety_stock_months).toBe(0));
+    expect(localStorage.getItem('sc_db_schema_version')).toBe('2');
+  });
+
+  it('does not touch data that is already at the current schema', () => {
+    const stored = JSON.parse(localStorage.getItem('sc_db_materials')!);
+    stored.forEach((m: any) => { m.safety_stock_months = 0; });
+    stored[0].safety_stock_months = 3.0; // a deliberate override set after v2
+    localStorage.setItem('sc_db_materials', JSON.stringify(stored));
+    localStorage.setItem('sc_db_schema_version', '2');
+
+    runLocalMigrations();
+
+    const after = JSON.parse(localStorage.getItem('sc_db_materials')!);
+    expect(after[0].safety_stock_months).toBe(3.0);
   });
 });

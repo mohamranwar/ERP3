@@ -101,13 +101,13 @@ const INITIAL_MATERIAL_CATEGORIES: MaterialCategory[] = [
 ];
 
 const INITIAL_MATERIALS: Material[] = [
-  { id: 'MT1', name: 'GP Bleached Fluff Pulp', sku: 'RM-PLP-01', description: 'Southern Pine Fluff Pulp', category_id: 'MC1', supplier_id: 'S1', supplier_lead_time_days: 15, transit_days: 12, customs_clearance_days: 7, total_lead_time_days: 34, reorder_point_days: 45, safety_stock_months: 1.5, moq: 20000, max_usage: 1200, controller: 'Mohamed Amr', status: 'running', standard_cost: 1.5, cost_basis: 'standard' },
-  { id: 'MT2', name: 'Spunbond Top Sheet 15gsm', sku: 'RM-NWT-18', description: 'Hydrophilic Top Sheet nonwoven', category_id: 'MC2', supplier_id: 'S2', supplier_lead_time_days: 20, transit_days: 18, customs_clearance_days: 10, total_lead_time_days: 48, reorder_point_days: 60, safety_stock_months: 2.0, moq: 15000, max_usage: 800, controller: 'Mohamed Amr', status: 'running', standard_cost: 0.8, cost_basis: 'standard' },
-  { id: 'MT3', name: 'Teemo Printed Polybag Large', sku: 'PK-PLB-28', description: 'LDPE Printed Polybag Outer', category_id: 'MC3', supplier_id: 'S3', supplier_lead_time_days: 7, transit_days: 3, customs_clearance_days: 2, total_lead_time_days: 12, reorder_point_days: 20, safety_stock_months: 1.0, moq: 5000, max_usage: 500, controller: 'Amr Anwar', status: 'running', standard_cost: 0.3, cost_basis: 'standard' },
-  { id: 'MT4', name: 'Corrugated Master Carton Big', sku: 'PK-CTN-29', description: 'Double Wall Corrugated Box', category_id: 'MC4', supplier_id: 'S3', supplier_lead_time_days: 5, transit_days: 3, customs_clearance_days: 2, total_lead_time_days: 10, reorder_point_days: 15, safety_stock_months: 0.8, moq: 2000, max_usage: 300, controller: 'Amr Anwar', status: 'running', standard_cost: 1.2, cost_basis: 'weighted_avg' },
+  { id: 'MT1', name: 'GP Bleached Fluff Pulp', sku: 'RM-PLP-01', description: 'Southern Pine Fluff Pulp', category_id: 'MC1', supplier_id: 'S1', supplier_lead_time_days: 15, transit_days: 12, customs_clearance_days: 7, total_lead_time_days: 34, reorder_point_days: 45, safety_stock_months: 0, moq: 20000, max_usage: 1200, controller: 'Mohamed Amr', status: 'running', standard_cost: 1.5, cost_basis: 'standard' },
+  { id: 'MT2', name: 'Spunbond Top Sheet 15gsm', sku: 'RM-NWT-18', description: 'Hydrophilic Top Sheet nonwoven', category_id: 'MC2', supplier_id: 'S2', supplier_lead_time_days: 20, transit_days: 18, customs_clearance_days: 10, total_lead_time_days: 48, reorder_point_days: 60, safety_stock_months: 0, moq: 15000, max_usage: 800, controller: 'Mohamed Amr', status: 'running', standard_cost: 0.8, cost_basis: 'standard' },
+  { id: 'MT3', name: 'Teemo Printed Polybag Large', sku: 'PK-PLB-28', description: 'LDPE Printed Polybag Outer', category_id: 'MC3', supplier_id: 'S3', supplier_lead_time_days: 7, transit_days: 3, customs_clearance_days: 2, total_lead_time_days: 12, reorder_point_days: 20, safety_stock_months: 0, moq: 5000, max_usage: 500, controller: 'Amr Anwar', status: 'running', standard_cost: 0.3, cost_basis: 'standard' },
+  { id: 'MT4', name: 'Corrugated Master Carton Big', sku: 'PK-CTN-29', description: 'Double Wall Corrugated Box', category_id: 'MC4', supplier_id: 'S3', supplier_lead_time_days: 5, transit_days: 3, customs_clearance_days: 2, total_lead_time_days: 10, reorder_point_days: 15, safety_stock_months: 0, moq: 2000, max_usage: 300, controller: 'Amr Anwar', status: 'running', standard_cost: 1.2, cost_basis: 'weighted_avg' },
   { id: 'MT5', name: 'Sumitomo SAP High-Speed', sku: 'RM-SAP-12', description: 'Super Absorbent Polymer particles', category_id: 'MC5', supplier_id: 'S5', supplier_lead_time_days: 25, transit_days: 14, customs_clearance_days: 8, total_lead_time_days: 47, reorder_point_days: 55, safety_stock_months: 2.5, moq: 10000, max_usage: 1000, controller: 'Mohamed Amr', status: 'running', standard_cost: 2.2, cost_basis: 'standard' },
   // Alternatives for Top Sheet
-  { id: 'MT6', name: 'Local Spunbond Top Sheet', sku: 'RM-NWT-18-ALT', description: 'Local Hydrophilic Nonwoven alternative', category_id: 'MC2', supplier_id: 'S4', supplier_lead_time_days: 10, transit_days: 5, customs_clearance_days: 3, total_lead_time_days: 18, reorder_point_days: 25, safety_stock_months: 1.0, moq: 8000, max_usage: 700, controller: 'Mohamed Amr', status: 'running', standard_cost: 0.72, cost_basis: 'standard' }
+  { id: 'MT6', name: 'Local Spunbond Top Sheet', sku: 'RM-NWT-18-ALT', description: 'Local Hydrophilic Nonwoven alternative', category_id: 'MC2', supplier_id: 'S4', supplier_lead_time_days: 10, transit_days: 5, customs_clearance_days: 3, total_lead_time_days: 18, reorder_point_days: 25, safety_stock_months: 0, moq: 8000, max_usage: 700, controller: 'Mohamed Amr', status: 'running', standard_cost: 0.72, cost_basis: 'standard' }
 ];
 
 const INITIAL_ALTERNATIVES: MaterialAlternative[] = [
@@ -305,6 +305,10 @@ function getLocalDB() {
     users: INITIAL_USERS,
   };
 
+  // A browser that has never held this app needs seeding, not migrating - the
+  // seed is already at the current schema.
+  const isFreshInstall = !localStorage.getItem('sc_db_materials');
+
   const keys = Object.keys(db) as Array<keyof typeof db>;
   keys.forEach(k => {
     const key = `sc_db_${k}`;
@@ -312,6 +316,45 @@ function getLocalDB() {
       localStorage.setItem(key, JSON.stringify(db[k]));
     }
   });
+
+  if (isFreshInstall) {
+    localStorage.setItem(STORAGE_SCHEMA_KEY, String(SCHEMA_VERSION));
+  } else {
+    runLocalMigrations();
+  }
+}
+
+/** Bump when a released schema change needs existing local data adjusted. */
+const SCHEMA_VERSION = 2;
+const STORAGE_SCHEMA_KEY = 'sc_db_schema_version';
+
+/**
+ * Tables are seeded once and never overwritten, so a shipped semantic change
+ * has to be applied to data already sitting in a planner's browser.
+ */
+export function runLocalMigrations() {
+  const stored = Number(localStorage.getItem(STORAGE_SCHEMA_KEY) || '1');
+  if (stored >= SCHEMA_VERSION) return;
+
+  // v2: safety_stock_months stopped being the buffer formula and became an
+  // opt-in override, with 0 meaning "size it from lead time". Values stored
+  // before this release were formula inputs, not deliberate overrides - left
+  // alone they would silently pin every material to the old oversized buffer.
+  if (stored < 2) {
+    const key = 'sc_db_materials';
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      try {
+        const materials = JSON.parse(raw) as Material[];
+        materials.forEach(m => { m.safety_stock_months = 0; });
+        localStorage.setItem(key, JSON.stringify(materials));
+      } catch {
+        // Corrupt table: leave it for the normal read path to surface.
+      }
+    }
+  }
+
+  localStorage.setItem(STORAGE_SCHEMA_KEY, String(SCHEMA_VERSION));
 }
 
 // Ensure the local storage is seeded on first load
@@ -757,6 +800,22 @@ function monthStart(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
 }
 
+export const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+/** Local-time YYYY-MM-DD, avoiding the UTC shift `toISOString()` introduces. */
+export function toDateStr(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/** Calendar length of the month containing `dateStr`, in days. */
+export function daysInMonthOf(dateStr: string): number {
+  const d = new Date(dateStr);
+  return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+}
+
 /** Every month that has sales or production plan rows, oldest first. */
 export function getPlannedPeriods(): string[] {
   const months = new Set<string>();
@@ -864,28 +923,76 @@ export function explodeBOM(demandByProduct: Record<string, number>): Record<stri
   return requirements;
 }
 
+/** Nominal days in a month, used to turn monthly plan volumes into daily rates. */
+export const DAYS_PER_MONTH = 30;
+
+/**
+ * Extra cover held on top of pure lead-time demand, as a multiplier.
+ *
+ * 1.0 would buy exactly enough to survive one replenishment cycle with no
+ * margin, which leaves nothing for demand variability or a late supplier.
+ * 1.25 gives a quarter of a lead time in slack.
+ */
+export const SAFETY_SERVICE_FACTOR = 1.25;
+
+/** Lead time assumed when a material has none recorded, in days. */
+const FALLBACK_LEAD_TIME_DAYS = 30;
+
 /**
  * Target buffer stock for a material, in units.
  *
- * `safety_stock_months` is denominated in months of cover, so the only
- * self-consistent basis is how much the plan actually consumes in a month.
- * The previous formula multiplied a per-day `max_usage` rate by 4, which put
- * MT1's "1.5 month" buffer at 7,200 units against a 1,826,280/month
- * requirement - roughly six hours of production.
+ * Safety stock exists to cover demand during the replenishment lead time:
+ * once stock is committed, the exposure lasts exactly as long as it takes to
+ * get more, so lead time - not an arbitrary number of months - is what sets
+ * the buffer. A 12-day polybag and a 48-day nonwoven carry very different
+ * risk, and sizing both off `safety_stock_months` charged the same months of
+ * cover to each.
  *
  * A buffer is a stock level, not a flow, so it does not change with the
- * bucket size of the run: 1.5 months of cover is the same quantity whether
- * the MRP is bucketed weekly or monthly.
+ * bucket size of the run: the same quantity applies whether the MRP is
+ * bucketed weekly or monthly.
  *
  * Materials the plan never consumes (obsolete items, or ones with no active
  * BOM) fall back to the master-data usage rate so they still get a sane
  * target instead of zero.
  */
 export function getSafetyStockQty(material: Material, avgMonthlyRequirement: number): number {
-  const monthlyBasis = avgMonthlyRequirement > 0
-    ? avgMonthlyRequirement
-    : (material.max_usage || 500) * 30;
-  return material.safety_stock_months * monthlyBasis;
+  const dailyDemand = avgMonthlyRequirement > 0
+    ? avgMonthlyRequirement / DAYS_PER_MONTH
+    : (material.max_usage || 500);
+
+  // A planner who types a figure into `safety_stock_months` has made a
+  // deliberate call - a volatile item, a supplier on watch, a contractual
+  // minimum - and that beats the computed default.
+  if (hasSafetyStockOverride(material)) {
+    return material.safety_stock_months * dailyDemand * DAYS_PER_MONTH;
+  }
+
+  const leadDays = material.total_lead_time_days > 0
+    ? material.total_lead_time_days
+    : FALLBACK_LEAD_TIME_DAYS;
+  return dailyDemand * leadDays * SAFETY_SERVICE_FACTOR;
+}
+
+/**
+ * Whether this material's buffer is pinned by hand. Zero (the default) means
+ * "size it from lead time"; any positive value is an explicit months-of-cover
+ * instruction from a planner.
+ */
+export function hasSafetyStockOverride(material: Material): boolean {
+  return material.safety_stock_months > 0;
+}
+
+/**
+ * Months of cover the buffer represents, for display. Reads back the
+ * override when one is set, otherwise the lead-time-derived figure.
+ */
+export function getSafetyStockMonths(material: Material): number {
+  if (hasSafetyStockOverride(material)) return material.safety_stock_months;
+  const leadDays = material.total_lead_time_days > 0
+    ? material.total_lead_time_days
+    : FALLBACK_LEAD_TIME_DAYS;
+  return (leadDays * SAFETY_SERVICE_FACTOR) / DAYS_PER_MONTH;
 }
 
 /** Sums a plan table into `{ [productId]: qty }` for one month (YYYY-MM). */
@@ -1063,6 +1170,22 @@ export function getCurrentPeriods(startDateStr: string, horizon: number, grain: 
 // THE MRP CALCULATION ENGINE
 // ==========================================
 
+/**
+ * Index of the bucket containing `ms`, or -1 when it falls before the run
+ * starts. Buckets are contiguous, so the last one that has already begun is
+ * the one that contains the instant.
+ */
+function periodIndexForMs(
+  periods: Array<{ startMs: number }>,
+  ms: number
+): number {
+  if (periods.length === 0 || ms < periods[0].startMs) return -1;
+  for (let i = periods.length - 1; i >= 0; i--) {
+    if (ms >= periods[i].startMs) return i;
+  }
+  return -1;
+}
+
 export async function runMRP(
   startDate: string,
   horizon: number,
@@ -1123,30 +1246,46 @@ export async function runMRP(
     matStock[m.id] = snap ? snap.quantity : 0;
   });
 
+  // Period boundaries, precomputed so the netting pass and the lead-time
+  // offset both work off the same calendar.
+  const periods = periodStartDates.map(periodStart => {
+    const current = new Date(periodStart);
+    const end = grain === 'month'
+      ? new Date(current.getFullYear(), current.getMonth() + 1, 1)
+      : new Date(current.getTime() + 7 * MS_PER_DAY);
+    return {
+      start: periodStart,
+      startMs: current.getTime(),
+      end: toDateStr(end),
+      days: Math.round((end.getTime() - current.getTime()) / MS_PER_DAY)
+    };
+  });
+
+  // Planned order receipts and releases, indexed [materialId][periodIndex].
+  // A receipt is when stock must land; a release is when the order has to be
+  // placed to make that happen. They differ by the material's lead time.
+  const plannedReceipts: Record<string, number[]> = {};
+  const plannedReleases: Record<string, number[]> = {};
+  const pastDueReleases: Record<string, number> = {};
+  materials.forEach(m => {
+    plannedReceipts[m.id] = new Array(periods.length).fill(0);
+    plannedReleases[m.id] = new Array(periods.length).fill(0);
+    pastDueReleases[m.id] = 0;
+  });
+
   // Run MRP period-by-period
-  periodStartDates.forEach((periodStart, pIdx) => {
-    // Determine the boundary of the current period
-    let periodEndStr = '';
-    if (grain === 'month') {
-      const current = new Date(periodStart);
-      const nextMonth = new Date(current.getFullYear(), current.getMonth() + 1, 1);
-      const y = nextMonth.getFullYear();
-      const m = String(nextMonth.getMonth() + 1).padStart(2, '0');
-      periodEndStr = `${y}-${m}-01`;
-    } else {
-      const current = new Date(periodStart);
-      const nextWeek = new Date(current.getTime() + 7 * 24 * 60 * 60 * 1000);
-      const y = nextWeek.getFullYear();
-      const m = String(nextWeek.getMonth() + 1).padStart(2, '0');
-      const d = String(nextWeek.getDate()).padStart(2, '0');
-      periodEndStr = `${y}-${m}-${d}`;
-    }
+  periods.forEach((period, pIdx) => {
+    const periodStart = period.start;
+    const periodEndStr = period.end;
 
     // 1. Calculate Gross Requirements for this period. The MPS is held at
-    // month grain, so a weekly run takes a quarter of the month's volume.
+    // month grain, so a shorter bucket takes the share of the month its own
+    // length represents rather than a flat quarter.
     const plannedThisPeriod = plannedQtyByProductForMonth(prodPlan, periodStart.slice(0, 7));
     if (grain === 'week') {
-      Object.keys(plannedThisPeriod).forEach(id => { plannedThisPeriod[id] /= 4; });
+      const daysInMonth = daysInMonthOf(periodStart);
+      const share = period.days / daysInMonth;
+      Object.keys(plannedThisPeriod).forEach(id => { plannedThisPeriod[id] *= share; });
     }
 
     const grossReq: Record<string, number> = {};
@@ -1179,7 +1318,7 @@ export async function runMRP(
 
       const startingStock = matStock[m.id];
       const projectedAvailableBeforeSafety = startingStock + totalReceipts - req;
-      
+
       let netRequirements = 0;
       let plannedOrders = 0;
 
@@ -1192,6 +1331,22 @@ export async function runMRP(
       const projectedEndingStock = projectedAvailableBeforeSafety + plannedOrders;
       matStock[m.id] = projectedEndingStock; // updates rolling inventory
 
+      // The order has to land in this period, so it must be placed a lead
+      // time earlier. Anything whose release date falls before the run starts
+      // is already late - it is collected separately rather than silently
+      // pulled forward into period 0's release line.
+      if (plannedOrders > 0) {
+        plannedReceipts[m.id][pIdx] += plannedOrders;
+        const leadDays = m.total_lead_time_days > 0 ? m.total_lead_time_days : 30;
+        const releaseMs = period.startMs - leadDays * MS_PER_DAY;
+        const releaseIdx = periodIndexForMs(periods, releaseMs);
+        if (releaseIdx === -1) {
+          pastDueReleases[m.id] += plannedOrders;
+        } else {
+          plannedReleases[m.id][releaseIdx] += plannedOrders;
+        }
+      }
+
       mrpResults.push({
         id: `M_RES_${runId}_${m.id}_P${pIdx}`,
         run_id: runId,
@@ -1201,10 +1356,27 @@ export async function runMRP(
         projected_available: Math.round(projectedEndingStock),
         safety_stock: Math.round(safetyStockQty),
         net_requirements: Math.round(netRequirements),
-        planned_order_releases: Math.round(plannedOrders),
+        planned_order_releases: 0, // filled in by the lead-time offset pass below
+        planned_order_receipts: Math.round(plannedOrders),
         gross_requirements: Math.round(req),
         scheduled_receipts: Math.round(totalReceipts)
       });
+    });
+  });
+
+  // Lead-time offset pass: a receipt needed in period N is released in the
+  // period containing (N's start - lead time). Only now can the release line
+  // be filled, because it depends on requirements discovered later in the run.
+  const resultIndex = new Map<string, MRPResult>();
+  mrpResults.forEach(r => resultIndex.set(`${r.material_id}|${r.week_start_date}`, r));
+  materials.forEach(m => {
+    periods.forEach((period, pIdx) => {
+      const row = resultIndex.get(`${m.id}|${period.start}`);
+      if (!row) return;
+      row.planned_order_releases = Math.round(plannedReleases[m.id][pIdx]);
+      if (pIdx === 0 && pastDueReleases[m.id] > 0) {
+        row.past_due_releases = Math.round(pastDueReleases[m.id]);
+      }
     });
   });
 

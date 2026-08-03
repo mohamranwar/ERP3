@@ -4,7 +4,14 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { fetchTableData, getVMaterialMonthlyProjection, getSafetyStockQty } from '../supabaseClient';
+import {
+  fetchTableData,
+  getVMaterialMonthlyProjection,
+  getSafetyStockQty,
+  getSafetyStockMonths,
+  hasSafetyStockOverride,
+  SAFETY_SERVICE_FACTOR
+} from '../supabaseClient';
 import { Material, VMaterialMonthlyProjection, Supplier, MaterialCategory, MaterialAlternative } from '../types';
 import { Layers, ShieldAlert, Sparkles, TrendingUp, Info, RefreshCw, Calendar } from 'lucide-react';
 import DataStateWrapper from './DataStateWrapper';
@@ -243,9 +250,17 @@ export default function MaterialDrillDown({
               </div>
 
               <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-xs space-y-1">
-                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Safety Stock Buffer</span>
-                <h3 className="text-xl font-extrabold text-amber-700 font-mono">{activeMaterial.safety_stock_months} Months</h3>
-                <p className="text-[10px] text-gray-400">Equivalent to approx {Math.round(safetyStockUnits).toLocaleString()} units</p>
+                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Safety Stock Qty</span>
+                <h3 className="text-xl font-extrabold text-amber-700 font-mono">{Math.round(safetyStockUnits).toLocaleString()} units</h3>
+                {hasSafetyStockOverride(activeMaterial) ? (
+                  <p className="text-[10px] text-amber-600 font-mono">
+                    Manual override: {activeMaterial.safety_stock_months} months of cover
+                  </p>
+                ) : (
+                  <p className="text-[10px] text-gray-400 font-mono">
+                    {activeMaterial.total_lead_time_days}d lead x {SAFETY_SERVICE_FACTOR} service = {getSafetyStockMonths(activeMaterial).toFixed(1)} months of cover
+                  </p>
+                )}
               </div>
 
               <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-xs space-y-1">
