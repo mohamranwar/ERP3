@@ -14,10 +14,10 @@ import {
   MS_PER_DAY,
   toDateStr
 } from '../supabaseClient';
-import { Material, Supplier, PurchaseOrder, MRPResult } from '../types';
+import { Material, Supplier, PurchaseOrder, MRPResult, SubstitutionProposal } from '../types';
 import {
   Play, Calendar, ClipboardCheck, LayoutGrid, ListTodo, ShoppingBag,
-  ShieldAlert, CheckCircle2, Truck, Plus, X, Info, ChevronDown, ChevronRight
+  ShieldAlert, CheckCircle2, Truck, Plus, X, Info, ChevronDown, ChevronRight, Repeat
 } from 'lucide-react';
 
 /**
@@ -78,7 +78,11 @@ export default function MRPScreen({
   const [mrpRunId, setMrpRunId] = useState<string | null>(null);
 
   // Tab State
-  const [activeTab, setActiveTab] = useState<'grid' | 'orders' | 'po_board'>('grid');
+  const [activeTab, setActiveTab] = useState<'grid' | 'orders' | 'po_board' | 'subs'>('grid');
+
+  // Substitution proposals come back with the run rather than being stored, so
+  // they live alongside the run rather than in the results table.
+  const [substitutions, setSubstitutions] = useState<SubstitutionProposal[]>([]);
 
   // Filters
   const [filterController, setFilterController] = useState('');
@@ -140,7 +144,8 @@ export default function MRPScreen({
   const handleRunMRP = async () => {
     setLoading(true);
     try {
-      const { run_id } = await runMRP(startDate, horizon, grain);
+      const { run_id, substitutions: subs } = await runMRP(startDate, horizon, grain);
+      setSubstitutions(subs);
       setMrpRunId(run_id);
       await loadData(true);
       showToast(`MRP completed successfully! Run ID: ${run_id}`, 'success');
@@ -343,7 +348,8 @@ export default function MRPScreen({
       await saveRecord('purchase_orders', newPO);
       
       // Auto re-run MRP solver so grid is instantly rebuilt with the new scheduled receipts
-      await runMRP(startDate, horizon, grain);
+      const rerun = await runMRP(startDate, horizon, grain);
+      setSubstitutions(rerun.substitutions);
       await loadData();
 
       setPoModalData(null);
@@ -487,6 +493,18 @@ export default function MRPScreen({
           >
             <ShoppingBag className="w-3.5 h-3.5" />
             PO Board
+          </button>
+          <button
+            id="mrp_tab_subs"
+            onClick={() => setActiveTab('subs')}
+            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg border flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeTab === 'subs'
+                ? 'bg-blue-600 border-blue-600 text-white shadow-xs font-extrabold'
+                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <Repeat className="w-3.5 h-3.5" />
+            Substitutions ({substitutions.length})
           </button>
         </div>
 
@@ -888,6 +906,109 @@ export default function MRPScreen({
                   </tbody>
                 </table>
               </ScrollableTable>
+            </div>
+          )}
+
+          {/* 4. Substitution proposals */}
+          {activeTab === 'subs' && (
+            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+              {substitutions.length === 0 ? (
+                <div className="p-12 text-center text-slate-400">
+                  <Repeat className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                  <p className="text-xs max-w-md mx-auto leading-relaxed">
+                    No substitutions to propose. Either nothing is arriving late, or the
+                    materials that are have no approved alternate in their BOM slot.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/70">
+                    <p className="text-[11px] text-slate-500 leading-relaxed max-w-3xl">
+                      Where a material cannot arrive in time, these are the approved
+                      alternates from the same BOM slot whose lead time still can.
+                      Quantities are converted through both BOM lines. Substituting a
+                      component is a quality and commercial decision, so nothing here is
+                      applied to the plan automatically.
+                    </p>
+                  </div>
+                  <ScrollableTable>
+                    <table className="min-w-full divide-y divide-slate-200 text-left text-xs">
+                      <thead className="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        <tr>
+                          <th className="px-4 py-3 min-w-[240px]">Short Material</th>
+                          <th className="px-4 py-3 min-w-[240px]">Approved Alternate</th>
+                          <th className="px-4 py-3 text-right min-w-[110px]">Shortfall</th>
+                          <th className="px-4 py-3 text-right min-w-[130px]">Alternate Qty</th>
+                          <th className="px-4 py-3 text-right min-w-[120px]">Not Rescued</th>
+                          <th className="px-4 py-3 min-w-[150px]">Serves From</th>
+                          <th className="px-4 py-3 text-right min-w-[130px]">Cost / Unit</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {substitutions.map(sp => (
+                          <tr key={sp.id} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="px-4 py-3">
+                              <div className="font-bold text-slate-800">{sp.material_name}</div>
+                              <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                                lead {sp.primary_lead_time_days}d
+                              </div>
+                              <div className="text-[10px] text-slate-500 mt-1">
+                                <span className="font-semibold text-slate-600">{sp.product_name}</span>
+                                <span className="text-slate-400"> · {sp.slot_name}</span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="font-bold text-emerald-700">{sp.alternate_material_name}</div>
+                              <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                                lead {sp.alternate_lead_time_days}d · {sp.alternate_on_hand.toLocaleString()} on hand
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono text-red-600 font-bold">
+                              {sp.shortfall_qty.toLocaleString()}
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono">
+                              <span className="font-bold text-emerald-700">{sp.alternate_qty.toLocaleString()}</span>
+                              <span className="block text-[9px] text-slate-400">
+                                covers {sp.coverable_qty.toLocaleString()}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono">
+                              {sp.uncoverable_qty > 0 ? (
+                                <span className="text-amber-700 font-bold">{sp.uncoverable_qty.toLocaleString()}</span>
+                              ) : (
+                                <span className="text-emerald-600 font-bold">All covered</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3">
+                              {sp.covers_from_period ? (
+                                <>
+                                  <span className="font-mono text-slate-700">{sp.covers_from_period}</span>
+                                  <span className="block text-[9px] text-slate-400 font-mono">
+                                    arrives {sp.earliest_arrival}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-[10px] font-bold text-red-600 uppercase tracking-wide">
+                                  Too late as well
+                                </span>
+                              )}
+                            </td>
+                            <td className={`px-4 py-3 text-right font-mono font-bold ${
+                              sp.unit_cost_delta <= 0 ? 'text-emerald-700' : 'text-amber-700'
+                            }`}>
+                              {sp.unit_cost_delta <= 0 ? '' : '+'}
+                              {sp.unit_cost_delta.toFixed(3)}
+                              <span className="block text-[9px] text-slate-400 font-sans font-normal">
+                                {sp.unit_cost_delta <= 0 ? 'cheaper' : 'dearer'} per unit
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </ScrollableTable>
+                </>
+              )}
             </div>
           )}
 

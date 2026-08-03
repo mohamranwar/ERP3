@@ -5,12 +5,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import {
-  Supplier, Channel, Machine, ProductCategory, ProductGroup, Product,
-  MaterialCategory, Material, MaterialAlternative, BOMHeader, BOMSlot, BOMOption,
-  SalesPlan, ProductionPlan, SalesActual, ProductionActual, InventorySnapshot,
-  PurchaseOrder, Shipment, MRPResult, VMaterialCoverage, VProductCoverage,
-  VFGPSIAnalysis, VBOMCostDetail, VFGCost, VMaterialWeightedAvgCost,
-  VMaterialEffectiveCost, VMaterialMonthlyProjection, VPlanVsActual, AppUser
+  Supplier, Channel, Machine, ProductCategory, ProductGroup, Product, MaterialCategory, Material, MaterialAlternative, BOMHeader, BOMSlot, BOMOption, SalesPlan, ProductionPlan, SalesActual, ProductionActual, InventorySnapshot, PurchaseOrder, Shipment, MRPResult, VMaterialCoverage, VProductCoverage, VFGPSIAnalysis, VBOMCostDetail, VFGCost, VMaterialWeightedAvgCost, VMaterialEffectiveCost, VMaterialMonthlyProjection, VPlanVsActual, AppUser, SubstitutionProposal
 } from './types';
 
 // Let's load credentials from localStorage first, fallback to env vars if present
@@ -950,6 +945,39 @@ function getPrimaryBomConsumption(): Record<string, Record<string, number>> {
 }
 
 /**
+ * Primary consumption split by the BOM slot that drives it.
+ *
+ * A material can sit in more than one slot - MT2 is the top sheet for both
+ * product families - and each slot converts to its alternate at its own ratio.
+ * Attributing the shortfall by slot keeps a substitution proposal honest:
+ * without it, two slots each claim the whole gap and the numbers double.
+ */
+export function primaryConsumptionBySlot(
+  demandByProduct: Record<string, number>
+): Record<string, Record<string, number>> {
+  const bomHeaders = readLocalTable<BOMHeader>('bom_headers').filter(b => b.is_active);
+  const bomSlots = readLocalTable<BOMSlot>('bom_slots');
+  const bomOptions = readLocalTable<BOMOption>('bom_options');
+
+  const out: Record<string, Record<string, number>> = {};
+  Object.entries(demandByProduct).forEach(([productId, qty]) => {
+    if (!qty) return;
+    const bom = bomHeaders.find(b => b.product_id === productId);
+    if (!bom) return;
+    bomSlots
+      .filter(sl => sl.bom_id === bom.id)
+      .forEach(slot => {
+        const opt = bomOptions.find(o => o.slot_id === slot.id && o.priority === 1);
+        if (!opt) return;
+        const used = qty * opt.qty_per_unit * (1 + opt.scrap_percent / 100);
+        out[opt.material_id] = out[opt.material_id] || {};
+        out[opt.material_id][slot.id] = (out[opt.material_id][slot.id] || 0) + used;
+      });
+  });
+  return out;
+}
+
+/**
  * Explodes a per-product demand map into gross material requirements.
  * Callers decide what the demand represents - a sales forecast, a month of
  * the MPS, a single week of it - and the explosion rules stay identical.
@@ -1233,11 +1261,65 @@ function periodIndexForMs(
   return -1;
 }
 
+/**
+ * Approved substitutes for a material, taken from the BOM itself.
+ *
+ * A slot lists its options in priority order: priority 1 is what the plan
+ * consumes, anything above it is a qualified alternative someone has already
+ * approved for that position. Because each option carries its own
+ * qty_per_unit and scrap, the exchange is rarely one-for-one - MT2 at 1.2 with
+ * 5% scrap and MT6 at 1.25 with 4% are different quantities of a different
+ * material doing the same job.
+ */
+export function getBomAlternates(materialId: string): Array<{
+  slot_id: string;
+  slot_name: string;
+  product_id: string;
+  alternate_material_id: string;
+  /** Alternate units needed per one unit of the primary it replaces. */
+  conversion: number;
+  primary_per_unit: number;
+  alternate_per_unit: number;
+}> {
+  const slots = readLocalTable<BOMSlot>('bom_slots');
+  const options = readLocalTable<BOMOption>('bom_options');
+  const headers = readLocalTable<BOMHeader>('bom_headers');
+  const out: ReturnType<typeof getBomAlternates> = [];
+
+  const perUnit = (o: BOMOption) => o.qty_per_unit * (1 + o.scrap_percent / 100);
+
+  slots.forEach(slot => {
+    const inSlot = options.filter(o => o.slot_id === slot.id);
+    const primary = inSlot.find(o => o.priority === 1);
+    if (!primary || primary.material_id !== materialId) return;
+
+    inSlot
+      .filter(o => o.priority > 1)
+      .sort((a, b) => a.priority - b.priority)
+      .forEach(alt => {
+        const p = perUnit(primary);
+        const a = perUnit(alt);
+        if (p <= 0) return;
+        out.push({
+          slot_id: slot.id,
+          slot_name: slot.slot_name,
+          product_id: headers.find(h => h.id === slot.bom_id)?.product_id ?? '',
+          alternate_material_id: alt.material_id,
+          conversion: a / p,
+          primary_per_unit: p,
+          alternate_per_unit: a,
+        });
+      });
+  });
+
+  return out;
+}
+
 export async function runMRP(
   startDate: string,
   horizon: number,
   grain: 'week' | 'month' = 'week'
-): Promise<{ run_id: string; results: MRPResult[] }> {
+): Promise<{ run_id: string; results: MRPResult[]; substitutions: SubstitutionProposal[] }> {
   if (isSupabaseConnected() && supabase) {
     try {
       // In Supabase, the RPC name is 'run_mrp'
@@ -1251,7 +1333,9 @@ export async function runMRP(
         const runId = typeof data === 'object' ? (data as any).run_id || data : String(data);
         const { data: resData, error: resError } = await supabase.from('mrp_results').select('*').eq('run_id', runId);
         if (!resError && resData) {
-          return { run_id: runId, results: resData as MRPResult[] };
+          // Substitution proposals are a local-planning aid; the SQL path has
+          // no equivalent view, so it returns none rather than inventing them.
+          return { run_id: runId, results: resData as MRPResult[], substitutions: [] };
         }
       }
     } catch (e) {
@@ -1286,11 +1370,15 @@ export async function runMRP(
 
   const mrpResults: MRPResult[] = [];
 
-  // Track stock for each material
+  // Track stock for each material. matStock is mutated as the run walks
+  // forward, so the opening position is kept separately - a substitution
+  // proposal needs to know what the alternate actually has on hand today.
   const matStock: Record<string, number> = {};
+  const matStockOpening: Record<string, number> = {};
   materials.forEach(m => {
     const snap = inventory.find(i => i.item_type === 'material' && i.item_id === m.id);
     matStock[m.id] = snap ? snap.quantity : 0;
+    matStockOpening[m.id] = matStock[m.id];
   });
 
   // Period boundaries, precomputed so the netting pass and the lead-time
@@ -1314,10 +1402,14 @@ export async function runMRP(
   const plannedReceipts: Record<string, number[]> = {};
   const plannedReleases: Record<string, number[]> = {};
   const pastDueReleases: Record<string, number> = {};
+  // Kept per bucket as well as in total: whether a substitute can rescue a
+  // shortfall depends on *when* the stock was needed, not just how much.
+  const pastDueByPeriod: Record<string, number[]> = {};
   materials.forEach(m => {
     plannedReceipts[m.id] = new Array(periods.length).fill(0);
     plannedReleases[m.id] = new Array(periods.length).fill(0);
     pastDueReleases[m.id] = 0;
+    pastDueByPeriod[m.id] = new Array(periods.length).fill(0);
   });
 
   // Run MRP period-by-period
@@ -1389,6 +1481,7 @@ export async function runMRP(
         const releaseIdx = periodIndexForMs(periods, releaseMs);
         if (releaseIdx === -1) {
           pastDueReleases[m.id] += plannedOrders;
+          pastDueByPeriod[m.id][pIdx] += plannedOrders;
         } else {
           plannedReleases[m.id][releaseIdx] += plannedOrders;
         }
@@ -1432,5 +1525,109 @@ export async function runMRP(
   const combined = [...mrpResults, ...currentResults];
   writeLocalTable<MRPResult>('mrp_results', combined);
 
-  return { run_id: runId, results: mrpResults };
+  // Slot attribution is measured over the same months the run covers, so a
+  // shortfall is divided the way the plan actually consumes the material.
+  const slotConsumption: Record<string, Record<string, number>> = {};
+  monthsInRun.forEach(month => {
+    Object.entries(primaryConsumptionBySlot(plannedQtyByProductForMonth(prodPlan, month)))
+      .forEach(([matId, bySlot]) => {
+        slotConsumption[matId] = slotConsumption[matId] || {};
+        Object.entries(bySlot).forEach(([slotId, qty]) => {
+          slotConsumption[matId][slotId] = (slotConsumption[matId][slotId] || 0) + qty;
+        });
+      });
+  });
+
+  const substitutions = buildSubstitutionProposals(
+    materials, periods, pastDueByPeriod, matStockOpening,
+    new Date(periodStartDates[0]).getTime(), slotConsumption
+  );
+
+  return { run_id: runId, results: mrpResults, substitutions };
+}
+
+/**
+ * Turns un-orderable shortfalls into substitution proposals.
+ *
+ * A primary is past due when its own lead time has already run out. The
+ * question this answers is narrower and more useful: is there an approved
+ * alternate whose lead time has *not* run out, and how much of the gap can it
+ * actually close? An alternate that is also too slow is reported rather than
+ * hidden, because "nothing can fix this" is itself the answer a planner needs.
+ */
+function buildSubstitutionProposals(
+  materials: Material[],
+  periods: Array<{ start: string; startMs: number }>,
+  pastDueByPeriod: Record<string, number[]>,
+  openingStock: Record<string, number>,
+  runStartMs: number,
+  slotConsumption: Record<string, Record<string, number>>
+): SubstitutionProposal[] {
+  const byId = new Map(materials.map(m => [m.id, m]));
+  const products = readLocalTable<Product>('products');
+  const proposals: SubstitutionProposal[] = [];
+
+  materials.forEach(primary => {
+    const buckets = pastDueByPeriod[primary.id] || [];
+    const totalShortfall = buckets.reduce((sum, q) => sum + q, 0);
+    if (totalShortfall <= 0) return;
+
+    const bySlot = slotConsumption[primary.id] || {};
+    const totalConsumed = Object.values(bySlot).reduce((sum, q) => sum + q, 0);
+
+    getBomAlternates(primary.id).forEach(alt => {
+      const altMat = byId.get(alt.alternate_material_id);
+      if (!altMat || altMat.status === 'obsolete') return;
+
+      // This slot's share of the material's consumption is the share of the
+      // shortfall it is answerable for. With one slot the share is 1.
+      const share = totalConsumed > 0
+        ? (bySlot[alt.slot_id] || 0) / totalConsumed
+        : 1 / Math.max(1, getBomAlternates(primary.id).length);
+      const shortfall = totalShortfall * share;
+      if (shortfall <= 0) return;
+
+      const altLead = altMat.total_lead_time_days > 0 ? altMat.total_lead_time_days : 30;
+      const arrivalMs = runStartMs + altLead * MS_PER_DAY;
+
+      // Only the buckets that begin on or after the alternate could land are
+      // rescuable; the rest are past saving by any route.
+      let coverable = 0;
+      let coversFrom: string | null = null;
+      buckets.forEach((qty, i) => {
+        if (qty <= 0) return;
+        if (periods[i].startMs >= arrivalMs) {
+          coverable += qty * share;
+          if (coversFrom === null) coversFrom = periods[i].start;
+        }
+      });
+
+      proposals.push({
+        id: `SUB_${primary.id}_${alt.alternate_material_id}_${alt.slot_id}`,
+        material_id: primary.id,
+        material_name: primary.name,
+        alternate_material_id: altMat.id,
+        alternate_material_name: altMat.name,
+        slot_id: alt.slot_id,
+        slot_name: alt.slot_name,
+        product_id: alt.product_id,
+        product_name: products.find(pr => pr.id === alt.product_id)?.name ?? alt.product_id,
+        shortfall_qty: Math.round(shortfall),
+        coverable_qty: Math.round(coverable),
+        alternate_qty: Math.round(coverable * alt.conversion),
+        uncoverable_qty: Math.round(shortfall - coverable),
+        primary_lead_time_days: primary.total_lead_time_days,
+        alternate_lead_time_days: altLead,
+        earliest_arrival: toDateStr(new Date(arrivalMs)),
+        covers_from_period: coversFrom,
+        alternate_on_hand: Math.round(openingStock[altMat.id] || 0),
+        unit_cost_delta:
+          alt.alternate_per_unit * altMat.standard_cost -
+          alt.primary_per_unit * primary.standard_cost,
+      });
+    });
+  });
+
+  // Most useful first: the ones that rescue the most.
+  return proposals.sort((a, b) => b.coverable_qty - a.coverable_qty);
 }

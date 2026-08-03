@@ -331,3 +331,42 @@ export interface VPlanVsActual {
   /** null when there is no plan to measure against (0 planned units). */
   achievement_percent: number | null;
 }
+
+/**
+ * A proposal to cover a shortfall with an approved BOM alternate.
+ *
+ * Raised when a primary material cannot arrive in time and the same BOM slot
+ * carries a lower-priority option whose lead time can. It is a suggestion for
+ * a planner, never an automatic plan change - substituting a component is a
+ * quality and commercial decision, not an arithmetic one.
+ */
+export interface SubstitutionProposal {
+  id: string;
+  material_id: string;
+  material_name: string;
+  alternate_material_id: string;
+  alternate_material_name: string;
+  slot_id: string;
+  slot_name: string;
+  /** Which product's BOM this slot belongs to - slot names repeat across products. */
+  product_id: string;
+  product_name: string;
+  /** Units of the primary that cannot arrive on time. */
+  shortfall_qty: number;
+  /** The share of that shortfall the alternate's lead time can actually cover. */
+  coverable_qty: number;
+  /** Equivalent quantity of the alternate, converted through both BOM lines. */
+  alternate_qty: number;
+  /** Units the alternate cannot rescue either, because even its lead time is too long. */
+  uncoverable_qty: number;
+  primary_lead_time_days: number;
+  alternate_lead_time_days: number;
+  /** Earliest date the alternate could land if ordered on the run start date. */
+  earliest_arrival: string;
+  /** First planning bucket the alternate can serve, or null if it can serve none. */
+  covers_from_period: string | null;
+  /** Alternate stock already on hand, which may cover part of it with no order at all. */
+  alternate_on_hand: number;
+  /** Cost of the alternate for one product unit, less the primary's. Negative is cheaper. */
+  unit_cost_delta: number;
+}
