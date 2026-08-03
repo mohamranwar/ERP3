@@ -355,7 +355,7 @@ export default function MasterDataScreen({
       />
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-200 overflow-x-auto gap-2 scrollbar-none font-sans" id="master_data_tabs_container">
+      <div className="flex border-b border-slate-200 overflow-x-auto gap-2 scrollbar-none font-sans" id="master_data_tabs_container">
         {(['materials', 'products', 'suppliers', 'machines', 'channels'] as TabType[]).map(tab => (
           <button
             key={tab}
@@ -364,7 +364,7 @@ export default function MasterDataScreen({
             className={`px-4 py-2 text-xs font-semibold uppercase tracking-wider border-b-2 whitespace-nowrap transition-all focus:outline-hidden cursor-pointer ${
               activeTab === tab 
                 ? 'border-blue-600 text-blue-600 font-bold bg-blue-50/20' 
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
             {tab}
@@ -373,7 +373,7 @@ export default function MasterDataScreen({
       </div>
 
       {/* Filters bar */}
-      <div className="flex flex-wrap items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200 font-sans">
+      <div className="flex flex-wrap items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200 font-sans">
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
@@ -387,7 +387,7 @@ export default function MasterDataScreen({
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-lg focus:outline-hidden font-semibold text-gray-600 cursor-pointer"
+              className="px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-hidden font-semibold text-slate-600 cursor-pointer"
             >
               <option value="">All Categories</option>
               {prodCats.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -395,7 +395,7 @@ export default function MasterDataScreen({
             <select
               value={filterGroup}
               onChange={(e) => setFilterGroup(e.target.value)}
-              className="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-lg focus:outline-hidden font-semibold text-gray-600 cursor-pointer"
+              className="px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-hidden font-semibold text-slate-600 cursor-pointer"
             >
               <option value="">All Brands/Groups</option>
               {prodGroups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
@@ -407,7 +407,7 @@ export default function MasterDataScreen({
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-lg focus:outline-hidden font-semibold text-gray-600 cursor-pointer"
+            className="px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-hidden font-semibold text-slate-600 cursor-pointer"
           >
             <option value="">All Material Categories</option>
             {matCats.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -418,7 +418,7 @@ export default function MasterDataScreen({
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-lg focus:outline-hidden font-semibold text-gray-600 cursor-pointer"
+            className="px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-hidden font-semibold text-slate-600 cursor-pointer"
           >
             <option value="">All Statuses</option>
             <option value="running">Running</option>
@@ -428,7 +428,7 @@ export default function MasterDataScreen({
 
         <button 
           onClick={loadData}
-          className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors cursor-pointer"
+          className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors cursor-pointer"
           title="Reload Master Tables"
         >
           <RefreshCw className="w-4 h-4" />
@@ -440,13 +440,13 @@ export default function MasterDataScreen({
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs font-sans">
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs font-sans">
           {/* Dense, Professional Tables */}
           {activeTab === 'materials' && (
             <div className="overflow-x-auto">
               <ScrollableTable>
-                <table className="min-w-full divide-y divide-gray-200 text-left">
-                  <thead className="bg-gray-50 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                <table className="min-w-full divide-y divide-slate-200 text-left">
+                  <thead className="bg-slate-50 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
                     <tr>
                       <th className="px-4 py-3">SKU</th>
                       <th className="px-4 py-3">Material Name</th>
@@ -461,27 +461,27 @@ export default function MasterDataScreen({
                       <th className="px-4 py-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 text-xs text-gray-900">
+                  <tbody className="divide-y divide-slate-200 text-xs text-slate-900">
                     {filteredMaterials.map(m => {
                       const catName = matCats.find(c => c.id === m.category_id)?.name || 'Unknown';
                       return (
-                        <tr key={m.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-4 py-2.5 font-mono text-gray-600 font-medium">{m.sku}</td>
+                        <tr key={m.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="px-4 py-2.5 font-mono text-slate-600 font-medium">{m.sku}</td>
                           <td className="px-4 py-2.5 font-medium">{m.name}</td>
-                          <td className="px-4 py-2.5 text-gray-500 truncate max-w-[120px]">{catName}</td>
-                          <td className="px-4 py-2.5 font-mono text-gray-400">
+                          <td className="px-4 py-2.5 text-slate-500 truncate max-w-[120px]">{catName}</td>
+                          <td className="px-4 py-2.5 font-mono text-slate-400">
                             {m.supplier_lead_time_days}d + {m.transit_days}d + {m.customs_clearance_days}d
                           </td>
                           <td className="px-4 py-2.5 text-right font-semibold font-mono">{m.total_lead_time_days}d</td>
                           <td className="px-4 py-2.5 text-right font-mono">
                             {m.safety_stock_months > 0
                               ? m.safety_stock_months
-                              : <span className="text-gray-400 text-[10px] font-sans">auto</span>}
+                              : <span className="text-slate-400 text-[10px] font-sans">auto</span>}
                           </td>
                           <td className="px-4 py-2.5 text-right font-mono">{m.moq.toLocaleString()}</td>
                           <td className="px-4 py-2.5 text-right font-mono font-semibold">${m.standard_cost.toFixed(3)}</td>
                           <td className="px-4 py-2.5">
-                            <span className={`px-1.5 py-0.5 rounded-[4px] text-[10px] font-semibold ${m.cost_basis === 'weighted_avg' ? 'bg-indigo-50 text-indigo-600' : 'bg-gray-50 text-gray-600'}`}>
+                            <span className={`px-1.5 py-0.5 rounded-[4px] text-[10px] font-semibold ${m.cost_basis === 'weighted_avg' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-50 text-slate-600'}`}>
                               {m.cost_basis}
                             </span>
                           </td>
@@ -491,10 +491,10 @@ export default function MasterDataScreen({
                             </span>
                           </td>
                           <td className="px-4 py-2.5 text-right flex justify-end gap-1.5">
-                            <button onClick={() => handleEdit(m)} className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-sm cursor-pointer">
+                            <button onClick={() => handleEdit(m)} className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-sm cursor-pointer">
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
-                            <button onClick={() => handleDelete(m.id)} className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-sm cursor-pointer">
+                            <button onClick={() => handleDelete(m.id)} className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-sm cursor-pointer">
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </td>
@@ -503,7 +503,7 @@ export default function MasterDataScreen({
                     })}
                     {filteredMaterials.length === 0 && (
                       <tr>
-                        <td colSpan={11} className="px-4 py-8 text-center text-gray-400">No materials match criteria.</td>
+                        <td colSpan={11} className="px-4 py-8 text-center text-slate-400">No materials match criteria.</td>
                       </tr>
                     )}
                   </tbody>
@@ -515,8 +515,8 @@ export default function MasterDataScreen({
           {activeTab === 'products' && (
             <div className="overflow-x-auto">
               <ScrollableTable>
-                <table className="min-w-full divide-y divide-gray-200 text-left">
-                  <thead className="bg-gray-50 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                <table className="min-w-full divide-y divide-slate-200 text-left">
+                  <thead className="bg-slate-50 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
                     <tr>
                       <th className="px-4 py-3">SKU</th>
                       <th className="px-4 py-3">Description</th>
@@ -530,20 +530,20 @@ export default function MasterDataScreen({
                       <th className="px-4 py-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 text-xs text-gray-900">
+                  <tbody className="divide-y divide-slate-200 text-xs text-slate-900">
                     {filteredProducts.map(p => {
                       const grpName = prodGroups.find(g => g.id === p.group_id)?.name || 'Unknown';
                       return (
-                        <tr key={p.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-4 py-2.5 font-mono text-gray-600 font-medium">{p.sku}</td>
+                        <tr key={p.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="px-4 py-2.5 font-mono text-slate-600 font-medium">{p.sku}</td>
                           <td className="px-4 py-2.5 font-medium">{p.name}</td>
-                          <td className="px-4 py-2.5 text-gray-500">{grpName}</td>
+                          <td className="px-4 py-2.5 text-slate-500">{grpName}</td>
                           <td className="px-4 py-2.5">
-                            <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-[10px] font-mono font-medium text-gray-700">
+                            <span className="px-2 py-0.5 bg-slate-100 rounded-sm text-[10px] font-mono font-medium text-slate-700">
                               {p.product_line}
                             </span>
                           </td>
-                          <td className="px-4 py-2.5 text-gray-500">{p.pack_type} / {p.size}</td>
+                          <td className="px-4 py-2.5 text-slate-500">{p.pack_type} / {p.size}</td>
                           <td className="px-4 py-2.5 text-right font-mono font-semibold text-emerald-600">${p.selling_price.toFixed(2)}</td>
                           <td className="px-4 py-2.5 text-right font-mono">${p.standard_cost.toFixed(2)}</td>
                           <td className="px-4 py-2.5 text-right font-mono">{p.pcs_per_bag} pcs ({p.bags_per_carton} bags)</td>
@@ -553,10 +553,10 @@ export default function MasterDataScreen({
                             </span>
                           </td>
                           <td className="px-4 py-2.5 text-right flex justify-end gap-1.5">
-                            <button onClick={() => handleEdit(p)} className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-sm cursor-pointer">
+                            <button onClick={() => handleEdit(p)} className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-sm cursor-pointer">
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
-                            <button onClick={() => handleDelete(p.id)} className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-sm cursor-pointer">
+                            <button onClick={() => handleDelete(p.id)} className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-sm cursor-pointer">
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </td>
@@ -565,7 +565,7 @@ export default function MasterDataScreen({
                     })}
                     {filteredProducts.length === 0 && (
                       <tr>
-                        <td colSpan={10} className="px-4 py-8 text-center text-gray-400">No products match criteria.</td>
+                        <td colSpan={10} className="px-4 py-8 text-center text-slate-400">No products match criteria.</td>
                       </tr>
                     )}
                   </tbody>
@@ -578,8 +578,8 @@ export default function MasterDataScreen({
           {['suppliers', 'machines', 'channels'].includes(activeTab) && (
             <div className="overflow-x-auto">
               <ScrollableTable>
-                <table className="min-w-full divide-y divide-gray-200 text-left">
-                  <thead className="bg-gray-50 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                <table className="min-w-full divide-y divide-slate-200 text-left">
+                  <thead className="bg-slate-50 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
                     <tr>
                       <th className="px-4 py-3">ID</th>
                       <th className="px-4 py-3">Name / Description</th>
@@ -593,13 +593,13 @@ export default function MasterDataScreen({
                       <th className="px-4 py-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 text-xs text-gray-900">
+                  <tbody className="divide-y divide-slate-200 text-xs text-slate-900">
                     {(activeTab === 'suppliers' ? filteredSuppliers : activeTab === 'machines' ? filteredMachines : filteredChannels).map((item: any) => (
-                      <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-3 font-mono text-gray-500">{item.id}</td>
+                      <tr key={item.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-4 py-3 font-mono text-slate-500">{item.id}</td>
                         <td className="px-4 py-3">
                           <p className="font-semibold">{item.name}</p>
-                          {item.description && <p className="text-[11px] text-gray-400 font-sans">{item.description}</p>}
+                          {item.description && <p className="text-[11px] text-slate-400 font-sans">{item.description}</p>}
                         </td>
                         {activeTab === 'suppliers' && (
                           <>
@@ -609,10 +609,10 @@ export default function MasterDataScreen({
                           </>
                         )}
                         <td className="px-4 py-3 text-right flex justify-end gap-1.5">
-                          <button onClick={() => handleEdit(item)} className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-sm cursor-pointer">
+                          <button onClick={() => handleEdit(item)} className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-sm cursor-pointer">
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
-                          <button onClick={() => handleDelete(item.id)} className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-sm cursor-pointer">
+                          <button onClick={() => handleDelete(item.id)} className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-sm cursor-pointer">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </td>
@@ -620,7 +620,7 @@ export default function MasterDataScreen({
                     ))}
                     {(activeTab === 'suppliers' ? filteredSuppliers : activeTab === 'machines' ? filteredMachines : filteredChannels).length === 0 && (
                       <tr>
-                        <td colSpan={6} className="px-4 py-8 text-center text-gray-400">No records found.</td>
+                        <td colSpan={6} className="px-4 py-8 text-center text-slate-400">No records found.</td>
                       </tr>
                     )}
                   </tbody>
@@ -634,64 +634,64 @@ export default function MasterDataScreen({
       {/* Slide-over or modal editor for fields */}
       {showForm && editItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col border border-gray-100">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-slate-50">
-              <h3 className="text-sm font-semibold text-gray-900">{editItem.id ? 'Edit' : 'Create New'} {activeTab.slice(0, -1).toUpperCase()}</h3>
-              <button onClick={() => { setShowForm(false); setEditItem(null); }} className="text-gray-400 hover:text-gray-600 text-lg font-medium cursor-pointer">&times;</button>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col border border-slate-100">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <h3 className="text-sm font-semibold text-slate-900">{editItem.id ? 'Edit' : 'Create New'} {activeTab.slice(0, -1).toUpperCase()}</h3>
+              <button onClick={() => { setShowForm(false); setEditItem(null); }} className="text-slate-400 hover:text-slate-600 text-lg font-medium cursor-pointer">&times;</button>
             </div>
 
             <form onSubmit={handleSave} className="p-6 overflow-y-auto space-y-4 max-h-[75vh] text-xs">
               {activeTab === 'materials' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">SKU Code</label>
-                    <input type="text" value={editItem.sku} onChange={e => setEditItem({ ...editItem, sku: e.target.value })} required className="w-full p-2 border border-gray-300 rounded-lg" />
+                    <label className="block text-xs font-semibold text-slate-700">SKU Code</label>
+                    <input type="text" value={editItem.sku} onChange={e => setEditItem({ ...editItem, sku: e.target.value })} required className="w-full p-2 border border-slate-300 rounded-lg" />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Material Name</label>
-                    <input type="text" value={editItem.name} onChange={e => setEditItem({ ...editItem, name: e.target.value })} required className="w-full p-2 border border-gray-300 rounded-lg" />
+                    <label className="block text-xs font-semibold text-slate-700">Material Name</label>
+                    <input type="text" value={editItem.name} onChange={e => setEditItem({ ...editItem, name: e.target.value })} required className="w-full p-2 border border-slate-300 rounded-lg" />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Category</label>
-                    <select value={editItem.category_id} onChange={e => setEditItem({ ...editItem, category_id: e.target.value })} required className="w-full p-2 border border-gray-300 rounded-lg bg-white">
+                    <label className="block text-xs font-semibold text-slate-700">Category</label>
+                    <select value={editItem.category_id} onChange={e => setEditItem({ ...editItem, category_id: e.target.value })} required className="w-full p-2 border border-slate-300 rounded-lg bg-white">
                       {matCats.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Primary Supplier</label>
-                    <select value={editItem.supplier_id} onChange={e => handleSupplierChangeInMaterialForm(e.target.value)} required className="w-full p-2 border border-gray-300 rounded-lg bg-white">
+                    <label className="block text-xs font-semibold text-slate-700">Primary Supplier</label>
+                    <select value={editItem.supplier_id} onChange={e => handleSupplierChangeInMaterialForm(e.target.value)} required className="w-full p-2 border border-slate-300 rounded-lg bg-white">
                       {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </select>
                   </div>
 
                   {/* Three lead time legs */}
-                  <div className="md:col-span-2 p-4 bg-gray-50 border border-gray-200 rounded-xl space-y-3">
-                    <h4 className="text-xs font-bold text-gray-800 flex items-center gap-1"><Layers className="w-3.5 h-3.5" /> Replenishment Horizon (Lead-Time Legs)</h4>
-                    <p className="text-[11px] text-gray-500">Expose distinct components of supplier-to-factory transport. Overrides defaults from supplier profile.</p>
+                  <div className="md:col-span-2 p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                    <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1"><Layers className="w-3.5 h-3.5" /> Replenishment Horizon (Lead-Time Legs)</h4>
+                    <p className="text-[11px] text-slate-500">Expose distinct components of supplier-to-factory transport. Overrides defaults from supplier profile.</p>
                     <div className="grid grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-[11px] font-medium text-gray-600">Supplier Production (Days)</label>
-                        <input type="number" value={editItem.supplier_lead_time_days} onChange={e => setEditItem({ ...editItem, supplier_lead_time_days: Number(e.target.value) })} className="w-full p-1.5 text-xs border border-gray-300 rounded-md font-mono" />
+                        <label className="block text-[11px] font-medium text-slate-600">Supplier Production (Days)</label>
+                        <input type="number" value={editItem.supplier_lead_time_days} onChange={e => setEditItem({ ...editItem, supplier_lead_time_days: Number(e.target.value) })} className="w-full p-1.5 text-xs border border-slate-300 rounded-md font-mono" />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-medium text-gray-600">Freight Transit (Days)</label>
-                        <input type="number" value={editItem.transit_days} onChange={e => setEditItem({ ...editItem, transit_days: Number(e.target.value) })} className="w-full p-1.5 text-xs border border-gray-300 rounded-md font-mono" />
+                        <label className="block text-[11px] font-medium text-slate-600">Freight Transit (Days)</label>
+                        <input type="number" value={editItem.transit_days} onChange={e => setEditItem({ ...editItem, transit_days: Number(e.target.value) })} className="w-full p-1.5 text-xs border border-slate-300 rounded-md font-mono" />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-medium text-gray-600">Customs Clearance (Days)</label>
-                        <input type="number" value={editItem.customs_clearance_days} onChange={e => setEditItem({ ...editItem, customs_clearance_days: Number(e.target.value) })} className="w-full p-1.5 text-xs border border-gray-300 rounded-md font-mono" />
+                        <label className="block text-[11px] font-medium text-slate-600">Customs Clearance (Days)</label>
+                        <input type="number" value={editItem.customs_clearance_days} onChange={e => setEditItem({ ...editItem, customs_clearance_days: Number(e.target.value) })} className="w-full p-1.5 text-xs border border-slate-300 rounded-md font-mono" />
                       </div>
                     </div>
                     {/* Readonly summaries */}
-                    <div className="pt-2 flex items-center gap-6 border-t border-gray-200 text-xs font-semibold">
+                    <div className="pt-2 flex items-center gap-6 border-t border-slate-200 text-xs font-semibold">
                       <div>
-                        <span className="text-gray-500">Total Horizon Days: </span>
+                        <span className="text-slate-500">Total Horizon Days: </span>
                         <span className="font-mono text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-md">
                           {Number(editItem.supplier_lead_time_days || 0) + Number(editItem.transit_days || 0) + Number(editItem.customs_clearance_days || 0)} days
                         </span>
                       </div>
                       <div>
-                        <span className="text-gray-500">Est. Reorder Point: </span>
+                        <span className="text-slate-500">Est. Reorder Point: </span>
                         <span className="font-mono text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">
                           {Math.round((Number(editItem.supplier_lead_time_days || 0) + Number(editItem.transit_days || 0) + Number(editItem.customs_clearance_days || 0)) * 1.25)} days
                         </span>
@@ -700,31 +700,31 @@ export default function MasterDataScreen({
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Safety Stock Override (Months)</label>
-                    <input type="number" step="0.1" min="0" value={editItem.safety_stock_months} onChange={e => setEditItem({ ...editItem, safety_stock_months: Number(e.target.value) })} className="w-full p-2 border border-gray-300 rounded-lg" />
-                    <p className="text-[10px] text-gray-400">Leave at 0 to size the buffer from lead time. Any value above 0 pins it to that many months of cover.</p>
+                    <label className="block text-xs font-semibold text-slate-700">Safety Stock Override (Months)</label>
+                    <input type="number" step="0.1" min="0" value={editItem.safety_stock_months} onChange={e => setEditItem({ ...editItem, safety_stock_months: Number(e.target.value) })} className="w-full p-2 border border-slate-300 rounded-lg" />
+                    <p className="text-[10px] text-slate-400">Leave at 0 to size the buffer from lead time. Any value above 0 pins it to that many months of cover.</p>
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Minimum Order Qty (MOQ)</label>
-                    <input type="number" value={editItem.moq} onChange={e => setEditItem({ ...editItem, moq: Number(e.target.value) })} className="w-full p-2 border border-gray-300 rounded-lg" />
+                    <label className="block text-xs font-semibold text-slate-700">Minimum Order Qty (MOQ)</label>
+                    <input type="number" value={editItem.moq} onChange={e => setEditItem({ ...editItem, moq: Number(e.target.value) })} className="w-full p-2 border border-slate-300 rounded-lg" />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Max Daily Usage</label>
-                    <input type="number" value={editItem.max_usage} onChange={e => setEditItem({ ...editItem, max_usage: Number(e.target.value) })} className="w-full p-2 border border-gray-300 rounded-lg" />
+                    <label className="block text-xs font-semibold text-slate-700">Max Daily Usage</label>
+                    <input type="number" value={editItem.max_usage} onChange={e => setEditItem({ ...editItem, max_usage: Number(e.target.value) })} className="w-full p-2 border border-slate-300 rounded-lg" />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Material Controller</label>
-                    <input type="text" value={editItem.controller} onChange={e => setEditItem({ ...editItem, controller: e.target.value })} className="w-full p-2 border border-gray-300 rounded-lg" />
+                    <label className="block text-xs font-semibold text-slate-700">Material Controller</label>
+                    <input type="text" value={editItem.controller} onChange={e => setEditItem({ ...editItem, controller: e.target.value })} className="w-full p-2 border border-slate-300 rounded-lg" />
                   </div>
 
                   {/* Cost configs */}
-                  <div className="md:col-span-2 p-4 bg-gray-50 border border-gray-200 rounded-xl grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2 p-4 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label className="block text-xs font-semibold text-gray-700">Manual Standard Cost</label>
-                      <input type="number" step="0.001" value={editItem.standard_cost} onChange={e => setEditItem({ ...editItem, standard_cost: Number(e.target.value) })} className="w-full p-2 border border-gray-300 rounded-lg font-mono" />
+                      <label className="block text-xs font-semibold text-slate-700">Manual Standard Cost</label>
+                      <input type="number" step="0.001" value={editItem.standard_cost} onChange={e => setEditItem({ ...editItem, standard_cost: Number(e.target.value) })} className="w-full p-2 border border-slate-300 rounded-lg font-mono" />
                     </div>
                     <div className="space-y-1">
-                      <label className="block text-xs font-semibold text-gray-700">Costing Basis Toggle</label>
+                      <label className="block text-xs font-semibold text-slate-700">Costing Basis Toggle</label>
                       <div className="flex gap-2 pt-1">
                         {['standard', 'weighted_avg'].map(basis => (
                           <button
@@ -734,7 +734,7 @@ export default function MasterDataScreen({
                             className={`flex-1 py-1.5 text-xs font-semibold rounded-lg border uppercase tracking-wider cursor-pointer ${
                               editItem.cost_basis === basis 
                                 ? 'bg-blue-600 border-blue-600 text-white font-bold' 
-                                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold'
+                                : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold'
                             }`}
                           >
                             {basis === 'standard' ? 'Standard Cost' : 'Weighted Avg'}
@@ -742,14 +742,14 @@ export default function MasterDataScreen({
                         ))}
                       </div>
                     </div>
-                    <div className="md:col-span-2 text-xs text-gray-500 font-sans">
+                    <div className="md:col-span-2 text-xs text-slate-500 font-sans">
                       * Choose standard to use manual pricing, or weighted_avg to utilize the average from live PO invoices.
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Status</label>
-                    <select value={editItem.status} onChange={e => setEditItem({ ...editItem, status: e.target.value })} className="w-full p-2 border border-gray-300 rounded-lg bg-white">
+                    <label className="block text-xs font-semibold text-slate-700">Status</label>
+                    <select value={editItem.status} onChange={e => setEditItem({ ...editItem, status: e.target.value })} className="w-full p-2 border border-slate-300 rounded-lg bg-white">
                       <option value="running">Running</option>
                       <option value="obsolete">Obsolete</option>
                     </select>
@@ -760,58 +760,58 @@ export default function MasterDataScreen({
               {activeTab === 'products' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">SKU Code</label>
-                    <input type="text" value={editItem.sku} onChange={e => setEditItem({ ...editItem, sku: e.target.value })} required className="w-full p-2 border border-gray-300 rounded-lg" />
+                    <label className="block text-xs font-semibold text-slate-700">SKU Code</label>
+                    <input type="text" value={editItem.sku} onChange={e => setEditItem({ ...editItem, sku: e.target.value })} required className="w-full p-2 border border-slate-300 rounded-lg" />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Description</label>
-                    <input type="text" value={editItem.name} onChange={e => setEditItem({ ...editItem, name: e.target.value })} required className="w-full p-2 border border-gray-300 rounded-lg" />
+                    <label className="block text-xs font-semibold text-slate-700">Description</label>
+                    <input type="text" value={editItem.name} onChange={e => setEditItem({ ...editItem, name: e.target.value })} required className="w-full p-2 border border-slate-300 rounded-lg" />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Category</label>
-                    <select value={editItem.category_id} onChange={e => setEditItem({ ...editItem, category_id: e.target.value })} className="w-full p-2 border border-gray-300 rounded-lg bg-white">
+                    <label className="block text-xs font-semibold text-slate-700">Category</label>
+                    <select value={editItem.category_id} onChange={e => setEditItem({ ...editItem, category_id: e.target.value })} className="w-full p-2 border border-slate-300 rounded-lg bg-white">
                       {prodCats.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Brand Group</label>
-                    <select value={editItem.group_id} onChange={e => setEditItem({ ...editItem, group_id: e.target.value })} className="w-full p-2 border border-gray-300 rounded-lg bg-white">
+                    <label className="block text-xs font-semibold text-slate-700">Brand Group</label>
+                    <select value={editItem.group_id} onChange={e => setEditItem({ ...editItem, group_id: e.target.value })} className="w-full p-2 border border-slate-300 rounded-lg bg-white">
                       {prodGroups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Machine Line (PPS)</label>
-                    <select value={editItem.product_line} onChange={e => setEditItem({ ...editItem, product_line: e.target.value })} className="w-full p-2 border border-gray-300 rounded-lg bg-white">
+                    <label className="block text-xs font-semibold text-slate-700">Machine Line (PPS)</label>
+                    <select value={editItem.product_line} onChange={e => setEditItem({ ...editItem, product_line: e.target.value })} className="w-full p-2 border border-slate-300 rounded-lg bg-white">
                       {machines.map(m => <option key={m.id} value={m.name}>{m.name}</option>)}
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Pack Type</label>
-                    <input type="text" value={editItem.pack_type} onChange={e => setEditItem({ ...editItem, pack_type: e.target.value })} placeholder="Jumbo / Medium" className="w-full p-2 border border-gray-300 rounded-lg" />
+                    <label className="block text-xs font-semibold text-slate-700">Pack Type</label>
+                    <input type="text" value={editItem.pack_type} onChange={e => setEditItem({ ...editItem, pack_type: e.target.value })} placeholder="Jumbo / Medium" className="w-full p-2 border border-slate-300 rounded-lg" />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Size</label>
-                    <input type="text" value={editItem.size} onChange={e => setEditItem({ ...editItem, size: e.target.value })} placeholder="Size 4 / Normal" className="w-full p-2 border border-gray-300 rounded-lg" />
+                    <label className="block text-xs font-semibold text-slate-700">Size</label>
+                    <input type="text" value={editItem.size} onChange={e => setEditItem({ ...editItem, size: e.target.value })} placeholder="Size 4 / Normal" className="w-full p-2 border border-slate-300 rounded-lg" />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Selling Price ($)</label>
-                    <input type="number" step="0.01" value={editItem.selling_price} onChange={e => setEditItem({ ...editItem, selling_price: Number(e.target.value) })} className="w-full p-2 border border-gray-300 rounded-lg font-mono" />
+                    <label className="block text-xs font-semibold text-slate-700">Selling Price ($)</label>
+                    <input type="number" step="0.01" value={editItem.selling_price} onChange={e => setEditItem({ ...editItem, selling_price: Number(e.target.value) })} className="w-full p-2 border border-slate-300 rounded-lg font-mono" />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Standard Cost ($)</label>
-                    <input type="number" step="0.01" value={editItem.standard_cost} onChange={e => setEditItem({ ...editItem, standard_cost: Number(e.target.value) })} className="w-full p-2 border border-gray-300 rounded-lg font-mono" />
+                    <label className="block text-xs font-semibold text-slate-700">Standard Cost ($)</label>
+                    <input type="number" step="0.01" value={editItem.standard_cost} onChange={e => setEditItem({ ...editItem, standard_cost: Number(e.target.value) })} className="w-full p-2 border border-slate-300 rounded-lg font-mono" />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Pcs Per Bag</label>
-                    <input type="number" value={editItem.pcs_per_bag} onChange={e => setEditItem({ ...editItem, pcs_per_bag: Number(e.target.value) })} className="w-full p-2 border border-gray-300 rounded-lg font-mono" />
+                    <label className="block text-xs font-semibold text-slate-700">Pcs Per Bag</label>
+                    <input type="number" value={editItem.pcs_per_bag} onChange={e => setEditItem({ ...editItem, pcs_per_bag: Number(e.target.value) })} className="w-full p-2 border border-slate-300 rounded-lg font-mono" />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Bags Per Carton</label>
-                    <input type="number" value={editItem.bags_per_carton} onChange={e => setEditItem({ ...editItem, bags_per_carton: Number(e.target.value) })} className="w-full p-2 border border-gray-300 rounded-lg font-mono" />
+                    <label className="block text-xs font-semibold text-slate-700">Bags Per Carton</label>
+                    <input type="number" value={editItem.bags_per_carton} onChange={e => setEditItem({ ...editItem, bags_per_carton: Number(e.target.value) })} className="w-full p-2 border border-slate-300 rounded-lg font-mono" />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Status</label>
-                    <select value={editItem.status} onChange={e => setEditItem({ ...editItem, status: e.target.value })} className="w-full p-2 border border-gray-300 rounded-lg bg-white">
+                    <label className="block text-xs font-semibold text-slate-700">Status</label>
+                    <select value={editItem.status} onChange={e => setEditItem({ ...editItem, status: e.target.value })} className="w-full p-2 border border-slate-300 rounded-lg bg-white">
                       <option value="running">Running</option>
                       <option value="obsolete">Obsolete</option>
                     </select>
@@ -822,39 +822,39 @@ export default function MasterDataScreen({
               {['suppliers', 'machines', 'channels'].includes(activeTab) && (
                 <div className="space-y-4">
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-gray-700">Name</label>
-                    <input type="text" value={editItem.name} onChange={e => setEditItem({ ...editItem, name: e.target.value })} required className="w-full p-2 border border-gray-300 rounded-lg" />
+                    <label className="block text-xs font-semibold text-slate-700">Name</label>
+                    <input type="text" value={editItem.name} onChange={e => setEditItem({ ...editItem, name: e.target.value })} required className="w-full p-2 border border-slate-300 rounded-lg" />
                   </div>
                   {activeTab === 'machines' && (
                     <div className="space-y-1">
-                      <label className="block text-xs font-semibold text-gray-700">Description</label>
-                      <input type="text" value={editItem.description} onChange={e => setEditItem({ ...editItem, description: e.target.value })} className="w-full p-2 border border-gray-300 rounded-lg" />
+                      <label className="block text-xs font-semibold text-slate-700">Description</label>
+                      <input type="text" value={editItem.description} onChange={e => setEditItem({ ...editItem, description: e.target.value })} className="w-full p-2 border border-slate-300 rounded-lg" />
                     </div>
                   )}
                   {activeTab === 'suppliers' && (
                     <div className="grid grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-[11px] text-gray-600 font-medium">Default Lead Time</label>
-                        <input type="number" value={editItem.default_lead_time_days} onChange={e => setEditItem({ ...editItem, default_lead_time_days: Number(e.target.value) })} className="w-full p-2 border border-gray-300 rounded-lg" />
+                        <label className="block text-[11px] text-slate-600 font-medium">Default Lead Time</label>
+                        <input type="number" value={editItem.default_lead_time_days} onChange={e => setEditItem({ ...editItem, default_lead_time_days: Number(e.target.value) })} className="w-full p-2 border border-slate-300 rounded-lg" />
                       </div>
                       <div>
-                        <label className="block text-[11px] text-gray-600 font-medium">Default Transit</label>
-                        <input type="number" value={editItem.default_transit_days} onChange={e => setEditItem({ ...editItem, default_transit_days: Number(e.target.value) })} className="w-full p-2 border border-gray-300 rounded-lg" />
+                        <label className="block text-[11px] text-slate-600 font-medium">Default Transit</label>
+                        <input type="number" value={editItem.default_transit_days} onChange={e => setEditItem({ ...editItem, default_transit_days: Number(e.target.value) })} className="w-full p-2 border border-slate-300 rounded-lg" />
                       </div>
                       <div>
-                        <label className="block text-[11px] text-gray-600 font-medium">Default Customs</label>
-                        <input type="number" value={editItem.default_customs_clearance_days} onChange={e => setEditItem({ ...editItem, default_customs_clearance_days: Number(e.target.value) })} className="w-full p-2 border border-gray-300 rounded-lg" />
+                        <label className="block text-[11px] text-slate-600 font-medium">Default Customs</label>
+                        <input type="number" value={editItem.default_customs_clearance_days} onChange={e => setEditItem({ ...editItem, default_customs_clearance_days: Number(e.target.value) })} className="w-full p-2 border border-slate-300 rounded-lg" />
                       </div>
                     </div>
                   )}
                 </div>
               )}
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 bg-gray-50 px-6 py-4 -mx-6 -mb-6 rounded-b-xl">
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 bg-slate-50 px-6 py-4 -mx-6 -mb-6 rounded-b-xl">
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setEditItem(null); }}
-                  className="px-3.5 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+                  className="px-3.5 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer"
                 >
                   Cancel
                 </button>

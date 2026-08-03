@@ -407,7 +407,7 @@ export default function LogisticsScreen({
       />
 
       {/* Filter and Search rail */}
-      <div className="flex flex-wrap items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200 font-sans">
+      <div className="flex flex-wrap items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200 font-sans">
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
@@ -419,14 +419,14 @@ export default function LogisticsScreen({
         <select
           value={filterDelay}
           onChange={(e) => setFilterDelay(e.target.value)}
-          className="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-lg focus:outline-hidden cursor-pointer font-semibold text-gray-600"
+          className="px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-hidden cursor-pointer font-semibold text-slate-600"
         >
           <option value="all">All Shipments</option>
           <option value="late">Late Shipments (Delay &gt; 0)</option>
           <option value="pending_arrival">Factory Arrival Needed</option>
         </select>
 
-        <button onClick={loadData} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors cursor-pointer" title="Refresh">
+        <button onClick={loadData} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors cursor-pointer" title="Refresh">
           <RefreshCw className="w-4 h-4" />
         </button>
       </div>
@@ -436,11 +436,11 @@ export default function LogisticsScreen({
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs font-sans">
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs font-sans">
           <div className="overflow-x-auto">
             <ScrollableTable>
-              <table className="min-w-full divide-y divide-gray-200 text-left">
-                <thead className="bg-gray-50 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+              <table className="min-w-full divide-y divide-slate-200 text-left">
+                <thead className="bg-slate-50 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
                   <tr>
                     <th className="px-4 py-3">Invoice / BL</th>
                     <th className="px-4 py-3">Material</th>
@@ -454,7 +454,7 @@ export default function LogisticsScreen({
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 text-xs text-gray-900">
+                <tbody className="divide-y divide-slate-200 text-xs text-slate-900">
                   {filteredShipments.map(s => {
                     const mat = materials.find(m => m.id === s.material_id);
                     const sup = suppliers.find(su => su.id === s.supplier_id);
@@ -467,29 +467,29 @@ export default function LogisticsScreen({
                         key={s.id} 
                         className={`transition-colors ${
                           isLate ? 'bg-red-50/40 hover:bg-red-50/70' : 
-                          isArrivalNull ? 'bg-amber-50/40 hover:bg-amber-50/70' : 'hover:bg-gray-50'
+                          isArrivalNull ? 'bg-amber-50/40 hover:bg-amber-50/70' : 'hover:bg-slate-50'
                         }`}
                       >
                         <td className="px-4 py-3">
                           <p className="font-semibold">{s.invoice_no || 'No Invoice'}</p>
-                          <p className="text-[10px] text-gray-400 font-mono font-medium">BL: {s.bl_no}</p>
+                          <p className="text-[10px] text-slate-400 font-mono font-medium">BL: {s.bl_no}</p>
                         </td>
                         <td className="px-4 py-3">
                           <p className="font-semibold">{mat ? mat.name : 'Unknown'}</p>
-                          <p className="text-[10px] text-gray-400 font-mono">{mat ? mat.sku : ''}</p>
+                          <p className="text-[10px] text-slate-400 font-mono">{mat ? mat.sku : ''}</p>
                         </td>
-                        <td className="px-4 py-3 text-gray-500">{sup ? sup.name : 'Unknown'}</td>
+                        <td className="px-4 py-3 text-slate-500">{sup ? sup.name : 'Unknown'}</td>
                         <td className="px-4 py-3 text-right">
                           <p className="font-semibold font-mono">{s.qty.toLocaleString()}</p>
-                          <p className="text-[10px] text-gray-400 font-mono">{s.container_count} Containers</p>
+                          <p className="text-[10px] text-slate-400 font-mono">{s.container_count} Containers</p>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <div className="inline-flex items-center justify-center p-1 bg-gray-100 rounded-sm">
+                          <div className="inline-flex items-center justify-center p-1 bg-slate-100 rounded-sm">
                             {getMethodIcon(s.ship_method)}
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-gray-400 font-mono">{s.etd}</td>
-                        <td className="px-4 py-3 text-gray-500 font-mono">{s.port_eta} ({s.port_name})</td>
+                        <td className="px-4 py-3 text-slate-400 font-mono">{s.etd}</td>
+                        <td className="px-4 py-3 text-slate-500 font-mono">{s.port_eta} ({s.port_name})</td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1.5">
                             <input
@@ -497,7 +497,7 @@ export default function LogisticsScreen({
                               value={s.factory_arrival_date || ''}
                               onChange={(e) => handleUpdateArrivalDate(s, e.target.value)}
                               className={`px-1.5 py-0.5 border text-xs rounded-sm focus:outline-hidden font-mono cursor-pointer ${
-                                isArrivalNull ? 'border-amber-300 bg-amber-50 text-amber-900 font-semibold' : 'border-gray-200'
+                                isArrivalNull ? 'border-amber-300 bg-amber-50 text-amber-900 font-semibold' : 'border-slate-200'
                               }`}
                             />
                             {isArrivalNull && (
@@ -513,14 +513,14 @@ export default function LogisticsScreen({
                               +{s.delay} Days
                             </span>
                           ) : (
-                            <span className="text-gray-400 text-[11px] font-mono">0d</span>
+                            <span className="text-slate-400 text-[11px] font-mono">0d</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-right flex justify-end gap-1">
-                          <button onClick={() => handleEdit(s)} className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-sm cursor-pointer">
+                          <button onClick={() => handleEdit(s)} className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-sm cursor-pointer">
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
-                          <button onClick={() => handleDelete(s.id)} className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-sm cursor-pointer">
+                          <button onClick={() => handleDelete(s.id)} className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-sm cursor-pointer">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </td>
@@ -529,7 +529,7 @@ export default function LogisticsScreen({
                   })}
                   {filteredShipments.length === 0 && (
                     <tr>
-                      <td colSpan={10} className="px-4 py-8 text-center text-gray-400">
+                      <td colSpan={10} className="px-4 py-8 text-center text-slate-400">
                         No shipments matching the criteria.
                       </td>
                     </tr>
@@ -544,20 +544,20 @@ export default function LogisticsScreen({
       {/* Shipment Editor Modal */}
       {showForm && editShipment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-xl overflow-hidden flex flex-col border border-gray-100">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-slate-50">
-              <h3 className="text-sm font-semibold text-gray-900">{editShipment.id ? 'Edit' : 'Create'} Shipment</h3>
-              <button onClick={() => { setShowForm(false); setEditShipment(null); }} className="text-gray-400 hover:text-gray-600 text-lg font-medium cursor-pointer">&times;</button>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-xl overflow-hidden flex flex-col border border-slate-100">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <h3 className="text-sm font-semibold text-slate-900">{editShipment.id ? 'Edit' : 'Create'} Shipment</h3>
+              <button onClick={() => { setShowForm(false); setEditShipment(null); }} className="text-slate-400 hover:text-slate-600 text-lg font-medium cursor-pointer">&times;</button>
             </div>
 
             <form onSubmit={handleSave} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4 text-xs">
                 <div className="space-y-1 col-span-2">
-                  <label className="font-semibold text-gray-500 uppercase">Material ID</label>
+                  <label className="font-semibold text-slate-500 uppercase">Material ID</label>
                   <select
                     value={editShipment.material_id}
                     onChange={(e) => setEditShipment(prev => ({ ...prev!, material_id: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white"
                   >
                     {materials.map(m => (
                       <option key={m.id} value={m.id}>{m.sku} - {m.name}</option>
@@ -566,11 +566,11 @@ export default function LogisticsScreen({
                 </div>
 
                 <div className="space-y-1 col-span-2">
-                  <label className="font-semibold text-gray-500 uppercase">Supplier</label>
+                  <label className="font-semibold text-slate-500 uppercase">Supplier</label>
                   <select
                     value={editShipment.supplier_id}
                     onChange={(e) => handleSupplierChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white"
                   >
                     {suppliers.map(s => (
                       <option key={s.id} value={s.id}>{s.name} ({s.origin_country})</option>
@@ -579,51 +579,51 @@ export default function LogisticsScreen({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-gray-500 uppercase">Quantity (Units)</label>
+                  <label className="font-semibold text-slate-500 uppercase">Quantity (Units)</label>
                   <input
                     type="number"
                     value={editShipment.qty}
                     onChange={(e) => setEditShipment(prev => ({ ...prev!, qty: Number(e.target.value) }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-gray-500 uppercase">Container Count</label>
+                  <label className="font-semibold text-slate-500 uppercase">Container Count</label>
                   <input
                     type="number"
                     value={editShipment.container_count}
                     onChange={(e) => setEditShipment(prev => ({ ...prev!, container_count: Number(e.target.value) }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-gray-500 uppercase">Invoice Number</label>
+                  <label className="font-semibold text-slate-500 uppercase">Invoice Number</label>
                   <input
                     type="text"
                     value={editShipment.invoice_no}
                     onChange={(e) => setEditShipment(prev => ({ ...prev!, invoice_no: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-gray-500 uppercase">Bill of Lading (BL)</label>
+                  <label className="font-semibold text-slate-500 uppercase">Bill of Lading (BL)</label>
                   <input
                     type="text"
                     value={editShipment.bl_no}
                     onChange={(e) => setEditShipment(prev => ({ ...prev!, bl_no: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-gray-500 uppercase">Ship Method</label>
+                  <label className="font-semibold text-slate-500 uppercase">Ship Method</label>
                   <select
                     value={editShipment.ship_method}
                     onChange={(e) => setEditShipment(prev => ({ ...prev!, ship_method: e.target.value as any }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white"
                   >
                     <option value="sea">Sea Freight</option>
                     <option value="air">Air Cargo</option>
@@ -632,61 +632,61 @@ export default function LogisticsScreen({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-gray-500 uppercase">ETD Date</label>
+                  <label className="font-semibold text-slate-500 uppercase">ETD Date</label>
                   <input
                     type="date"
                     value={editShipment.etd}
                     onChange={(e) => handleEtdChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-gray-500 uppercase">Port ETA Date</label>
+                  <label className="font-semibold text-slate-500 uppercase">Port ETA Date</label>
                   <input
                     type="date"
                     value={editShipment.port_eta}
                     onChange={(e) => handlePortEtaChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-gray-500 uppercase">Destination Port Name</label>
+                  <label className="font-semibold text-slate-500 uppercase">Destination Port Name</label>
                   <input
                     type="text"
                     value={editShipment.port_name}
                     onChange={(e) => setEditShipment(prev => ({ ...prev!, port_name: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-gray-500 uppercase">Customs Clearance Days</label>
+                  <label className="font-semibold text-slate-500 uppercase">Customs Clearance Days</label>
                   <input
                     type="number"
                     value={editShipment.customs_clearance_days}
                     onChange={(e) => handleCustomsDaysChange(Number(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-gray-500 uppercase">Estimated Factory Arrival</label>
+                  <label className="font-semibold text-slate-500 uppercase">Estimated Factory Arrival</label>
                   <input
                     type="date"
                     value={editShipment.factory_arrival_date || ''}
                     onChange={(e) => setEditShipment(prev => ({ ...prev!, factory_arrival_date: e.target.value || null }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono"
                   />
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-gray-100 flex justify-end gap-2 text-xs">
+              <div className="pt-4 border-t border-slate-100 flex justify-end gap-2 text-xs">
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setEditShipment(null); }}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 cursor-pointer"
+                  className="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -705,22 +705,22 @@ export default function LogisticsScreen({
       {/* PO Conversion modal popup */}
       {showPoModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col border border-gray-100">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-slate-50 text-xs">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col border border-slate-100">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50 text-xs">
               <div>
-                <h3 className="text-sm font-bold text-gray-900">Purchase Orders (Pending Shipments)</h3>
-                <p className="text-gray-400">Select a validated purchase order to dispatch as sea/air transit cargo.</p>
+                <h3 className="text-sm font-bold text-slate-900">Purchase Orders (Pending Shipments)</h3>
+                <p className="text-slate-400">Select a validated purchase order to dispatch as sea/air transit cargo.</p>
               </div>
-              <button onClick={() => setShowPoModal(false)} className="text-gray-400 hover:text-gray-600 text-lg font-medium cursor-pointer">&times;</button>
+              <button onClick={() => setShowPoModal(false)} className="text-slate-400 hover:text-slate-600 text-lg font-medium cursor-pointer">&times;</button>
             </div>
 
-            <div className="p-4 bg-gray-50 border-b border-gray-200">
+            <div className="p-4 bg-slate-50 border-b border-slate-200">
               <input
                 type="text"
                 placeholder="Filter POs by Order No, SKU..."
                 value={poSearchQuery}
                 onChange={(e) => setPoSearchQuery(e.target.value)}
-                className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs"
+                className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
               />
             </div>
 
@@ -735,16 +735,16 @@ export default function LogisticsScreen({
                   const mat = materials.find(m => m.id === po.material_id);
                   const sup = suppliers.find(s => s.id === po.supplier_id);
                   return (
-                    <div key={po.id} className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg shadow-2xs hover:border-blue-300 transition-colors">
+                    <div key={po.id} className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg shadow-2xs hover:border-blue-300 transition-colors">
                       <div>
-                        <h4 className="font-bold text-gray-800">{po.order_no}</h4>
-                        <p className="text-gray-500">{mat ? mat.name : 'Unknown SKU'}</p>
-                        <p className="text-[10px] text-gray-400">Supplier: {sup ? sup.name : 'Unknown'}</p>
+                        <h4 className="font-bold text-slate-800">{po.order_no}</h4>
+                        <p className="text-slate-500">{mat ? mat.name : 'Unknown SKU'}</p>
+                        <p className="text-[10px] text-slate-400">Supplier: {sup ? sup.name : 'Unknown'}</p>
                       </div>
                       <div className="text-right flex items-center gap-4">
                         <div>
-                          <span className="block font-semibold text-gray-900">{po.remaining_qty.toLocaleString()} units</span>
-                          <span className="block text-[10px] text-gray-400">Req Date: {po.required_date}</span>
+                          <span className="block font-semibold text-slate-900">{po.remaining_qty.toLocaleString()} units</span>
+                          <span className="block text-[10px] text-slate-400">Req Date: {po.required_date}</span>
                         </div>
                         <button
                           onClick={() => handleConvertPo(po)}
@@ -757,7 +757,7 @@ export default function LogisticsScreen({
                   );
                 })}
               {purchaseOrders.filter(po => po.status === 'pending').length === 0 && (
-                <p className="text-center text-gray-400 py-6">No validated pending purchase orders currently open in the procurement pipeline.</p>
+                <p className="text-center text-slate-400 py-6">No validated pending purchase orders currently open in the procurement pipeline.</p>
               )}
             </div>
           </div>

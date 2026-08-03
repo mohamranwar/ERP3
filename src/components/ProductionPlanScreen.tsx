@@ -425,13 +425,13 @@ export default function ProductionPlanScreen({
       />
 
       {/* Primary Tab Switcher */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-slate-200">
         <button
           onClick={() => setActiveTab('schedule')}
           className={`px-4 py-2 text-xs font-bold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
             activeTab === 'schedule'
               ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-gray-500 hover:text-gray-800'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
           <Table className="w-4 h-4" />
@@ -442,7 +442,7 @@ export default function ProductionPlanScreen({
           className={`px-4 py-2 text-xs font-bold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
             activeTab === 'reports'
               ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-gray-500 hover:text-gray-800'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
           <BarChart3 className="w-4 h-4" />
@@ -451,9 +451,9 @@ export default function ProductionPlanScreen({
       </div>
 
       {/* Control row */}
-      <div className="flex flex-wrap items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200 font-sans">
+      <div className="flex flex-wrap items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200 font-sans">
         {/* Grain Switcher */}
-        <div className="flex bg-white rounded-lg border border-gray-300 p-0.5" id="mps_grain_switcher">
+        <div className="flex bg-white rounded-lg border border-slate-300 p-0.5" id="mps_grain_switcher">
           {(['day', 'week', 'month'] as GrainType[]).map(grain => (
             <button
               key={grain}
@@ -462,7 +462,7 @@ export default function ProductionPlanScreen({
               className={`px-3 py-1 text-xs font-bold capitalize rounded-md transition-colors cursor-pointer ${
                 selectedGrain === grain 
                   ? 'bg-blue-600 text-white shadow-xs' 
-                  : 'text-gray-500 hover:text-gray-800'
+                  : 'text-slate-500 hover:text-slate-800'
               }`}
             >
               {grain}
@@ -472,13 +472,13 @@ export default function ProductionPlanScreen({
 
         {/* View mode switcher for report tab */}
         {activeTab === 'reports' && (
-          <div className="flex bg-white rounded-lg border border-gray-300 p-0.5" id="report_view_switcher">
+          <div className="flex bg-white rounded-lg border border-slate-300 p-0.5" id="report_view_switcher">
             <button
               onClick={() => setReportView('machine')}
               className={`px-3 py-1 text-xs font-bold rounded-md transition-colors cursor-pointer ${
                 reportView === 'machine'
                   ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-gray-500 hover:text-gray-800'
+                  : 'text-slate-500 hover:text-slate-800'
               }`}
             >
               By Machine
@@ -488,7 +488,7 @@ export default function ProductionPlanScreen({
               className={`px-3 py-1 text-xs font-bold rounded-md transition-colors cursor-pointer ${
                 reportView === 'sku'
                   ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-gray-500 hover:text-gray-800'
+                  : 'text-slate-500 hover:text-slate-800'
               }`}
             >
               By SKU
@@ -505,7 +505,7 @@ export default function ProductionPlanScreen({
           hasActiveSearch={hasActiveSearch}
         />
 
-        <button onClick={loadData} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors cursor-pointer ms-auto" title="Refresh">
+        <button onClick={loadData} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors cursor-pointer ms-auto" title="Refresh">
           <RefreshCw className="w-4 h-4" />
         </button>
       </div>
@@ -528,14 +528,14 @@ export default function ProductionPlanScreen({
             const dynamicCapacity = getAdjustedCapacity(mac.monthly_capacity);
 
             return (
-              <div key={mac.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs hover:border-gray-300 transition-colors">
+              <div key={mac.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs hover:border-slate-300 transition-colors">
                 {/* Machine Header */}
-                <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+                <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Cpu className="w-4 h-4 text-blue-600" />
                     <div>
-                      <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider">{mac.name} Line</h3>
-                      <p className="text-[10px] text-gray-400 font-sans">{mac.description}</p>
+                      <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">{mac.name} Line</h3>
+                      <p className="text-[10px] text-slate-400 font-sans">{mac.description}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -551,8 +551,8 @@ export default function ProductionPlanScreen({
                 {/* SKU Grid */}
                 <div className="overflow-x-auto">
                   <ScrollableTable>
-                    <table className="min-w-full divide-y divide-gray-200 text-left text-xs">
-                      <thead className="bg-gray-50/50 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                    <table className="min-w-full divide-y divide-slate-200 text-left text-xs">
+                      <thead className="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                         <tr>
                           <th className="px-4 py-2">SKU</th>
                           <th className="px-4 py-2">Finished Product Name</th>
@@ -564,12 +564,12 @@ export default function ProductionPlanScreen({
                           ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-200 text-xs text-gray-900">
+                      <tbody className="divide-y divide-slate-200 text-xs text-slate-900">
                         {mProducts.map(p => (
-                          <tr key={p.id} className="hover:bg-gray-50/30 transition-colors">
-                            <td className="px-4 py-2 font-mono text-gray-500 font-semibold">{p.sku}</td>
+                          <tr key={p.id} className="hover:bg-slate-50/30 transition-colors">
+                            <td className="px-4 py-2 font-mono text-slate-500 font-semibold">{p.sku}</td>
                             <td className="px-4 py-2 font-semibold text-slate-800">{p.name}</td>
-                            <td className="px-4 py-2 text-gray-400">{p.pack_type} / {p.size}</td>
+                            <td className="px-4 py-2 text-slate-400">{p.pack_type} / {p.size}</td>
                             {columns.map(col => (
                               <td key={col} className="px-4 py-1.5 text-right">
                                 <input
@@ -577,7 +577,7 @@ export default function ProductionPlanScreen({
                                   placeholder="0"
                                   value={getCellValue(p.id, col)}
                                   onChange={(e) => handleCellChange(p.id, col, e.target.value)}
-                                  className="w-full text-right p-1.5 border border-transparent rounded-lg hover:border-gray-200 focus:border-blue-500 focus:bg-white focus:outline-hidden font-bold font-mono text-xs text-gray-800"
+                                  className="w-full text-right p-1.5 border border-transparent rounded-lg hover:border-slate-200 focus:border-blue-500 focus:bg-white focus:outline-hidden font-bold font-mono text-xs text-slate-800"
                                 />
                               </td>
                             ))}
@@ -586,13 +586,13 @@ export default function ProductionPlanScreen({
 
                         {mProducts.length === 0 && (
                           <tr>
-                            <td colSpan={3 + columns.length} className="px-4 py-6 text-center text-gray-400">No products assigned to this machine. Update product master lines.</td>
+                            <td colSpan={3 + columns.length} className="px-4 py-6 text-center text-slate-400">No products assigned to this machine. Update product master lines.</td>
                           </tr>
                         )}
 
                         {mProducts.length > 0 && (
-                          <tr className="bg-gray-50/70 border-t-2 border-gray-200 font-bold text-gray-900">
-                            <td colSpan={3} className="px-4 py-3 uppercase text-[10px] tracking-wider text-gray-500 font-bold">
+                          <tr className="bg-slate-50/70 border-t-2 border-slate-200 font-bold text-slate-900">
+                            <td colSpan={3} className="px-4 py-3 uppercase text-[10px] tracking-wider text-slate-500 font-bold">
                               Total {mac.name} Production Volume
                             </td>
                             {columns.map(col => (
@@ -604,8 +604,8 @@ export default function ProductionPlanScreen({
                         )}
 
                         {mProducts.length > 0 && (
-                          <tr className="bg-slate-100/50 font-semibold border-b border-gray-200 text-gray-700">
-                            <td colSpan={3} className="px-4 py-2.5 uppercase text-[9px] tracking-wider text-gray-500 font-bold">
+                          <tr className="bg-slate-100/50 font-semibold border-b border-slate-200 text-slate-700">
+                            <td colSpan={3} className="px-4 py-2.5 uppercase text-[9px] tracking-wider text-slate-500 font-bold">
                               Machine Capacity Utilization
                             </td>
                             {columns.map(col => {
@@ -615,15 +615,15 @@ export default function ProductionPlanScreen({
 
                               return (
                                 <td key={col} className="px-4 py-2.5 text-right font-mono text-xs">
-                                  <div className="space-y-1 bg-white p-1.5 rounded border border-gray-100 shadow-3xs flex flex-col items-end">
+                                  <div className="space-y-1 bg-white p-1.5 rounded border border-slate-100 shadow-3xs flex flex-col items-end">
                                     <div className="flex items-center justify-between w-full gap-1.5 text-[10px]">
-                                      <span className="font-sans font-bold text-gray-400 uppercase">util:</span>
+                                      <span className="font-sans font-bold text-slate-400 uppercase">util:</span>
                                       <span className={`font-bold font-mono ${isOverloaded ? 'text-red-600' : 'text-emerald-700'}`}>
                                         {utilization.toFixed(1)}%
                                       </span>
                                     </div>
                                     
-                                    <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                    <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
                                       <div 
                                         className={`h-full rounded-full transition-all ${
                                           isOverloaded ? 'bg-red-500 animate-pulse' : 'bg-emerald-50'
@@ -653,20 +653,20 @@ export default function ProductionPlanScreen({
         </div>
       ) : (
         /* REPORTS AND PIVOTS TAB */
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs font-sans p-4 space-y-4">
-          <div className="border-b border-gray-100 pb-3 flex items-center justify-between">
-            <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider">
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs font-sans p-4 space-y-4">
+          <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
               {reportView === 'machine' ? 'Production Capacity Audit Pivot (By Machine)' : 'Finished Goods Production Plan Pivot (By SKU)'}
             </h3>
-            <span className="text-[10px] text-gray-400 font-mono">Grain: {selectedGrain}</span>
+            <span className="text-[10px] text-slate-400 font-mono">Grain: {selectedGrain}</span>
           </div>
 
           <div className="overflow-x-auto">
             <ScrollableTable>
               {reportView === 'machine' ? (
                 /* BY MACHINE REPORT TABLE */
-                <table className="min-w-full divide-y divide-gray-200 text-left text-xs">
-                  <thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                <table className="min-w-full divide-y divide-slate-200 text-left text-xs">
+                  <thead className="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     <tr>
                       <th className="px-4 py-3">Machine</th>
                       <th className="px-4 py-3 text-right">Base Capacity</th>
@@ -677,14 +677,14 @@ export default function ProductionPlanScreen({
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 text-xs">
+                  <tbody className="divide-y divide-slate-200 text-xs">
                     {machineReportRows.map(row => (
-                      <tr key={row.machine.id} className="hover:bg-gray-50/50 transition-colors">
+                      <tr key={row.machine.id} className="hover:bg-slate-50/50 transition-colors">
                         <td className="px-4 py-4">
-                          <span className="font-bold text-gray-800">{row.machine.name}</span>
-                          <span className="block text-[10px] text-gray-400 mt-0.5">{row.machine.description}</span>
+                          <span className="font-bold text-slate-800">{row.machine.name}</span>
+                          <span className="block text-[10px] text-slate-400 mt-0.5">{row.machine.description}</span>
                         </td>
-                        <td className="px-4 py-4 text-right font-mono font-bold text-gray-500">
+                        <td className="px-4 py-4 text-right font-mono font-bold text-slate-500">
                           {row.capacity.toLocaleString()}
                         </td>
                         {row.colsData.map((col, idx) => {
@@ -698,7 +698,7 @@ export default function ProductionPlanScreen({
                           return (
                             <td key={idx} className="px-4 py-3 text-right">
                               <div className="flex flex-col items-end gap-1">
-                                <span className="font-mono font-extrabold text-gray-800">
+                                <span className="font-mono font-extrabold text-slate-800">
                                   {col.sum.toLocaleString()}
                                 </span>
                                 <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-mono ${colorClass}`}>
@@ -714,8 +714,8 @@ export default function ProductionPlanScreen({
                 </table>
               ) : (
                 /* BY SKU REPORT TABLE */
-                <table className="min-w-full divide-y divide-gray-200 text-left text-xs">
-                  <thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                <table className="min-w-full divide-y divide-slate-200 text-left text-xs">
+                  <thead className="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     <tr>
                       <th className="px-4 py-3">SKU</th>
                       <th className="px-4 py-3">Product Name</th>
@@ -727,18 +727,18 @@ export default function ProductionPlanScreen({
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 text-xs">
+                  <tbody className="divide-y divide-slate-200 text-xs">
                     {skuReportRows.map(row => (
-                      <tr key={row.product.id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="px-4 py-3 font-mono text-gray-500 font-semibold">{row.product.sku}</td>
-                        <td className="px-4 py-3 font-semibold text-gray-800">{row.product.name}</td>
+                      <tr key={row.product.id} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="px-4 py-3 font-mono text-slate-500 font-semibold">{row.product.sku}</td>
+                        <td className="px-4 py-3 font-semibold text-slate-800">{row.product.name}</td>
                         <td className="px-4 py-3">
-                          <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-mono">
+                          <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-mono">
                             {row.product.product_line}
                           </span>
                         </td>
                         {row.colsData.map((val, idx) => (
-                          <td key={idx} className="px-4 py-3 text-right font-mono font-bold text-gray-700">
+                          <td key={idx} className="px-4 py-3 text-right font-mono font-bold text-slate-700">
                             {val > 0 ? val.toLocaleString() : "-"}
                           </td>
                         ))}
@@ -746,7 +746,7 @@ export default function ProductionPlanScreen({
                     ))}
                     {skuReportRows.length === 0 && (
                       <tr>
-                        <td colSpan={3 + columns.length} className="px-4 py-8 text-center text-gray-400">
+                        <td colSpan={3 + columns.length} className="px-4 py-8 text-center text-slate-400">
                           No matching SKUs found.
                         </td>
                       </tr>

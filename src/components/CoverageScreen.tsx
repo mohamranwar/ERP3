@@ -91,12 +91,12 @@ export default function CoverageScreen({
         title="Stock Coverage Analysis"
         subtitle="Compare months-of-inventory with and without scheduled transit cargo. Color-coded shortage triggers."
         actions={
-          <div className="flex items-center gap-1.5 bg-gray-100 p-0.5 rounded-lg" id="coverage_tabs_container">
+          <div className="flex items-center gap-1.5 bg-slate-100 p-0.5 rounded-lg" id="coverage_tabs_container">
             <button
               id="btn_cov_materials"
               onClick={() => { setActiveTab('materials'); setSearchQuery(''); }}
               className={`px-3 py-1.5 text-xs font-bold rounded-md flex items-center gap-1.5 transition-colors cursor-pointer ${
-                activeTab === 'materials' ? 'bg-white text-gray-800 shadow-xs' : 'text-gray-500 hover:text-gray-700'
+                activeTab === 'materials' ? 'bg-white text-slate-800 shadow-xs' : 'text-slate-500 hover:text-slate-700'
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -106,7 +106,7 @@ export default function CoverageScreen({
               id="btn_cov_products"
               onClick={() => { setActiveTab('products'); setSearchQuery(''); }}
               className={`px-3 py-1.5 text-xs font-bold rounded-md flex items-center gap-1.5 transition-colors cursor-pointer ${
-                activeTab === 'products' ? 'bg-white text-gray-800 shadow-xs' : 'text-gray-500 hover:text-gray-700'
+                activeTab === 'products' ? 'bg-white text-slate-800 shadow-xs' : 'text-slate-500 hover:text-slate-700'
               }`}
             >
               <Package className="w-3.5 h-3.5" />
@@ -117,7 +117,7 @@ export default function CoverageScreen({
       />
 
       {/* Legends, Demand Basis Selector & Search bar */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center bg-gray-50 p-4 rounded-xl border border-gray-200">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center bg-slate-50 p-4 rounded-xl border border-slate-200">
         {/* Search */}
         <SearchBar
           value={searchQuery}
@@ -129,11 +129,11 @@ export default function CoverageScreen({
 
         {/* Demand Basis Switcher */}
         <div className="flex items-center gap-1.5 lg:justify-center">
-          <span className="text-[10px] font-bold text-gray-500 uppercase">Basis:</span>
+          <span className="text-[10px] font-bold text-slate-500 uppercase">Basis:</span>
           <select
             value={demandBasis}
             onChange={(e) => setDemandBasis(e.target.value as 'forecast' | 'sales')}
-            className="px-2.5 py-1.5 text-xs bg-white border border-gray-300 rounded-lg text-gray-700 font-bold focus:outline-hidden cursor-pointer"
+            className="px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-700 font-bold focus:outline-hidden cursor-pointer"
           >
             <option value="forecast">Forecast-based ({periodLabel} Plan)</option>
             <option value="sales">Sales-based ({periodLabel} Actuals)</option>
@@ -155,7 +155,7 @@ export default function CoverageScreen({
             <span>&gt; 3 Mo (Overstock)</span>
           </div>
           
-          <button onClick={loadData} className="p-1 hover:bg-gray-200 text-gray-500 rounded ml-2 cursor-pointer" title="Refresh">
+          <button onClick={loadData} className="p-1 hover:bg-slate-200 text-slate-500 rounded ml-2 cursor-pointer" title="Refresh">
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
         </div>

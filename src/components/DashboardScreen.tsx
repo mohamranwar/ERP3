@@ -82,8 +82,8 @@ export default function DashboardScreen({
       <div className="space-y-6 animate-pulse" id="dashboard_screen_loading">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <div className="h-6 w-48 bg-gray-200 rounded"></div>
-            <div className="h-3 w-80 bg-gray-200 rounded"></div>
+            <div className="h-6 w-48 bg-slate-200 rounded"></div>
+            <div className="h-3 w-80 bg-slate-200 rounded"></div>
           </div>
         </div>
 
@@ -91,23 +91,23 @@ export default function DashboardScreen({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="bg-white border border-slate-200 rounded p-3 h-24 flex flex-col justify-between">
-              <div className="h-3 w-20 bg-gray-200 rounded"></div>
-              <div className="h-6 w-12 bg-gray-200 rounded"></div>
-              <div className="h-1 w-full bg-gray-100 rounded"></div>
+              <div className="h-3 w-20 bg-slate-200 rounded"></div>
+              <div className="h-6 w-12 bg-slate-200 rounded"></div>
+              <div className="h-1 w-full bg-slate-100 rounded"></div>
             </div>
           ))}
         </div>
 
         {/* Chart Skeleton */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 h-[400px] flex flex-col justify-between">
-          <div className="flex justify-between items-center border-b border-gray-100 pb-4">
+        <div className="bg-white border border-slate-200 rounded-xl p-6 h-[400px] flex flex-col justify-between">
+          <div className="flex justify-between items-center border-b border-slate-100 pb-4">
             <div className="space-y-2">
-              <div className="h-4 w-60 bg-gray-200 rounded"></div>
-              <div className="h-3 w-96 bg-gray-200 rounded"></div>
+              <div className="h-4 w-60 bg-slate-200 rounded"></div>
+              <div className="h-3 w-96 bg-slate-200 rounded"></div>
             </div>
-            <div className="h-7 w-48 bg-gray-200 rounded"></div>
+            <div className="h-7 w-48 bg-slate-200 rounded"></div>
           </div>
-          <div className="flex-1 bg-gray-50/50 rounded-lg mt-4"></div>
+          <div className="flex-1 bg-slate-50/50 rounded-lg mt-4"></div>
         </div>
       </div>
     );
@@ -126,16 +126,16 @@ export default function DashboardScreen({
         <div className="bg-white border border-slate-200 rounded p-3 flex flex-col justify-between h-24 shadow-xs">
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">OOS Risk (RM/PK)</span>
           <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-bold text-rose-600">{oosRiskCount}</span>
+            <span className="text-2xl font-bold text-red-600">{oosRiskCount}</span>
             <span className={`text-[10px] px-1 font-bold rounded border ${
-              oosRiskCount > 0 ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'
+              oosRiskCount > 0 ? 'bg-red-50 text-red-600 border-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'
             }`}>
               {oosRiskCount > 0 ? 'Critical' : 'Healthy'}
             </span>
           </div>
           <div className="w-full bg-slate-100 h-1 rounded-full">
             <div 
-              className="bg-rose-500 h-full rounded-full" 
+              className="bg-red-500 h-full rounded-full" 
               style={{ width: `${Math.min(100, materialCoverages.length > 0 ? (oosRiskCount / materialCoverages.length) * 100 : 0)}%` }}
             ></div>
           </div>
@@ -194,13 +194,13 @@ export default function DashboardScreen({
       </div>
 
       {/* Bar Chart section */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-100 pb-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 pb-4">
           <div className="flex items-center gap-2">
-            <BarChart2 className="w-5 h-5 text-gray-500" />
+            <BarChart2 className="w-5 h-5 text-slate-500" />
             <div>
-              <h3 className="text-xs font-semibold text-gray-800 uppercase tracking-wider">Top 20 Materials with Lowest Coverage</h3>
-              <p className="text-[11px] text-gray-500">Months of inventory coverage including scheduled receipts. Threshold: &lt; 1.0 (Red) is OOS Risk, &gt; 3.0 (Blue) is overstock.</p>
+              <h3 className="text-xs font-semibold text-slate-800 uppercase tracking-wider">Top 20 Materials with Lowest Coverage</h3>
+              <p className="text-[11px] text-slate-500">Months of inventory coverage including scheduled receipts. Threshold: &lt; 1.0 (Red) is OOS Risk, &gt; 3.0 (Blue) is overstock.</p>
             </div>
           </div>
           <SearchBar
@@ -215,7 +215,7 @@ export default function DashboardScreen({
         {/* Polished SVG Bar Chart with updated height */}
         <div className="overflow-x-auto">
           <div className="min-w-[700px] flex flex-col">
-            <div className="flex items-stretch h-80 justify-around border-b border-gray-200 pb-2 pt-4 px-4 bg-gray-50/50 rounded-lg">
+            <div className="flex items-stretch h-80 justify-around border-b border-slate-200 pb-2 pt-4 px-4 bg-slate-50/50 rounded-lg">
               {lowestMaterials.map((mat, i) => {
                 // Cap at 90% so the numeric value label above the bar always has room.
                 const pct = Math.min((mat.coverage_months / maxCoverageVal) * 90, 90);
@@ -231,14 +231,14 @@ export default function DashboardScreen({
                 return (
                   <div key={mat.material_id} className="group relative flex h-full w-full flex-col items-center justify-end mx-1">
                     {/* Hover tooltip */}
-                    <div className="absolute bottom-full mb-2 hidden group-hover:block z-10 bg-gray-900 text-white text-[10px] rounded-sm py-1 px-2 pointer-events-none whitespace-nowrap shadow-md">
+                    <div className="absolute bottom-full mb-2 hidden group-hover:block z-10 bg-slate-900 text-white text-[10px] rounded-sm py-1 px-2 pointer-events-none whitespace-nowrap shadow-md">
                       <p className="font-semibold">{mat.material_name}</p>
                       <p>Coverage: {mat.coverage_months} months</p>
                       <p>Stock: {mat.opening_stock.toLocaleString()}</p>
                     </div>
 
                     {/* Numeric Value above bar */}
-                    <span className="text-[10px] font-semibold text-gray-600 mb-1 font-mono">
+                    <span className="text-[10px] font-semibold text-slate-600 mb-1 font-mono">
                       {mat.coverage_months}m
                     </span>
 
@@ -259,7 +259,7 @@ export default function DashboardScreen({
               {lowestMaterials.map(mat => (
                 <div key={mat.material_id} className="w-5 mx-1 flex justify-center">
                   <span
-                    className="text-[9px] font-mono text-gray-500 font-medium whitespace-nowrap rotate-45 origin-top-left"
+                    className="text-[9px] font-mono text-slate-500 font-medium whitespace-nowrap rotate-45 origin-top-left"
                     title={mat.material_name}
                   >
                     {mat.sku}

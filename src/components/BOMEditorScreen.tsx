@@ -361,7 +361,7 @@ export default function BOMEditorScreen({
               id="bom_product_picker"
               value={selectedProductId}
               onChange={(e) => setSelectedProductId(e.target.value)}
-              className="px-3.5 py-1.5 text-xs bg-white border border-gray-300 rounded-lg font-semibold text-gray-700 shadow-xs focus:outline-hidden cursor-pointer"
+              className="px-3.5 py-1.5 text-xs bg-white border border-slate-300 rounded-lg font-semibold text-slate-700 shadow-xs focus:outline-hidden cursor-pointer"
             >
               {products.map(p => (
                 <option key={p.id} value={p.id}>{p.sku} - {p.name}</option>
@@ -388,12 +388,12 @@ export default function BOMEditorScreen({
           {/* Main BOM List */}
           <div className="lg:col-span-2 space-y-4">
             {filteredSlots.length === 0 ? (
-              <div className="p-12 text-center border-2 border-dashed border-gray-200 rounded-xl space-y-3">
-                <Layers className="w-8 h-8 text-gray-400 mx-auto" />
-                <h4 className="text-sm font-semibold text-gray-600">
+              <div className="p-12 text-center border-2 border-dashed border-slate-200 rounded-xl space-y-3">
+                <Layers className="w-8 h-8 text-slate-400 mx-auto" />
+                <h4 className="text-sm font-semibold text-slate-600">
                   {searchQuery ? 'No matching slots found' : 'No components slots created yet'}
                 </h4>
-                <p className="text-xs text-gray-400 max-w-sm mx-auto">
+                <p className="text-xs text-slate-400 max-w-sm mx-auto">
                   {searchQuery 
                     ? 'Try refining your search query or clear it to view all.' 
                     : 'Click "Add Slot" above to define structural positions like Top Sheet Surface, Core Absorbent, or Polybag.'}
@@ -405,12 +405,12 @@ export default function BOMEditorScreen({
                   .sort((a, b) => a.priority - b.priority);
 
                 return (
-                  <div key={slot.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs hover:border-gray-300 transition-colors">
+                  <div key={slot.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs hover:border-slate-300 transition-colors">
                     {/* Slot Header */}
-                    <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+                    <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Layers className="w-4 h-4 text-blue-600" />
-                        <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider">{slot.slot_name}</h3>
+                        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">{slot.slot_name}</h3>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
@@ -421,7 +421,7 @@ export default function BOMEditorScreen({
                         </button>
                         <button
                           onClick={() => handleDeleteSlot(slot.id)}
-                          className="p-1 text-gray-400 hover:text-red-600 rounded-sm hover:bg-red-50"
+                          className="p-1 text-slate-400 hover:text-red-600 rounded-sm hover:bg-red-50"
                           title="Delete entire slot"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -430,7 +430,7 @@ export default function BOMEditorScreen({
                     </div>
 
                     {/* Slot Material Options */}
-                    <div className="divide-y divide-gray-100">
+                    <div className="divide-y divide-slate-100">
                       {slotOpts.map(opt => {
                         const mat = materials.find(m => m.id === opt.material_id);
                         const isPrimary = opt.priority === 1;
@@ -448,11 +448,11 @@ export default function BOMEditorScreen({
                                 }`}>
                                   {isPrimary ? 'Primary (MRP Active)' : 'Alternate'}
                                 </span>
-                                <span className="text-xs font-semibold text-gray-900">{mat ? mat.name : 'Unknown Material'}</span>
-                                <span className="text-[10px] text-gray-400 font-mono font-medium">({mat ? mat.sku : ''})</span>
+                                <span className="text-xs font-semibold text-slate-900">{mat ? mat.name : 'Unknown Material'}</span>
+                                <span className="text-[10px] text-slate-400 font-mono font-medium">({mat ? mat.sku : ''})</span>
                               </div>
-                              <div className="text-xs text-gray-500 font-sans">
-                                Unit Standard Cost: <span className="font-semibold text-gray-700 font-mono">${mat?.standard_cost.toFixed(3)}</span> 
+                              <div className="text-xs text-slate-500 font-sans">
+                                Unit Standard Cost: <span className="font-semibold text-slate-700 font-mono">${mat?.standard_cost.toFixed(3)}</span> 
                                 {mat?.cost_basis === 'weighted_avg' && <span className="text-[10px] text-indigo-500 font-medium"> (using Weighted-Avg PO)</span>}
                               </div>
                             </div>
@@ -460,25 +460,25 @@ export default function BOMEditorScreen({
                             {/* Qty & Scrap Inputs / Labels */}
                             <div className="flex items-center gap-4">
                               {isEditing ? (
-                                <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg border border-gray-200">
+                                <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
                                   <div className="w-20">
-                                    <span className="block text-[9px] font-semibold uppercase text-gray-400 mb-0.5">Qty / Unit</span>
+                                    <span className="block text-[9px] font-semibold uppercase text-slate-400 mb-0.5">Qty / Unit</span>
                                     <input 
                                       type="number" 
                                       step="0.001" 
                                       value={editingQty} 
                                       onChange={e => setEditingQty(Number(e.target.value))} 
-                                      className="w-full p-1 text-xs font-mono border border-gray-300 rounded-md" 
+                                      className="w-full p-1 text-xs font-mono border border-slate-300 rounded-md" 
                                     />
                                   </div>
                                   <div className="w-20">
-                                    <span className="block text-[9px] font-semibold uppercase text-gray-400 mb-0.5">Scrap %</span>
+                                    <span className="block text-[9px] font-semibold uppercase text-slate-400 mb-0.5">Scrap %</span>
                                     <input 
                                       type="number" 
                                       step="0.1" 
                                       value={editingScrap} 
                                       onChange={e => setEditingScrap(Number(e.target.value))} 
-                                      className="w-full p-1 text-xs font-mono border border-gray-300 rounded-md" 
+                                      className="w-full p-1 text-xs font-mono border border-slate-300 rounded-md" 
                                     />
                                   </div>
                                   <button
@@ -490,24 +490,24 @@ export default function BOMEditorScreen({
                                 </div>
                               ) : (
                                 <div className="text-right">
-                                  <p className="text-xs text-gray-700">
+                                  <p className="text-xs text-slate-700">
                                     Qty: <span className="font-semibold font-mono">{opt.qty_per_unit}</span>
                                   </p>
-                                  <p className="text-[10px] text-gray-400">
+                                  <p className="text-[10px] text-slate-400">
                                     Scrap: <span className="font-semibold font-mono">{opt.scrap_percent}%</span>
                                   </p>
                                 </div>
                               )}
 
                               <div className="text-right w-24">
-                                <p className="text-xs font-semibold text-gray-900 font-mono">
+                                <p className="text-xs font-semibold text-slate-900 font-mono">
                                   ${liveCost ? liveCost.line_cost.toFixed(4) : '0.0000'}
                                 </p>
-                                <p className="text-[9px] text-gray-400 uppercase tracking-wider">Line cost</p>
+                                <p className="text-[9px] text-slate-400 uppercase tracking-wider">Line cost</p>
                               </div>
 
                               {/* Controls */}
-                              <div className="flex items-center gap-1.5 border-l border-gray-100 pl-4">
+                              <div className="flex items-center gap-1.5 border-l border-slate-100 pl-4">
                                 {!isPrimary && (
                                   <button
                                     onClick={() => handleMakePrimary(opt.id, slot.id)}
@@ -523,7 +523,7 @@ export default function BOMEditorScreen({
                                       setEditingQty(opt.qty_per_unit);
                                       setEditingScrap(opt.scrap_percent);
                                     }}
-                                    className="p-1 text-gray-400 hover:text-blue-600 rounded-sm hover:bg-gray-100"
+                                    className="p-1 text-slate-400 hover:text-blue-600 rounded-sm hover:bg-slate-100"
                                     title="Edit qty/scrap"
                                   >
                                     <Edit2 className="w-3.5 h-3.5" />
@@ -531,7 +531,7 @@ export default function BOMEditorScreen({
                                 )}
                                 <button
                                   onClick={() => handleDeleteOption(opt.id)}
-                                  className="p-1 text-gray-400 hover:text-red-600 rounded-sm hover:bg-red-50"
+                                  className="p-1 text-slate-400 hover:text-red-600 rounded-sm hover:bg-red-50"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
@@ -541,7 +541,7 @@ export default function BOMEditorScreen({
                         );
                       })}
                       {slotOpts.length === 0 && (
-                        <div className="p-4 text-center text-gray-400 text-xs">No material options assigned to this slot. Click "Add Material" above.</div>
+                        <div className="p-4 text-center text-slate-400 text-xs">No material options assigned to this slot. Click "Add Material" above.</div>
                       )}
                     </div>
                   </div>
@@ -552,8 +552,8 @@ export default function BOMEditorScreen({
 
           {/* BOM Financial Analyzer Sidebar */}
           <div className="space-y-4">
-            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs space-y-6">
-              <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 pb-3 flex items-center gap-1.5">
+            <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-6">
+              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-3 flex items-center gap-1.5">
                 <DollarSign className="w-4 h-4 text-emerald-600" /> Live BOM Financials
               </h3>
 
@@ -561,14 +561,14 @@ export default function BOMEditorScreen({
                 <div className="space-y-6">
                   {/* KPI cards inside sidebar */}
                   <div className="space-y-2">
-                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Unit Selling Price</span>
-                    <h4 className="text-xl font-bold text-gray-900 font-mono">${fgCost.selling_price.toFixed(2)}</h4>
+                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Unit Selling Price</span>
+                    <h4 className="text-xl font-bold text-slate-900 font-mono">${fgCost.selling_price.toFixed(2)}</h4>
                   </div>
 
-                  <div className="space-y-3 pt-3 border-t border-gray-100">
-                    <h4 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Material Cost Breakdown (Primary)</h4>
+                  <div className="space-y-3 pt-3 border-t border-slate-100">
+                    <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Material Cost Breakdown (Primary)</h4>
                     
-                    <div className="space-y-1.5 text-xs text-gray-600 font-sans">
+                    <div className="space-y-1.5 text-xs text-slate-600 font-sans">
                       <div className="flex justify-between">
                         <span>Raw Materials (RM)</span>
                         <span className="font-mono font-medium">${fgCost.rm_cost.toFixed(4)}</span>
@@ -581,7 +581,7 @@ export default function BOMEditorScreen({
                         <span>Consumables (CON)</span>
                         <span className="font-mono font-medium">${fgCost.con_cost.toFixed(4)}</span>
                       </div>
-                      <div className="flex justify-between pt-2 border-t border-dashed border-gray-200 font-bold text-gray-900">
+                      <div className="flex justify-between pt-2 border-t border-dashed border-slate-200 font-bold text-slate-900">
                         <span>Total COGS (Material)</span>
                         <span className="font-mono">${fgCost.total_material_cost.toFixed(4)}</span>
                       </div>
@@ -603,7 +603,7 @@ export default function BOMEditorScreen({
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-gray-400">Add primary material slots to evaluate contribution margin metrics.</p>
+                <p className="text-xs text-slate-400">Add primary material slots to evaluate contribution margin metrics.</p>
               )}
             </div>
 
@@ -619,25 +619,25 @@ export default function BOMEditorScreen({
       {/* Add Slot Modal */}
       {showSlotModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs" ref={slotModalRef}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col border border-gray-100">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-900">Add New Component Slot</h3>
-              <button onClick={() => setShowSlotModal(false)} className="text-gray-400 hover:text-gray-600 text-lg font-medium">&times;</button>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col border border-slate-100">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-slate-900">Add New Component Slot</h3>
+              <button onClick={() => setShowSlotModal(false)} className="text-slate-400 hover:text-slate-600 text-lg font-medium">&times;</button>
             </div>
             <form onSubmit={handleAddSlot} className="p-6 space-y-4">
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-gray-700">Slot Name</label>
+                <label className="block text-xs font-semibold text-slate-700">Slot Name</label>
                 <input
                   type="text"
                   value={newSlotName}
                   onChange={e => setNewSlotName(e.target.value)}
                   placeholder="e.g. Back Sheet Surface, Elastic Leg Cuff"
                   required
-                  className="w-full p-2 border border-gray-300 rounded-lg text-xs"
+                  className="w-full p-2 border border-slate-300 rounded-lg text-xs"
                 />
               </div>
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                <button type="button" onClick={() => setShowSlotModal(false)} className="px-3.5 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button type="button" onClick={() => setShowSlotModal(false)} className="px-3.5 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">Cancel</button>
                 <button type="submit" className="px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700">Add Slot</button>
               </div>
             </form>
@@ -648,19 +648,19 @@ export default function BOMEditorScreen({
       {/* Add Option Modal */}
       {showOptionModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs" ref={optionModalRef}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col border border-gray-100">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-900">Add Material Option to Slot</h3>
-              <button onClick={() => setShowOptionModal(false)} className="text-gray-400 hover:text-gray-600 text-lg font-medium">&times;</button>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col border border-slate-100">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-slate-900">Add Material Option to Slot</h3>
+              <button onClick={() => setShowOptionModal(false)} className="text-slate-400 hover:text-slate-600 text-lg font-medium">&times;</button>
             </div>
             <form onSubmit={handleAddOption} className="p-6 space-y-4">
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-gray-700">Select Material</label>
+                <label className="block text-xs font-semibold text-slate-700">Select Material</label>
                 <select
                   value={newOptionMaterialId}
                   onChange={e => setNewOptionMaterialId(e.target.value)}
                   required
-                  className="w-full p-2 border border-gray-300 rounded-lg text-xs"
+                  className="w-full p-2 border border-slate-300 rounded-lg text-xs"
                 >
                   <option value="">-- Choose Material --</option>
                   {materials.map(m => (
@@ -670,30 +670,30 @@ export default function BOMEditorScreen({
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-gray-700">Qty Per Unit</label>
+                  <label className="block text-xs font-semibold text-slate-700">Qty Per Unit</label>
                   <input
                     type="number"
                     step="0.001"
                     value={newOptionQty}
                     onChange={e => setNewOptionQty(Number(e.target.value))}
                     required
-                    className="w-full p-2 border border-gray-300 rounded-lg text-xs font-mono"
+                    className="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-gray-700">Scrap %</label>
+                  <label className="block text-xs font-semibold text-slate-700">Scrap %</label>
                   <input
                     type="number"
                     step="0.1"
                     value={newOptionScrap}
                     onChange={e => setNewOptionScrap(Number(e.target.value))}
                     required
-                    className="w-full p-2 border border-gray-300 rounded-lg text-xs font-mono"
+                    className="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono"
                   />
                 </div>
               </div>
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                <button type="button" onClick={() => setShowOptionModal(false)} className="px-3.5 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button type="button" onClick={() => setShowOptionModal(false)} className="px-3.5 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">Cancel</button>
                 <button type="submit" className="px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700">Add Material</button>
               </div>
             </form>

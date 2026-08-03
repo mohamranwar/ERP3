@@ -460,7 +460,7 @@ export default function FinishedGoodsAnalysis({
         actions={
           <button 
             onClick={loadAllData} 
-            className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 flex items-center gap-1.5 shadow-xs cursor-pointer"
+            className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 flex items-center gap-1.5 shadow-xs cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             Refresh
@@ -469,7 +469,7 @@ export default function FinishedGoodsAnalysis({
       />
 
       {/* Control Panel / Filters Row */}
-      <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-xs flex flex-wrap items-center gap-4 text-xs font-sans">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs flex flex-wrap items-center gap-4 text-xs font-sans">
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
@@ -478,14 +478,14 @@ export default function FinishedGoodsAnalysis({
           hasActiveSearch={hasActiveSearch}
         />
 
-        <div className="h-4 w-[1px] bg-gray-200"></div>
+        <div className="h-4 w-[1px] bg-slate-200"></div>
 
         <div className="flex items-center gap-1.5">
-          <span className="font-semibold text-gray-500 uppercase">Group By:</span>
+          <span className="font-semibold text-slate-500 uppercase">Group By:</span>
           <select 
             value={groupBy} 
             onChange={(e) => { setGroupBy(e.target.value as GroupByOption); setExpandedNodes({}); }}
-            className="px-2.5 py-1.5 border border-gray-300 rounded-lg bg-white focus:outline-hidden font-medium text-slate-700 cursor-pointer"
+            className="px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white focus:outline-hidden font-medium text-slate-700 cursor-pointer"
           >
             <option value="category">Category</option>
             <option value="group">Group</option>
@@ -497,11 +497,11 @@ export default function FinishedGoodsAnalysis({
         </div>
 
         <div className="flex items-center gap-1.5">
-          <span className="font-semibold text-gray-500 uppercase">Unit:</span>
+          <span className="font-semibold text-slate-500 uppercase">Unit:</span>
           <select 
             value={unit} 
             onChange={(e) => setUnit(e.target.value as UnitOption)}
-            className="px-2.5 py-1.5 border border-gray-300 rounded-lg bg-white focus:outline-hidden font-medium text-slate-700 cursor-pointer"
+            className="px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white focus:outline-hidden font-medium text-slate-700 cursor-pointer"
           >
             <option value="pieces">Pieces</option>
             <option value="cartons">Cartons</option>
@@ -510,11 +510,11 @@ export default function FinishedGoodsAnalysis({
         </div>
 
         <div className="flex items-center gap-1.5">
-          <span className="font-semibold text-gray-500 uppercase">Month:</span>
+          <span className="font-semibold text-slate-500 uppercase">Month:</span>
           <select 
             value={selectedMonth} 
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="px-2.5 py-1.5 border border-gray-300 rounded-lg bg-white focus:outline-hidden font-medium text-slate-700 cursor-pointer"
+            className="px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white focus:outline-hidden font-medium text-slate-700 cursor-pointer"
           >
             {monthOptions.map(m => (
               <option key={m} value={m}>{formatPlanningPeriod(m)}</option>
@@ -522,14 +522,14 @@ export default function FinishedGoodsAnalysis({
           </select>
         </div>
 
-        <div className="h-4 w-[1px] bg-gray-200"></div>
+        <div className="h-4 w-[1px] bg-slate-200"></div>
 
         <div className="flex items-center gap-1.5">
-          <span className="font-semibold text-gray-500 uppercase">Line:</span>
+          <span className="font-semibold text-slate-500 uppercase">Line:</span>
           <select 
             value={filterProductLine} 
             onChange={(e) => setFilterProductLine(e.target.value)}
-            className="px-2.5 py-1.5 border border-gray-300 rounded-lg bg-white focus:outline-hidden font-medium text-slate-700 cursor-pointer"
+            className="px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white focus:outline-hidden font-medium text-slate-700 cursor-pointer"
           >
             <option value="">All Lines</option>
             {productLines.map(line => <option key={line} value={line}>{line}</option>)}
@@ -537,11 +537,11 @@ export default function FinishedGoodsAnalysis({
         </div>
 
         <div className="flex items-center gap-1.5">
-          <span className="font-semibold text-gray-500 uppercase">Pack:</span>
+          <span className="font-semibold text-slate-500 uppercase">Pack:</span>
           <select 
             value={filterPackType} 
             onChange={(e) => setFilterPackType(e.target.value)}
-            className="px-2.5 py-1.5 border border-gray-300 rounded-lg bg-white focus:outline-hidden font-medium text-slate-700 cursor-pointer"
+            className="px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white focus:outline-hidden font-medium text-slate-700 cursor-pointer"
           >
             <option value="">All Packs</option>
             {packTypes.map(p => <option key={p} value={p}>{p}</option>)}
@@ -553,7 +553,7 @@ export default function FinishedGoodsAnalysis({
           className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
             showObsolete 
               ? 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100' 
-              : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+              : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
           }`}
         >
           {showObsolete ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
@@ -562,16 +562,16 @@ export default function FinishedGoodsAnalysis({
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-48 bg-white border border-gray-100 rounded-xl">
+        <div className="flex justify-center items-center h-48 bg-white border border-slate-100 rounded-xl">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           
           {/* Left / Main Table */}
-          <div className="xl:col-span-2 bg-white border border-gray-200 rounded-xl shadow-xs overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-              <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider">
+          <div className="xl:col-span-2 bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
                 PSI Pivot Matrix — {getMonthName(selectedMonth)}
               </h3>
               <span className="text-[10px] bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded uppercase">
@@ -581,8 +581,8 @@ export default function FinishedGoodsAnalysis({
 
             <div className="overflow-x-auto">
               <ScrollableTable>
-                <table className="min-w-full divide-y divide-gray-200 text-left text-xs font-sans">
-                  <thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                <table className="min-w-full divide-y divide-slate-200 text-left text-xs font-sans">
+                  <thead className="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     <tr>
                       <th className="px-4 py-3 min-w-[200px]">Node Tree</th>
                       <th className="px-4 py-3 text-right">Start Stock</th>
@@ -597,10 +597,10 @@ export default function FinishedGoodsAnalysis({
                       <th className="px-4 py-3 text-right">Sales Value</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100 text-gray-800">
+                  <tbody className="divide-y divide-slate-100 text-slate-800">
                     {pivotNodes.length === 0 ? (
                       <tr>
-                        <td colSpan={11} className="px-4 py-8 text-center text-gray-400">
+                        <td colSpan={11} className="px-4 py-8 text-center text-slate-400">
                           No active products match selected filters.
                         </td>
                       </tr>
@@ -635,16 +635,16 @@ export default function FinishedGoodsAnalysis({
           </div>
 
           {/* Right / Visualisations Panel */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-xs space-y-6 font-sans">
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-6 font-sans">
             <div>
-              <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 pb-3 flex items-center gap-1.5">
+              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-3 flex items-center gap-1.5">
                 <BarChart3 className="w-4 h-4 text-blue-600" /> July Sales Value by Group
               </h3>
-              <p className="text-[11px] text-gray-500 mt-1">Horizontal distribution of forecasted sales value across the selected group-by dimension.</p>
+              <p className="text-[11px] text-slate-500 mt-1">Horizontal distribution of forecasted sales value across the selected group-by dimension.</p>
             </div>
 
             {chartData.length === 0 ? (
-              <p className="text-xs text-gray-400 text-center py-12">No data to display</p>
+              <p className="text-xs text-slate-400 text-center py-12">No data to display</p>
             ) : (
               <div className="space-y-4">
                 {chartData.map((d, i) => {
@@ -681,17 +681,17 @@ export default function FinishedGoodsAnalysis({
       {/* SKU MONTHLY LEDGER DETAIL DRAWER / MODAL */}
       {selectedSkuProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl overflow-hidden flex flex-col border border-gray-100">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-slate-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl overflow-hidden flex flex-col border border-slate-100">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
               <div>
                 <span className="text-[10px] text-blue-600 font-bold uppercase tracking-wider font-mono">Monthly PSI Balance Sheet</span>
-                <h3 className="text-sm font-bold text-gray-900 mt-0.5">
+                <h3 className="text-sm font-bold text-slate-900 mt-0.5">
                   {selectedSkuProduct.sku} - {selectedSkuProduct.name}
                 </h3>
               </div>
               <button 
                 onClick={() => setSelectedSkuProduct(null)} 
-                className="text-gray-400 hover:text-gray-600 p-1 bg-white border border-gray-200 rounded-lg shadow-sm cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 p-1 bg-white border border-slate-200 rounded-lg shadow-sm cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -721,10 +721,10 @@ export default function FinishedGoodsAnalysis({
               </div>
 
               {/* Monthly Ledger Table */}
-              <div className="border border-gray-200 rounded-xl overflow-hidden shadow-xs">
+              <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
                 <ScrollableTable>
-                  <table className="min-w-full divide-y divide-gray-200 text-xs">
-                    <thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  <table className="min-w-full divide-y divide-slate-200 text-xs">
+                    <thead className="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                       <tr>
                         <th className="px-5 py-3">PSI Metric (Pcs)</th>
                         {skuLedgerData.map(d => (
@@ -734,7 +734,7 @@ export default function FinishedGoodsAnalysis({
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200 text-gray-800">
+                    <tbody className="divide-y divide-slate-200 text-slate-800">
                       <tr className="hover:bg-slate-50">
                         <td className="px-5 py-4 font-semibold text-slate-600 flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-blue-500"></span>
@@ -797,7 +797,7 @@ export default function FinishedGoodsAnalysis({
               </div>
             </div>
 
-            <div className="px-6 py-4 border-t border-gray-100 flex justify-end bg-slate-50">
+            <div className="px-6 py-4 border-t border-slate-100 flex justify-end bg-slate-50">
               <button 
                 onClick={() => setSelectedSkuProduct(null)}
                 className="px-4 py-2 bg-slate-800 text-white hover:bg-slate-950 font-semibold rounded-lg text-xs cursor-pointer"

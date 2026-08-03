@@ -18,8 +18,8 @@ export default function EmptyState({
         <Database className="w-8 h-8" />
       </div>
       <div className="space-y-1.5">
-        <h3 className="text-sm font-semibold text-gray-900 font-sans">No Data Available</h3>
-        <p className="text-xs text-gray-500 max-w-sm font-sans">{message}</p>
+        <h3 className="text-sm font-semibold text-slate-900 font-sans">No Data Available</h3>
+        <p className="text-xs text-slate-500 max-w-sm font-sans">{message}</p>
       </div>
       {onAction && (
         <button

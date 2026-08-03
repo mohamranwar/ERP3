@@ -407,13 +407,13 @@ export default function App() {
             <div className="flex bg-slate-100 border border-slate-300 p-0.5 rounded-lg max-sm:hidden">
               <button 
                 onClick={() => setLang('EN')} 
-                className={`tap-compact px-2.5 py-1 text-[11px] font-bold rounded-md transition-all cursor-pointer ${lang === 'EN' ? 'bg-white text-blue-600 shadow-2xs' : 'text-gray-500 hover:text-gray-800'}`}
+                className={`tap-compact px-2.5 py-1 text-[11px] font-bold rounded-md transition-all cursor-pointer ${lang === 'EN' ? 'bg-white text-blue-600 shadow-2xs' : 'text-slate-500 hover:text-slate-800'}`}
               >
                 EN
               </button>
               <button 
                 onClick={() => setLang('AR')} 
-                className={`tap-compact px-2.5 py-1 text-[11px] font-bold rounded-md transition-all cursor-pointer ${lang === 'AR' ? 'bg-white text-blue-600 shadow-2xs' : 'text-gray-500 hover:text-gray-800'}`}
+                className={`tap-compact px-2.5 py-1 text-[11px] font-bold rounded-md transition-all cursor-pointer ${lang === 'AR' ? 'bg-white text-blue-600 shadow-2xs' : 'text-slate-500 hover:text-slate-800'}`}
               >
                 عربي
               </button>
@@ -463,14 +463,14 @@ export default function App() {
         */}
       {showConfig && (
         <div className="fixed inset-0 z-[4500] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" ref={configModalRef}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col border border-gray-100">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col border border-slate-100">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                 <Database className="w-4 h-4 text-blue-600" /> Database Integration Hub
               </h3>
               <button 
                 onClick={() => setShowConfig(false)} 
-                className="text-gray-400 hover:text-gray-600 text-xl font-semibold cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 text-xl font-semibold cursor-pointer"
               >
                 &times;
               </button>
@@ -489,30 +489,30 @@ export default function App() {
               )}
 
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-gray-700">Supabase Project URL</label>
+                <label className="block text-xs font-semibold text-slate-700">Supabase Project URL</label>
                 <input
                   type="url"
                   value={supUrl}
                   onChange={e => setSupUrl(e.target.value)}
                   placeholder="https://your-project.supabase.co"
                   required
-                  className="w-full p-2.5 border border-gray-300 rounded-lg text-xs font-mono bg-gray-50/50"
+                  className="w-full p-2.5 border border-slate-300 rounded-lg text-xs font-mono bg-slate-50/50"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-gray-700">Supabase Anon Key</label>
+                <label className="block text-xs font-semibold text-slate-700">Supabase Anon Key</label>
                 <input
                   type="password"
                   value={supKey}
                   onChange={e => setSupKey(e.target.value)}
                   placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                   required
-                  className="w-full p-2.5 border border-gray-300 rounded-lg text-xs font-mono bg-gray-50/50"
+                  className="w-full p-2.5 border border-slate-300 rounded-lg text-xs font-mono bg-slate-50/50"
                 />
               </div>
 
-              <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+              <div className="flex justify-between items-center pt-4 border-t border-slate-100">
                 {dbConnected ? (
                   <button
                     type="button"
@@ -523,14 +523,14 @@ export default function App() {
                     Disconnect (Reset Demo)
                   </button>
                 ) : (
-                  <div className="text-[10px] text-gray-400 font-sans">Ready to bridge local planner to live DB.</div>
+                  <div className="text-[10px] text-slate-400 font-sans">Ready to bridge local planner to live DB.</div>
                 )}
 
                 <div className="flex gap-2">
                   <button 
                     type="button" 
                     onClick={() => setShowConfig(false)} 
-                    className="px-3.5 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    className="px-3.5 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer"
                   >
                     Cancel
                   </button>

@@ -283,7 +283,7 @@ export default function MRPScreen({
   const getTimingColor = (timing: string) => {
     if (timing === 'Check with Proc.') return 'bg-red-50 text-red-700 border-red-200';
     if (timing === 'Need to be Closed') return 'bg-amber-50 text-amber-700 border-amber-200';
-    return 'bg-gray-50 text-gray-700 border-gray-200';
+    return 'bg-slate-50 text-slate-700 border-slate-200';
   };
 
   // Open the purchase order pre-creation dialog
@@ -365,18 +365,18 @@ export default function MRPScreen({
         title="Material Requirements Planner (MRP)"
         subtitle="Trigger bill-of-materials explosion, inventory netting, lead-time offsets, and evaluate planned procurement orders."
         actions={
-          <div className="bg-white border border-gray-200 p-2 rounded-xl flex items-center flex-wrap gap-2.5 shadow-xs text-xs font-sans">
-            <div className="flex items-center gap-1 font-semibold text-gray-600">
+          <div className="bg-white border border-slate-200 p-2 rounded-xl flex items-center flex-wrap gap-2.5 shadow-xs text-xs font-sans">
+            <div className="flex items-center gap-1 font-semibold text-slate-600">
               <Calendar className="w-3.5 h-3.5 text-blue-600" /> Start Date:
               <input 
                 type="date" 
                 value={startDate} 
                 onChange={e => setStartDate(e.target.value)} 
-                className="p-1 border border-gray-300 rounded bg-white text-xs font-mono" 
+                className="p-1 border border-slate-300 rounded bg-white text-xs font-mono" 
               />
             </div>
 
-            <div className="flex items-center gap-1.5 font-semibold text-gray-600">
+            <div className="flex items-center gap-1.5 font-semibold text-slate-600">
               Grain:
               <div className="flex bg-slate-100 border border-slate-300 p-0.5 rounded-lg">
                 <button
@@ -388,7 +388,7 @@ export default function MRPScreen({
                   className={`px-2 py-0.5 text-[10px] font-bold rounded-md transition-all cursor-pointer ${
                     grain === 'week' 
                       ? 'bg-white text-blue-600 shadow-2xs' 
-                      : 'text-gray-500 hover:text-gray-800'
+                      : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   Weekly
@@ -402,7 +402,7 @@ export default function MRPScreen({
                   className={`px-2 py-0.5 text-[10px] font-bold rounded-md transition-all cursor-pointer ${
                     grain === 'month' 
                       ? 'bg-white text-blue-600 shadow-2xs' 
-                      : 'text-gray-500 hover:text-gray-800'
+                      : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   Monthly
@@ -410,12 +410,12 @@ export default function MRPScreen({
               </div>
             </div>
 
-            <div className="flex items-center gap-1 font-semibold text-gray-600">
+            <div className="flex items-center gap-1 font-semibold text-slate-600">
               Horizon:
               <select 
                 value={horizon} 
                 onChange={e => setHorizon(Number(e.target.value))} 
-                className="p-1 border border-gray-300 rounded bg-white text-xs text-gray-700 cursor-pointer"
+                className="p-1 border border-slate-300 rounded bg-white text-xs text-slate-700 cursor-pointer"
               >
                 {grain === 'month' ? (
                   <>
@@ -450,7 +450,7 @@ export default function MRPScreen({
       />
 
       {/* Mode selectors and filters bar */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-gray-200 pb-2 font-sans">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-slate-200 pb-2 font-sans">
         <div className="flex flex-wrap gap-2">
           <button
             id="mrp_tab_grid"
@@ -458,7 +458,7 @@ export default function MRPScreen({
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg border flex items-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'grid' 
                 ? 'bg-blue-600 border-blue-600 text-white shadow-xs font-extrabold' 
-                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
@@ -470,7 +470,7 @@ export default function MRPScreen({
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg border flex items-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'orders' 
                 ? 'bg-blue-600 border-blue-600 text-white shadow-xs font-extrabold' 
-                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >
             <ListTodo className="w-3.5 h-3.5" />
@@ -482,7 +482,7 @@ export default function MRPScreen({
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg border flex items-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'po_board' 
                 ? 'bg-blue-600 border-blue-600 text-white shadow-xs font-extrabold' 
-                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >
             <ShoppingBag className="w-3.5 h-3.5" />
@@ -494,11 +494,11 @@ export default function MRPScreen({
         <div className="flex flex-wrap items-center gap-2.5">
           {runOptions.length > 0 && (
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold text-gray-500 uppercase">Run:</span>
+              <span className="text-xs font-semibold text-slate-500 uppercase">Run:</span>
               <select
                 value={mrpRunId || ''}
                 onChange={(e) => setMrpRunId(e.target.value)}
-                className="px-2.5 py-1.5 text-xs bg-white border border-gray-300 rounded-lg text-gray-700 font-semibold focus:outline-hidden cursor-pointer"
+                className="px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-700 font-semibold focus:outline-hidden cursor-pointer"
               >
                 {runOptions.map(opt => (
                   <option key={opt.runId} value={opt.runId}>{opt.label}</option>
@@ -521,7 +521,7 @@ export default function MRPScreen({
               <select
                 value={filterController}
                 onChange={(e) => setFilterController(e.target.value)}
-                className="px-2.5 py-1.5 text-xs bg-white border border-gray-300 rounded-lg focus:outline-hidden text-gray-600 cursor-pointer"
+                className="px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-hidden text-slate-600 cursor-pointer"
               >
                 <option value="">All Controllers</option>
                 <option value="Mohamed Amr">Mohamed Amr</option>
@@ -531,7 +531,7 @@ export default function MRPScreen({
               <select
                 value={filterSupplier}
                 onChange={(e) => setFilterSupplier(e.target.value)}
-                className="px-2.5 py-1.5 text-xs bg-white border border-gray-300 rounded-lg focus:outline-hidden text-gray-600 cursor-pointer"
+                className="px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-hidden text-slate-600 cursor-pointer"
               >
                 <option value="">All Suppliers</option>
                 {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -543,42 +543,42 @@ export default function MRPScreen({
 
       {/* Show active run timestamp */}
       {selectedRunTimestamp() && (
-        <div className="flex items-center justify-between text-xs text-gray-400 font-mono px-1">
+        <div className="flex items-center justify-between text-xs text-slate-400 font-mono px-1">
           <span>Active Run ID: <strong className="text-blue-600">{mrpRunId}</strong></span>
           <span>Calculated on: {selectedRunTimestamp()}</span>
         </div>
       )}
 
       {loading ? (
-        <div className="flex justify-center items-center h-48 bg-white border border-gray-100 rounded-xl">
+        <div className="flex justify-center items-center h-48 bg-white border border-slate-100 rounded-xl">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       ) : (
         <div id="mrp_tab_content_wrapper" className="font-sans">
           {/* 1. Time-Phased Grid Tab */}
           {activeTab === 'grid' && (
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs">
+            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
               {buckets.length === 0 ? (
-                <div className="p-12 text-center text-gray-400">
-                  <ClipboardCheck className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                <div className="p-12 text-center text-slate-400">
+                  <ClipboardCheck className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                   <p className="text-xs">No active MRP plans found. Click <b>"Run Solver"</b> above to trigger calculations.</p>
                 </div>
               ) : (
                 <ScrollableTable>
-                  <table className="min-w-full divide-y divide-gray-200 text-left text-xs font-sans">
-                    <thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  <table className="min-w-full divide-y divide-slate-200 text-left text-xs font-sans">
+                    <thead className="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                       <tr>
-                        <th className="px-4 py-3 sticky left-0 bg-gray-50 z-10 min-w-[260px] border-r border-gray-100">Material Component</th>
-                        <th className="px-4 py-3 min-w-[150px] border-r border-gray-100">Time-Phased Metric</th>
+                        <th className="px-4 py-3 sticky left-0 bg-slate-50 z-10 min-w-[260px] border-r border-slate-100">Material Component</th>
+                        <th className="px-4 py-3 min-w-[150px] border-r border-slate-100">Time-Phased Metric</th>
                         {bucketRanges.map(b => (
                           <th key={b.start} className="px-4 py-3 text-right min-w-[150px]">
-                            <span className="block font-mono text-[11px] text-gray-600 normal-case">{b.label}</span>
-                            <span className="block font-mono text-[9px] text-gray-400 font-normal normal-case">{b.year}</span>
+                            <span className="block font-mono text-[11px] text-slate-600 normal-case">{b.label}</span>
+                            <span className="block font-mono text-[9px] text-slate-400 font-normal normal-case">{b.year}</span>
                           </th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200 text-xs">
+                    <tbody className="divide-y divide-slate-200 text-xs">
                       {filteredMaterials.map(m => {
                         const isExpanded = expandedMaterials.has(m.id);
                         const rowFor = (wk: string) => resultLookup.get(`${m.id}|${wk}`);
@@ -597,18 +597,18 @@ export default function MRPScreen({
                               className="bg-slate-50/60 font-semibold border-t border-slate-200/80 hover:bg-slate-100/70 cursor-pointer transition-colors"
                               onClick={() => toggleMaterial(m.id)}
                             >
-                              <td className="px-4 py-2 sticky left-0 bg-slate-50/95 z-10 font-bold text-slate-800 border-r border-gray-100">
+                              <td className="px-4 py-2 sticky left-0 bg-slate-50/95 z-10 font-bold text-slate-800 border-r border-slate-100">
                                 <div className="flex items-center gap-1.5">
                                   {isExpanded
                                     ? <ChevronDown className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                                     : <ChevronRight className="w-3.5 h-3.5 text-slate-500 shrink-0" />}
                                   <span>{m.name}</span>
                                 </div>
-                                <span className="block text-[10px] text-gray-400 font-mono font-normal mt-0.5 pl-5">
+                                <span className="block text-[10px] text-slate-400 font-mono font-normal mt-0.5 pl-5">
                                   {m.sku} | MOQ {m.moq.toLocaleString()} | Lead {m.total_lead_time_days}d
                                 </span>
                               </td>
-                              <td className="px-4 py-2 border-r border-gray-100 align-middle">
+                              <td className="px-4 py-2 border-r border-slate-100 align-middle">
                                 {/* Netting tops stock up to the safety level, so a bucket rarely
                                     reads short. The real exposure is an order that had to be
                                     placed before this run began - it cannot arrive on time. */}
@@ -650,10 +650,10 @@ export default function MRPScreen({
                               <>
                                 {/* 1. Gross Requirements */}
                                 <tr className="hover:bg-slate-50/30 transition-colors">
-                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-gray-100"></td>
-                                  <td className="px-4 py-1.5 text-slate-500 font-medium border-r border-gray-100">
+                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-slate-100"></td>
+                                  <td className="px-4 py-1.5 text-slate-500 font-medium border-r border-slate-100">
                                     <span className="flex items-center gap-1.5">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
                                       Gross Requirements
                                     </span>
                                   </td>
@@ -669,8 +669,8 @@ export default function MRPScreen({
 
                                 {/* 2. Scheduled Receipts */}
                                 <tr className="hover:bg-slate-50/30 transition-colors">
-                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-gray-100"></td>
-                                  <td className="px-4 py-1.5 text-emerald-800 font-medium border-r border-gray-100">
+                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-slate-100"></td>
+                                  <td className="px-4 py-1.5 text-emerald-800 font-medium border-r border-slate-100">
                                     <span className="flex items-center gap-1.5">
                                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                       Scheduled Receipts
@@ -688,8 +688,8 @@ export default function MRPScreen({
 
                                 {/* 3. Safety Stock - the level the plan is netted against */}
                                 <tr className="hover:bg-slate-50/30 transition-colors bg-amber-50/20">
-                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-gray-100"></td>
-                                  <td className="px-4 py-1.5 text-amber-900 font-medium border-r border-gray-100">
+                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-slate-100"></td>
+                                  <td className="px-4 py-1.5 text-amber-900 font-medium border-r border-slate-100">
                                     <span className="flex items-center gap-1.5">
                                       <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                                       Safety Stock
@@ -713,8 +713,8 @@ export default function MRPScreen({
 
                                 {/* 4. Projected Available Stock */}
                                 <tr className="hover:bg-slate-50/30 transition-colors">
-                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-gray-100"></td>
-                                  <td className="px-4 py-1.5 text-blue-800 font-semibold border-r border-gray-100">
+                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-slate-100"></td>
+                                  <td className="px-4 py-1.5 text-blue-800 font-semibold border-r border-slate-100">
                                     <span className="flex items-center gap-1.5">
                                       <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
                                       Projected Stock
@@ -740,17 +740,17 @@ export default function MRPScreen({
 
                                 {/* 5. Net Requirements - the shortfall before MOQ rounding */}
                                 <tr className="hover:bg-slate-50/30 transition-colors">
-                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-gray-100"></td>
-                                  <td className="px-4 py-1.5 text-rose-800 font-medium border-r border-gray-100">
+                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-slate-100"></td>
+                                  <td className="px-4 py-1.5 text-red-800 font-medium border-r border-slate-100">
                                     <span className="flex items-center gap-1.5">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                      <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
                                       Net Requirements
                                     </span>
                                   </td>
                                   {buckets.map(wk => {
                                     const net = rowFor(wk)?.net_requirements || 0;
                                     return (
-                                      <td key={wk} className="px-4 py-1.5 text-right font-mono text-rose-700">
+                                      <td key={wk} className="px-4 py-1.5 text-right font-mono text-red-700">
                                         {net > 0 ? net.toLocaleString() : '-'}
                                       </td>
                                     );
@@ -759,8 +759,8 @@ export default function MRPScreen({
 
                                 {/* 6. Planned Receipts - when stock has to land */}
                                 <tr className="hover:bg-slate-50/30 transition-colors">
-                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-gray-100"></td>
-                                  <td className="px-4 py-1.5 text-indigo-800 font-medium border-r border-gray-100">
+                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-slate-100"></td>
+                                  <td className="px-4 py-1.5 text-indigo-800 font-medium border-r border-slate-100">
                                     <span className="flex items-center gap-1.5">
                                       <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
                                       Planned Receipts
@@ -777,11 +777,11 @@ export default function MRPScreen({
                                 </tr>
 
                                 {/* 7. Planned Order Releases - when to place the order */}
-                                <tr className="hover:bg-slate-50/30 transition-colors border-b border-gray-100 bg-amber-50/5">
-                                  <td className="px-4 py-2 sticky left-0 bg-white z-10 border-r border-gray-100"></td>
-                                  <td className="px-4 py-2 text-amber-800 font-bold border-r border-gray-100">
+                                <tr className="hover:bg-slate-50/30 transition-colors border-b border-slate-100 bg-amber-50/5">
+                                  <td className="px-4 py-2 sticky left-0 bg-white z-10 border-r border-slate-100"></td>
+                                  <td className="px-4 py-2 text-amber-800 font-bold border-r border-slate-100">
                                     <span className="flex items-center gap-1.5">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
                                       Planned Releases
                                     </span>
                                   </td>
@@ -793,7 +793,7 @@ export default function MRPScreen({
                                     // the planner can act instead of only being told they exist.
                                     const late = bIdx === 0 ? pastDue : 0;
                                     if (release === 0 && late === 0) {
-                                      return <td key={wk} className="px-4 py-2 text-right font-mono text-gray-400">-</td>;
+                                      return <td key={wk} className="px-4 py-2 text-right font-mono text-slate-400">-</td>;
                                     }
                                     return (
                                       <td key={wk} className={`px-4 py-2 text-right font-mono ${late > 0 ? 'bg-red-50/60' : ''}`}>
@@ -844,10 +844,10 @@ export default function MRPScreen({
 
           {/* 2. Planned Orders Tab */}
           {activeTab === 'orders' && (
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs">
+            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
               <ScrollableTable>
-                <table className="min-w-full divide-y divide-gray-200 text-left text-xs">
-                  <thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                <table className="min-w-full divide-y divide-slate-200 text-left text-xs">
+                  <thead className="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     <tr>
                       <th className="px-4 py-3">Suggested Release Date</th>
                       <th className="px-4 py-3">Material Required</th>
@@ -858,18 +858,18 @@ export default function MRPScreen({
                       <th className="px-4 py-3 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 text-gray-900">
+                  <tbody className="divide-y divide-slate-200 text-slate-900">
                     {plannedOrdersList.map(order => (
-                      <tr key={order.id} className="hover:bg-gray-50">
+                      <tr key={order.id} className="hover:bg-slate-50">
                         <td className="px-4 py-3 font-semibold text-blue-600 font-mono">{order.release_date}</td>
                         <td className="px-4 py-3">
                           <p className="font-semibold">{order.material_name}</p>
-                          <p className="text-[10px] text-gray-400 font-mono">{order.sku}</p>
+                          <p className="text-[10px] text-slate-400 font-mono">{order.sku}</p>
                         </td>
                         <td className="px-4 py-3 text-right font-bold font-mono">{order.quantity.toLocaleString()}</td>
-                        <td className="px-4 py-3 text-gray-600">{order.supplier_name}</td>
-                        <td className="px-4 py-3 font-mono text-gray-500">{order.required_date}</td>
-                        <td className="px-4 py-3 text-gray-500">{order.controller || 'Mohamed Amr'}</td>
+                        <td className="px-4 py-3 text-slate-600">{order.supplier_name}</td>
+                        <td className="px-4 py-3 font-mono text-slate-500">{order.required_date}</td>
+                        <td className="px-4 py-3 text-slate-500">{order.controller || 'Mohamed Amr'}</td>
                         <td className="px-4 py-3 text-right">
                           <button
                             onClick={() => openCreatePoDialog(order.material_id, order.quantity, order.required_date)}
@@ -882,7 +882,7 @@ export default function MRPScreen({
                     ))}
                     {plannedOrdersList.length === 0 && (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-gray-400">No planned orders generated for this period. Run MRP or adjust MPS production metrics.</td>
+                        <td colSpan={7} className="px-4 py-8 text-center text-slate-400">No planned orders generated for this period. Run MRP or adjust MPS production metrics.</td>
                       </tr>
                     )}
                   </tbody>
@@ -895,8 +895,8 @@ export default function MRPScreen({
           {activeTab === 'po_board' && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4" id="po_board_grids_container">
               {/* Column 1: Planned / NO PO */}
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3 flex flex-col h-[65vh]">
-                <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 flex flex-col h-[65vh]">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                   <h4 className="text-xs font-bold text-red-700 uppercase tracking-wider flex items-center gap-1">
                     <ShieldAlert className="w-3.5 h-3.5" /> No PO (Planned)
                   </h4>
@@ -908,14 +908,14 @@ export default function MRPScreen({
                   {plannedOrdersList.map(order => (
                     <div key={order.id} className="bg-white p-3 rounded-lg border border-red-100 shadow-2xs space-y-2 animate-in fade-in zoom-in-95 duration-150">
                       <div>
-                        <h5 className="font-semibold text-xs text-gray-900">{order.material_name}</h5>
-                        <p className="text-[9px] text-gray-400 font-mono">{order.sku}</p>
+                        <h5 className="font-semibold text-xs text-slate-900">{order.material_name}</h5>
+                        <p className="text-[9px] text-slate-400 font-mono">{order.sku}</p>
                       </div>
                       <div className="flex justify-between items-baseline">
-                        <span className="text-[10px] text-gray-500 font-semibold uppercase font-sans">Suggested Qty:</span>
+                        <span className="text-[10px] text-slate-500 font-semibold uppercase font-sans">Suggested Qty:</span>
                         <span className="font-bold font-mono text-xs">{order.quantity.toLocaleString()}</span>
                       </div>
-                      <div className="text-[9px] text-gray-500 flex justify-between border-t border-gray-100 pt-1.5">
+                      <div className="text-[9px] text-slate-500 flex justify-between border-t border-slate-100 pt-1.5">
                         <span>Release: {order.release_date}</span>
                         <span>Assign: {order.supplier_name.split(' ')[0]}</span>
                       </div>
@@ -928,14 +928,14 @@ export default function MRPScreen({
                     </div>
                   ))}
                   {plannedOrdersList.length === 0 && (
-                    <div className="p-6 text-center text-[11px] text-gray-400">All planned stock arrivals are covered by open supplier POs. No shortage gaps found.</div>
+                    <div className="p-6 text-center text-[11px] text-slate-400">All planned stock arrivals are covered by open supplier POs. No shortage gaps found.</div>
                   )}
                 </div>
               </div>
 
               {/* Column 2: Pending (ordered, not shipped) */}
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3 flex flex-col h-[65vh]">
-                <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 flex flex-col h-[65vh]">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                   <h4 className="text-xs font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1">
                     <ClipboardCheck className="w-3.5 h-3.5" /> Pending POs
                   </h4>
@@ -948,19 +948,19 @@ export default function MRPScreen({
                     const mat = materials.find(m => m.id === po.material_id);
                     const sup = suppliers.find(s => s.id === po.supplier_id);
                     return (
-                      <div key={po.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-2xs space-y-2 animate-in fade-in zoom-in-95 duration-150">
+                      <div key={po.id} className="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs space-y-2 animate-in fade-in zoom-in-95 duration-150">
                         <div className="flex justify-between items-start">
-                          <h5 className="font-semibold text-xs text-gray-900">{mat ? mat.name : 'Unknown'}</h5>
+                          <h5 className="font-semibold text-xs text-slate-900">{mat ? mat.name : 'Unknown'}</h5>
                           <span className={`px-1.5 py-0.5 rounded-sm border text-[9px] font-bold ${getTimingColor(po.timing)}`}>
                             {po.timing}
                           </span>
                         </div>
-                        <p className="text-[9px] text-gray-400 font-mono">{po.order_no}</p>
+                        <p className="text-[9px] text-slate-400 font-mono">{po.order_no}</p>
                         <div className="flex justify-between items-baseline text-xs">
-                          <span className="text-[10px] text-gray-400">Order Qty:</span>
+                          <span className="text-[10px] text-slate-400">Order Qty:</span>
                           <span className="font-bold font-mono">{po.remaining_qty.toLocaleString()}</span>
                         </div>
-                        <div className="text-[9px] text-gray-500 flex justify-between border-t border-gray-100 pt-1.5">
+                        <div className="text-[9px] text-slate-500 flex justify-between border-t border-slate-100 pt-1.5">
                           <span>Required: {po.required_date}</span>
                           <span>Supplier: {sup ? sup.name.split(' ')[0] : 'Unknown'}</span>
                         </div>
@@ -971,8 +971,8 @@ export default function MRPScreen({
               </div>
 
               {/* Column 3: In Transit */}
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3 flex flex-col h-[65vh]">
-                <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 flex flex-col h-[65vh]">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                   <h4 className="text-xs font-bold text-indigo-700 uppercase tracking-wider flex items-center gap-1">
                     <Truck className="w-3.5 h-3.5" /> In Transit
                   </h4>
@@ -985,14 +985,14 @@ export default function MRPScreen({
                     const mat = materials.find(m => m.id === po.material_id);
                     const sup = suppliers.find(s => s.id === po.supplier_id);
                     return (
-                      <div key={po.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-2xs space-y-2 animate-in fade-in zoom-in-95 duration-150">
-                        <h5 className="font-semibold text-xs text-gray-900">{mat ? mat.name : 'Unknown'}</h5>
-                        <p className="text-[9px] text-gray-400 font-mono">{po.order_no}</p>
+                      <div key={po.id} className="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs space-y-2 animate-in fade-in zoom-in-95 duration-150">
+                        <h5 className="font-semibold text-xs text-slate-900">{mat ? mat.name : 'Unknown'}</h5>
+                        <p className="text-[9px] text-slate-400 font-mono">{po.order_no}</p>
                         <div className="flex justify-between items-baseline text-xs">
-                          <span className="text-[10px] text-gray-400 font-sans">Ship Qty:</span>
+                          <span className="text-[10px] text-slate-400 font-sans">Ship Qty:</span>
                           <span className="font-bold font-mono text-indigo-600">{po.qty.toLocaleString()}</span>
                         </div>
-                        <div className="text-[9px] text-gray-500 flex justify-between border-t border-gray-100 pt-1.5">
+                        <div className="text-[9px] text-slate-500 flex justify-between border-t border-slate-100 pt-1.5">
                           <span>Required: {po.required_date}</span>
                           <span>Supplier: {sup ? sup.name.split(' ')[0] : 'Unknown'}</span>
                         </div>
@@ -1000,14 +1000,14 @@ export default function MRPScreen({
                     );
                   })}
                   {purchaseOrders.filter(p => p.status === 'in_transit').length === 0 && (
-                    <div className="p-6 text-center text-[11px] text-gray-400">No active orders currently tracked in transit. Convert open POs in the Logistics tab.</div>
+                    <div className="p-6 text-center text-[11px] text-slate-400">No active orders currently tracked in transit. Convert open POs in the Logistics tab.</div>
                   )}
                 </div>
               </div>
 
               {/* Column 4: Completed */}
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3 flex flex-col h-[65vh]">
-                <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 flex flex-col h-[65vh]">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                   <h4 className="text-xs font-bold text-emerald-700 uppercase tracking-wider flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" /> Completed
                   </h4>
@@ -1020,14 +1020,14 @@ export default function MRPScreen({
                     const mat = materials.find(m => m.id === po.material_id);
                     const sup = suppliers.find(s => s.id === po.supplier_id);
                     return (
-                      <div key={po.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-2xs space-y-2 opacity-80 animate-in fade-in zoom-in-95 duration-150">
-                        <h5 className="font-semibold text-xs text-gray-900">{mat ? mat.name : 'Unknown'}</h5>
-                        <p className="text-[9px] text-gray-400 font-mono">{po.order_no}</p>
+                      <div key={po.id} className="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs space-y-2 opacity-80 animate-in fade-in zoom-in-95 duration-150">
+                        <h5 className="font-semibold text-xs text-slate-900">{mat ? mat.name : 'Unknown'}</h5>
+                        <p className="text-[9px] text-slate-400 font-mono">{po.order_no}</p>
                         <div className="flex justify-between items-baseline text-xs">
-                          <span className="text-[10px] text-gray-400 font-sans">Received Qty:</span>
+                          <span className="text-[10px] text-slate-400 font-sans">Received Qty:</span>
                           <span className="font-bold font-mono text-emerald-600">{po.qty.toLocaleString()}</span>
                         </div>
-                        <div className="text-[9px] text-gray-500 flex justify-between border-t border-gray-100 pt-1.5">
+                        <div className="text-[9px] text-slate-500 flex justify-between border-t border-slate-100 pt-1.5">
                           <span>Received: {po.required_date}</span>
                           <span>Supplier: {sup ? sup.name.split(' ')[0] : 'Unknown'}</span>
                         </div>
@@ -1044,14 +1044,14 @@ export default function MRPScreen({
       {/* CREATE PURCHASE ORDER CONFIRMATION MODAL */}
       {poModalData && (
         <div className="fixed inset-0 z-[4600] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" ref={poModalRef}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col border border-gray-100 font-sans">
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-slate-50">
-              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col border border-slate-100 font-sans">
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                 <ShoppingBag className="w-4 h-4 text-blue-600" /> Confirm Purchase Order
               </h3>
               <button 
                 onClick={() => setPoModalData(null)} 
-                className="text-gray-400 hover:text-gray-600 font-bold p-1 bg-white border border-gray-200 rounded-md shadow-xs cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 font-bold p-1 bg-white border border-slate-200 rounded-md shadow-xs cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -1063,49 +1063,49 @@ export default function MRPScreen({
               </div>
 
               <div className="space-y-2.5">
-                <div className="flex justify-between border-b border-gray-100 pb-1.5">
-                  <span className="text-gray-400">Material Name</span>
-                  <span className="font-semibold text-gray-800 text-right max-w-[200px] truncate">{poModalData.material.name}</span>
+                <div className="flex justify-between border-b border-slate-100 pb-1.5">
+                  <span className="text-slate-400">Material Name</span>
+                  <span className="font-semibold text-slate-800 text-right max-w-[200px] truncate">{poModalData.material.name}</span>
                 </div>
-                <div className="flex justify-between border-b border-gray-100 pb-1.5">
-                  <span className="text-gray-400">Material SKU</span>
-                  <span className="font-semibold font-mono text-gray-800">{poModalData.material.sku}</span>
+                <div className="flex justify-between border-b border-slate-100 pb-1.5">
+                  <span className="text-slate-400">Material SKU</span>
+                  <span className="font-semibold font-mono text-slate-800">{poModalData.material.sku}</span>
                 </div>
-                <div className="flex justify-between border-b border-gray-100 pb-1.5">
-                  <span className="text-gray-400">Supplier Assigned</span>
-                  <span className="font-semibold text-gray-800">{poModalData.supplier.name}</span>
+                <div className="flex justify-between border-b border-slate-100 pb-1.5">
+                  <span className="text-slate-400">Supplier Assigned</span>
+                  <span className="font-semibold text-slate-800">{poModalData.supplier.name}</span>
                 </div>
-                <div className="flex justify-between border-b border-gray-100 pb-1.5">
-                  <span className="text-gray-400">Suggested Qty</span>
+                <div className="flex justify-between border-b border-slate-100 pb-1.5">
+                  <span className="text-slate-400">Suggested Qty</span>
                   <span className="font-bold text-slate-800 font-mono">{poModalData.qty.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between border-b border-gray-100 pb-1.5">
-                  <span className="text-gray-400">Lead-Time (Supplier + Transit)</span>
-                  <span className="font-semibold text-gray-800 font-mono">{poModalData.material.total_lead_time_days} days</span>
+                <div className="flex justify-between border-b border-slate-100 pb-1.5">
+                  <span className="text-slate-400">Lead-Time (Supplier + Transit)</span>
+                  <span className="font-semibold text-slate-800 font-mono">{poModalData.material.total_lead_time_days} days</span>
                 </div>
-                <div className="flex justify-between border-b border-gray-100 pb-1.5">
-                  <span className="text-gray-400">Required Date</span>
+                <div className="flex justify-between border-b border-slate-100 pb-1.5">
+                  <span className="text-slate-400">Required Date</span>
                   <span className="font-semibold text-blue-600 font-mono">{poModalData.requiredDate}</span>
                 </div>
-                <div className="flex justify-between border-b border-gray-100 pb-1.5">
-                  <span className="text-gray-400">Suggested Release Date</span>
+                <div className="flex justify-between border-b border-slate-100 pb-1.5">
+                  <span className="text-slate-400">Suggested Release Date</span>
                   <span className="font-semibold text-amber-600 font-mono">{poModalData.suggestedReleaseDate}</span>
                 </div>
-                <div className="flex justify-between border-b border-gray-100 pb-1.5">
-                  <span className="text-gray-400">Unit Price</span>
+                <div className="flex justify-between border-b border-slate-100 pb-1.5">
+                  <span className="text-slate-400">Unit Price</span>
                   <span className="font-semibold text-emerald-600 font-mono">${(poModalData.material.standard_cost || 0).toFixed(4)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Estimated Total Value</span>
+                  <span className="text-slate-400">Estimated Total Value</span>
                   <span className="font-extrabold text-emerald-600 font-mono text-sm">${((poModalData.material.standard_cost || 0) * poModalData.qty).toLocaleString()}</span>
                 </div>
               </div>
             </div>
 
-            <div className="px-5 py-4 border-t border-gray-100 flex justify-end gap-2 bg-slate-50">
+            <div className="px-5 py-4 border-t border-slate-100 flex justify-end gap-2 bg-slate-50">
               <button 
                 onClick={() => setPoModalData(null)}
-                className="px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold rounded-lg text-xs cursor-pointer"
+                className="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold rounded-lg text-xs cursor-pointer"
               >
                 Cancel
               </button>
