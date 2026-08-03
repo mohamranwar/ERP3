@@ -63,6 +63,14 @@ export default function DashboardScreen({
 
   const totalSalesForecast = useMemo(() => fgPsi.reduce((sum, item) => sum + item.sales_forecast, 0), [fgPsi]);
   const totalSalesActual = useMemo(() => fgPsi.reduce((sum, item) => sum + item.actual_sales, 0), [fgPsi]);
+  // Whether anyone has reported sales for this period at all. A future month
+  // carries a plan and no actuals, which totals zero and is not the same thing
+  // as having sold nothing.
+  const hasSalesActuals = useMemo(
+    () => fgPsi.some(item => item.sales_actual_records > 0),
+    [fgPsi]
+  );
+
   // null when nothing is planned for the period. Reporting 0% next to an "On
   // Target" badge told the opposite of the truth: it read as a total miss that
   // was somehow fine, when in fact there was simply nothing to measure.
@@ -70,6 +78,21 @@ export default function DashboardScreen({
     () => (totalSalesForecast > 0 ? (totalSalesActual / totalSalesForecast) * 100 : null),
     [totalSalesForecast, totalSalesActual]
   );
+
+  type AchievementState = 'no-plan' | 'awaiting' | 'on-target' | 'behind';
+  const achievementState: AchievementState =
+    salesAchievement === null ? 'no-plan'
+      : !hasSalesActuals ? 'awaiting'
+        : salesAchievement >= 85 ? 'on-target'
+          : 'behind';
+
+  const ACHIEVEMENT_STYLE: Record<AchievementState, { value: string; badge: string; tone: string; chip: string }> = {
+    'no-plan': { value: 'No plan', badge: 'Nothing planned', tone: 'text-slate-400', chip: 'bg-slate-50 text-slate-500 border-slate-200' },
+    'awaiting': { value: '-', badge: 'Awaiting actuals', tone: 'text-slate-400', chip: 'bg-slate-50 text-slate-500 border-slate-200' },
+    'on-target': { value: `${(salesAchievement ?? 0).toFixed(1)}%`, badge: 'On Target', tone: 'text-emerald-600', chip: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
+    'behind': { value: `${(salesAchievement ?? 0).toFixed(1)}%`, badge: 'Behind', tone: 'text-amber-600', chip: 'bg-amber-50 text-amber-600 border-amber-100' },
+  };
+  const achievement = ACHIEVEMENT_STYLE[achievementState];
 
   // Sorting for lowest 20 materials matching search
   const lowestMaterials = useMemo(() => {
@@ -184,24 +207,16 @@ export default function DashboardScreen({
         {/* Sales Achievement Card */}
         <div className="bg-white border border-slate-200 rounded p-3 flex flex-col justify-between h-24 shadow-xs">
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Sales Achievement</span>
-          <div className="flex items-baseline justify-between">
-            <span className={`text-2xl font-bold ${salesAchievement === null ? 'text-slate-400' : 'text-emerald-600'}`}>
-              {salesAchievement === null ? 'No plan' : `${salesAchievement.toFixed(1)}%`}
-            </span>
-            <span className={`text-[10px] px-1 font-bold rounded border ${
-              salesAchievement === null
-                ? 'bg-slate-50 text-slate-500 border-slate-200'
-                : salesAchievement >= 85
-                  ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                  : 'bg-amber-50 text-amber-600 border-amber-100'
-            }`}>
-              {salesAchievement === null ? 'Nothing planned' : salesAchievement >= 85 ? 'On Target' : 'Behind'}
+          <div className="flex items-baseline justify-between gap-1.5">
+            <span className={`text-2xl font-bold ${achievement.tone}`}>{achievement.value}</span>
+            <span className={`text-[10px] px-1 font-bold rounded border whitespace-nowrap ${achievement.chip}`}>
+              {achievement.badge}
             </span>
           </div>
           <div className="w-full bg-slate-100 h-1 rounded-full">
             <div 
               className="bg-emerald-500 h-full rounded-full" 
-              style={{ width: `${Math.min(100, salesAchievement ?? 0)}%` }}
+              style={{ width: `${achievementState === 'on-target' || achievementState === 'behind' ? Math.min(100, salesAchievement ?? 0) : 0}%` }}
             ></div>
           </div>
         </div>

@@ -4,10 +4,13 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { fetchTableData, getPlanningPeriod, getPlannedPeriods, formatPlanningPeriod } from '../supabaseClient';
-import { 
-  Product, ProductGroup, ProductCategory, SalesPlan, ProductionPlan, 
-  InventorySnapshot, SalesActual, ProductionActual 
+import {
+  fetchTableData, getPlanningPeriod, getPlannedPeriods, formatPlanningPeriod,
+  getVFGPSIAnalysis, isInPeriod
+} from '../supabaseClient';
+import {
+  Product, ProductGroup, ProductCategory, SalesPlan, ProductionPlan,
+  InventorySnapshot, SalesActual, ProductionActual, VFGPSIAnalysis
 } from '../types';
 import { 
   RefreshCw, ChevronRight, ChevronDown, SlidersHorizontal, 
@@ -74,6 +77,16 @@ export default function FinishedGoodsAnalysis({
   const [selectedSkuProduct, setSelectedSkuProduct] = useState<Product | null>(null);
   const [skuLedgerData, setSkuLedgerData] = useState<PSIMonthRow[]>([]);
 
+  // Period totals come from the engine rather than being summed again here.
+  // This screen used to carry its own copy of the aggregation, which is how it
+  // ended up matching periods differently from every other screen.
+  const [psiRows, setPsiRows] = useState<VFGPSIAnalysis[]>([]);
+  const psiByProduct = useMemo(() => {
+    const map = new Map<string, VFGPSIAnalysis>();
+    psiRows.forEach(r => map.set(r.row_id, r));
+    return map;
+  }, [psiRows]);
+
   const { showToast } = useToast();
 
   async function loadAllData() {
@@ -89,6 +102,7 @@ export default function FinishedGoodsAnalysis({
         fetchTableData<SalesActual>('sales_actual'),
         fetchTableData<ProductionActual>('production_actual')
       ]);
+      setPsiRows(await getVFGPSIAnalysis(selectedMonth));
 
       setProducts(prods);
       setCategories(cats);
@@ -107,7 +121,7 @@ export default function FinishedGoodsAnalysis({
 
   useEffect(() => {
     loadAllData();
-  }, [refreshKey]);
+  }, [refreshKey, selectedMonth]);
 
   // Compute 4-month ledger for the selected SKU detail view
   useEffect(() => {
@@ -117,7 +131,7 @@ export default function FinishedGoodsAnalysis({
     // matrix, not a hardcoded July 2026 - otherwise drilling into a SKU while
     // viewing August/September data would still show a ledger starting from
     // July, silently disagreeing with what's on screen.
-    const baseDate = new Date(selectedMonth);
+    const [baseYear, baseMonth] = selectedMonth.split('-').map(Number);
     const ledger: PSIMonthRow[] = [];
     let runningInventory = 0;
 
@@ -127,16 +141,18 @@ export default function FinishedGoodsAnalysis({
     runningInventory = initialSnap ? initialSnap.quantity : 0;
 
     for (let i = 0; i < 4; i++) {
-      const targetDate = new Date(baseDate);
-      targetDate.setMonth(baseDate.getMonth() + i);
-      const mStr = targetDate.toISOString().slice(0, 7);
+      // Stepped on the calendar rather than through a UTC Date: parsing
+      // "2026-08-01" gives UTC midnight, and reading it back with
+      // toISOString() in a negative-offset zone returns the previous month.
+      const targetDate = new Date(baseYear, baseMonth - 1 + i, 1);
+      const mStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, '0')}`;
 
       const monthProd = productionPlans
-        .filter(p => p.product_id === selectedSkuProduct.id && p.period_start.startsWith(mStr))
+        .filter(p => p.product_id === selectedSkuProduct.id && isInPeriod(p.period_start, mStr))
         .reduce((sum, p) => sum + p.quantity, 0);
 
       const monthSales = salesPlans
-        .filter(s => s.product_id === selectedSkuProduct.id && s.period_start.startsWith(mStr))
+        .filter(s => s.product_id === selectedSkuProduct.id && isInPeriod(s.period_start, mStr))
         .reduce((sum, s) => sum + s.quantity, 0);
 
       const begInv = runningInventory;
@@ -168,47 +184,27 @@ export default function FinishedGoodsAnalysis({
   };
 
   const getProductMetrics = (p: Product) => {
-    const startStockSnapshot = inventorySnapshots.find(
-      i => i.item_type === 'product' && i.item_id === p.id
-    );
-    const rawStartStock = startStockSnapshot ? startStockSnapshot.quantity : 0;
-
-    const mPrefix = selectedMonth.slice(0, 7);
-
-    const rawSalesForecast = salesPlans
-      .filter(s => s.product_id === p.id && s.period_start.startsWith(mPrefix))
-      .reduce((sum, s) => sum + s.quantity, 0);
-
-    const rawActualSales = salesActuals
-      .filter(s => s.product_id === p.id && s.period_start.startsWith(mPrefix))
-      .reduce((sum, s) => sum + s.quantity, 0);
-
-    const rawProductionPlan = productionPlans
-      .filter(pr => pr.product_id === p.id && pr.period_start.startsWith(mPrefix))
-      .reduce((sum, pr) => sum + pr.quantity, 0);
-
-    const rawActualProduction = productionActuals
-      .filter(pa => pa.product_id === p.id && pa.period_start.startsWith(mPrefix))
-      .reduce((sum, pa) => sum + pa.quantity, 0);
-
+    // Engine figures are in pieces; this screen's only addition is converting
+    // them to the selected unit.
+    const row = psiByProduct.get(p.id);
     const mult = getProductValueMultiplier(p, unit);
 
-    const startStock = rawStartStock * mult;
-    const salesForecast = rawSalesForecast * mult;
-    const actualSales = rawActualSales * mult;
-    const productionPlan = rawProductionPlan * mult;
-    const actualProduction = rawActualProduction * mult;
-    const expectedStock = (rawStartStock + rawProductionPlan - rawSalesForecast) * mult;
-    const salesValue = rawSalesForecast * p.selling_price; 
+    if (!row) {
+      return {
+        startStock: 0, salesForecast: 0, actualSales: 0, productionPlan: 0,
+        actualProduction: 0, expectedStock: 0, salesValue: 0,
+      };
+    }
 
     return {
-      startStock,
-      salesForecast,
-      actualSales,
-      productionPlan,
-      actualProduction,
-      expectedStock,
-      salesValue
+      startStock: row.start_stock * mult,
+      salesForecast: row.sales_forecast * mult,
+      actualSales: row.actual_sales * mult,
+      productionPlan: row.production_plan * mult,
+      actualProduction: row.actual_production * mult,
+      expectedStock: row.expected_stock * mult,
+      // Value is always money, so it does not take the unit multiplier.
+      salesValue: row.sales_value,
     };
   };
 
