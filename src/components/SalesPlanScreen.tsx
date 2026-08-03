@@ -336,9 +336,9 @@ export default function SalesPlanScreen({
       />
 
       {/* Control bar */}
-      <div className="flex flex-wrap items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200 font-sans">
+      <div className="flex flex-wrap items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200 font-sans">
         {/* Grain Switcher */}
-        <div className="flex bg-white rounded-lg border border-gray-300 p-0.5" id="grain_toggle_container">
+        <div className="flex bg-white rounded-lg border border-slate-300 p-0.5" id="grain_toggle_container">
           {(['day', 'week', 'month'] as GrainType[]).map(grain => (
             <button
               key={grain}
@@ -347,7 +347,7 @@ export default function SalesPlanScreen({
               className={`px-3 py-1 text-xs font-bold capitalize rounded-md transition-all cursor-pointer ${
                 selectedGrain === grain 
                   ? 'bg-blue-600 text-white shadow-xs' 
-                  : 'text-gray-500 hover:text-gray-800'
+                  : 'text-slate-500 hover:text-slate-800'
               }`}
             >
               {grain}
@@ -357,12 +357,12 @@ export default function SalesPlanScreen({
 
         {/* Channel selection */}
         <div className="flex items-center gap-1.5">
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Channel:</span>
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Channel:</span>
           <select
             id="sales_channel_picker"
             value={selectedChannelId}
             onChange={(e) => { setSelectedChannelId(e.target.value); setGridEdits({}); }}
-            className="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-lg focus:outline-hidden font-bold text-gray-700 cursor-pointer"
+            className="px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-hidden font-bold text-slate-700 cursor-pointer"
           >
             <option value="">All Channels (Read-Only)</option>
             {channels.map(c => (
@@ -380,7 +380,7 @@ export default function SalesPlanScreen({
           hasActiveSearch={hasActiveSearch}
         />
 
-        <button onClick={loadData} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors cursor-pointer" title="Refresh">
+        <button onClick={loadData} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors cursor-pointer" title="Refresh">
           <RefreshCw className="w-4 h-4" />
         </button>
       </div>
@@ -390,10 +390,10 @@ export default function SalesPlanScreen({
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs font-sans">
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs font-sans">
           <ScrollableTable>
-            <table className="min-w-full divide-y divide-gray-200 text-left text-xs">
-              <thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider sticky top-0">
+            <table className="min-w-full divide-y divide-slate-200 text-left text-xs">
+              <thead className="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider sticky top-0">
                 <tr>
                   <th className="px-4 py-3">SKU</th>
                   <th className="px-4 py-3">Product Description</th>
@@ -406,14 +406,14 @@ export default function SalesPlanScreen({
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 text-xs text-gray-900">
+              <tbody className="divide-y divide-slate-200 text-xs text-slate-900">
                 {filteredProducts.map(p => (
-                  <tr key={p.id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-4 py-3 font-mono text-gray-500 font-semibold">{p.sku}</td>
-                    <td className="px-4 py-3 font-semibold text-gray-800">{p.name}</td>
-                    <td className="px-4 py-3 text-gray-500">{p.brand}</td>
+                  <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-4 py-3 font-mono text-slate-500 font-semibold">{p.sku}</td>
+                    <td className="px-4 py-3 font-semibold text-slate-800">{p.name}</td>
+                    <td className="px-4 py-3 text-slate-500">{p.brand}</td>
                     <td className="px-4 py-3">
-                      <span className="px-1.5 py-0.5 bg-gray-100 rounded-xs text-[10px] font-mono font-medium text-gray-600">
+                      <span className="px-1.5 py-0.5 bg-slate-100 rounded-xs text-[10px] font-mono font-medium text-slate-600">
                         {p.product_line}
                       </span>
                     </td>
@@ -433,12 +433,12 @@ export default function SalesPlanScreen({
                               onChange={(e) => handleCellChange(p.id, col, e.target.value)}
                               className={`w-full text-right p-1.5 border border-transparent rounded-lg focus:outline-hidden font-bold font-mono text-xs ${
                                 !selectedChannelId 
-                                  ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
-                                  : 'bg-gray-50/30 text-gray-800 hover:border-gray-200 focus:border-blue-500 focus:bg-white'
+                                  ? 'bg-slate-100 text-slate-500 cursor-not-allowed' 
+                                  : 'bg-slate-50/30 text-slate-800 hover:border-slate-200 focus:border-blue-500 focus:bg-white'
                               }`}
                             />
                             {!selectedChannelId && (
-                              <span className="text-[8px] text-gray-400 font-medium">Aggregated</span>
+                              <span className="text-[8px] text-slate-400 font-medium">Aggregated</span>
                             )}
                             {selectedChannelId && isBlank && suggestion > 0 && (
                               <button

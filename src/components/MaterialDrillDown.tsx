@@ -214,12 +214,12 @@ export default function MaterialDrillDown({
               className="w-40"
               hasActiveSearch={hasActiveSearch}
             />
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider ms-2">Select Material:</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider ms-2">Select Material:</span>
             <select
               id="drill_material_picker"
               value={selectedMaterialId}
               onChange={(e) => setSelectedMaterialId(e.target.value)}
-              className="px-3.5 py-1.5 text-xs bg-white border border-gray-300 rounded-lg font-semibold text-gray-700 shadow-xs focus:outline-hidden max-w-[240px] cursor-pointer"
+              className="px-3.5 py-1.5 text-xs bg-white border border-slate-300 rounded-lg font-semibold text-slate-700 shadow-xs focus:outline-hidden max-w-[240px] cursor-pointer"
             >
               {filteredMaterials.map(m => (
                 <option key={m.id} value={m.id}>{m.sku} - {m.name}</option>
@@ -243,36 +243,36 @@ export default function MaterialDrillDown({
           <div className="space-y-6">
             {/* Top Specifications Panel */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-xs space-y-1">
-                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Total Lead-Time Days</span>
+              <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs space-y-1">
+                <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Total Lead-Time Days</span>
                 <h3 className="text-xl font-extrabold text-blue-600 font-mono">{activeMaterial.total_lead_time_days} days</h3>
-                <p className="text-[10px] text-gray-400 font-mono">({activeMaterial.supplier_lead_time_days}d production + {activeMaterial.transit_days}d transit + {activeMaterial.customs_clearance_days}d customs)</p>
+                <p className="text-[10px] text-slate-400 font-mono">({activeMaterial.supplier_lead_time_days}d production + {activeMaterial.transit_days}d transit + {activeMaterial.customs_clearance_days}d customs)</p>
               </div>
 
-              <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-xs space-y-1">
-                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Safety Stock Qty</span>
+              <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs space-y-1">
+                <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Safety Stock Qty</span>
                 <h3 className="text-xl font-extrabold text-amber-700 font-mono">{Math.round(safetyStockUnits).toLocaleString()} units</h3>
                 {hasSafetyStockOverride(activeMaterial) ? (
                   <p className="text-[10px] text-amber-600 font-mono">
                     Manual override: {activeMaterial.safety_stock_months} months of cover
                   </p>
                 ) : (
-                  <p className="text-[10px] text-gray-400 font-mono">
+                  <p className="text-[10px] text-slate-400 font-mono">
                     {activeMaterial.total_lead_time_days}d lead x {SAFETY_SERVICE_FACTOR} service = {getSafetyStockMonths(activeMaterial).toFixed(1)} months of cover
                   </p>
                 )}
               </div>
 
-              <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-xs space-y-1">
-                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Reorder Point Trigger</span>
+              <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs space-y-1">
+                <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Reorder Point Trigger</span>
                 <h3 className="text-xl font-extrabold text-indigo-600 font-mono">{activeMaterial.reorder_point_days} Days</h3>
-                <p className="text-[10px] text-gray-400">Reorder when coverage drops below {activeMaterial.reorder_point_days} days</p>
+                <p className="text-[10px] text-slate-400">Reorder when coverage drops below {activeMaterial.reorder_point_days} days</p>
               </div>
 
-              <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-xs space-y-1">
-                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Primary Supplier</span>
-                <h3 className="text-sm font-bold text-gray-800 truncate">{activeSupplier?.name || 'Unknown'}</h3>
-                <p className="text-[10px] text-gray-400 font-sans">MOQ requirement: {activeMaterial.moq.toLocaleString()} units</p>
+              <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-xs space-y-1">
+                <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Primary Supplier</span>
+                <h3 className="text-sm font-bold text-slate-800 truncate">{activeSupplier?.name || 'Unknown'}</h3>
+                <p className="text-[10px] text-slate-400 font-sans">MOQ requirement: {activeMaterial.moq.toLocaleString()} units</p>
               </div>
             </div>
 
@@ -288,17 +288,17 @@ export default function MaterialDrillDown({
             )}
 
             {/* Projection Table */}
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs">
-              <div className="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Month-by-Month Stock & Coverage Projections</h3>
-                <button onClick={loadInitial} className="p-1 text-gray-500 hover:text-gray-800 rounded transition-colors cursor-pointer">
+            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+              <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Month-by-Month Stock & Coverage Projections</h3>
+                <button onClick={loadInitial} className="p-1 text-slate-500 hover:text-slate-800 rounded transition-colors cursor-pointer">
                   <RefreshCw className="w-3.5 h-3.5" />
                 </button>
               </div>
 
               <ScrollableTable>
-                <table className="min-w-full divide-y divide-gray-200 text-left text-xs font-sans">
-                  <thead className="bg-gray-50/50 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                <table className="min-w-full divide-y divide-slate-200 text-left text-xs font-sans">
+                  <thead className="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     <tr>
                       <th className="px-5 py-3">Planning Period</th>
                       <th className="px-5 py-3 text-right">Opening Inventory</th>
@@ -312,7 +312,7 @@ export default function MaterialDrillDown({
                       <th className="px-5 py-3 text-right">Months of Coverage</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 text-xs text-gray-700">
+                  <tbody className="divide-y divide-slate-200 text-xs text-slate-700">
                     {projections.map((p, idx) => {
                       const isNegative = (p.ending_stock ?? 0) < 0;
                       const consumption = p.plan_consumption ?? 0;
@@ -321,17 +321,17 @@ export default function MaterialDrillDown({
                       const coverageMonths = (p.ending_coverage_days ?? 0) / 30;
 
                       return (
-                        <tr key={idx} className="hover:bg-gray-50/30 transition-colors">
-                          <td className="px-5 py-3.5 font-bold text-gray-800">{formatMonth(p.period_start)}</td>
-                          <td className="px-5 py-3.5 text-right font-mono text-gray-500">{(p.opening_stock ?? 0).toLocaleString()}</td>
-                          <td className="px-5 py-3.5 text-right font-mono text-gray-600">{consumption.toLocaleString()}</td>
+                        <tr key={idx} className="hover:bg-slate-50/30 transition-colors">
+                          <td className="px-5 py-3.5 font-bold text-slate-800">{formatMonth(p.period_start)}</td>
+                          <td className="px-5 py-3.5 text-right font-mono text-slate-500">{(p.opening_stock ?? 0).toLocaleString()}</td>
+                          <td className="px-5 py-3.5 text-right font-mono text-slate-600">{consumption.toLocaleString()}</td>
                           <td className="px-5 py-3.5 text-right font-mono text-emerald-600 font-semibold">
                             {inTransit > 0 ? `+${inTransit.toLocaleString()}` : '0'}
                           </td>
                           <td className="px-5 py-3.5 text-right font-mono text-indigo-600 font-semibold">
                             {pendingPO > 0 ? `+${pendingPO.toLocaleString()}` : '0'}
                           </td>
-                          <td className={`px-5 py-3.5 text-right font-mono font-bold ${isNegative ? 'text-rose-600 bg-rose-50/20' : 'text-gray-900'}`}>
+                          <td className={`px-5 py-3.5 text-right font-mono font-bold ${isNegative ? 'text-red-600 bg-red-50/20' : 'text-slate-900'}`}>
                             {(p.ending_stock ?? 0).toLocaleString()}
                           </td>
                           <td className="px-5 py-3.5 text-right">
@@ -356,15 +356,15 @@ export default function MaterialDrillDown({
             {/* Split Details Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Receipts Timeline */}
-              <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-5 shadow-xs space-y-4">
-                <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 pb-3 flex items-center gap-1.5">
+              <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-3 flex items-center gap-1.5">
                   <Calendar className="w-4 h-4 text-blue-600" /> Procurement & Shipment Inbound Timeline
                 </h3>
 
                 {timelineEvents.length === 0 ? (
-                  <p className="text-xs text-gray-400 py-6 text-center">No pending shipments or purchase approval requests recorded for this component.</p>
+                  <p className="text-xs text-slate-400 py-6 text-center">No pending shipments or purchase approval requests recorded for this component.</p>
                 ) : (
-                  <div className="relative border-l border-gray-200 ml-2.5 pl-4 space-y-5">
+                  <div className="relative border-l border-slate-200 ml-2.5 pl-4 space-y-5">
                     {timelineEvents.map((evt) => {
                       const isPO = evt.type === 'purchase_order';
                       return (
@@ -374,7 +374,7 @@ export default function MaterialDrillDown({
                           }`} />
                           <div className="flex justify-between items-start gap-4">
                             <div className="space-y-0.5">
-                              <h4 className="text-xs font-bold text-gray-800 flex items-center gap-2">
+                              <h4 className="text-xs font-bold text-slate-800 flex items-center gap-2">
                                 {isPO ? 'Planned Procurement Release' : 'In-Transit Freight Shipment'}
                                 <span className={`text-[9px] font-mono px-1 py-0.5 rounded ${
                                   isPO ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
@@ -382,11 +382,11 @@ export default function MaterialDrillDown({
                                   Ref: {evt.reference}
                                 </span>
                               </h4>
-                              <p className="text-[10px] text-gray-400 font-medium">{evt.details}</p>
+                              <p className="text-[10px] text-slate-400 font-medium">{evt.details}</p>
                             </div>
                             <div className="text-right space-y-0.5 shrink-0">
-                              <span className="block text-xs font-bold font-mono text-gray-900">+{evt.qty.toLocaleString()} units</span>
-                              <span className="block text-[9px] font-mono text-gray-400 font-bold">ETA: {formatDateFriendly(evt.date)}</span>
+                              <span className="block text-xs font-bold font-mono text-slate-900">+{evt.qty.toLocaleString()} units</span>
+                              <span className="block text-[9px] font-mono text-slate-400 font-bold">ETA: {formatDateFriendly(evt.date)}</span>
                             </div>
                           </div>
                         </div>
@@ -397,34 +397,34 @@ export default function MaterialDrillDown({
               </div>
 
               {/* Alternatives & Categories info */}
-              <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-xs space-y-5">
+              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-5">
                 <div className="space-y-3">
-                  <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 pb-3 flex items-center gap-1.5">
+                  <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-3 flex items-center gap-1.5">
                     <Layers className="w-4 h-4 text-amber-600" /> Category & Material Family
                   </h3>
                   <div className="space-y-1">
-                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Classification</span>
-                    <p className="text-xs font-bold text-gray-800">{activeCat?.name || 'Unclassified'}</p>
-                    <p className="text-[10px] text-gray-400">{activeCat?.description || 'No family description available.'}</p>
+                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Classification</span>
+                    <p className="text-xs font-bold text-slate-800">{activeCat?.name || 'Unclassified'}</p>
+                    <p className="text-[10px] text-slate-400">{activeCat?.description || 'No family description available.'}</p>
                   </div>
                 </div>
 
-                <div className="space-y-3 pt-3 border-t border-gray-100">
-                  <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
+                <div className="space-y-3 pt-3 border-t border-slate-100">
+                  <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-indigo-600" /> Approved Alternative Materials
                   </h3>
 
                   {activeAlts.length === 0 ? (
-                    <p className="text-[10px] text-gray-400">No alternate components assigned. Supply chains must rely solely on primary supplier releases.</p>
+                    <p className="text-[10px] text-slate-400">No alternate components assigned. Supply chains must rely solely on primary supplier releases.</p>
                   ) : (
                     <div className="space-y-2">
                       {activeAlts.map(alt => (
-                        <div key={alt.id} className="flex justify-between items-center bg-gray-50/50 border border-gray-200 p-2 rounded-lg text-xs">
+                        <div key={alt.id} className="flex justify-between items-center bg-slate-50/50 border border-slate-200 p-2 rounded-lg text-xs">
                           <div>
-                            <span className="font-mono text-[10px] font-bold text-gray-400">{alt.sku}</span>
-                            <h4 className="font-semibold text-gray-700">{alt.name}</h4>
+                            <span className="font-mono text-[10px] font-bold text-slate-400">{alt.sku}</span>
+                            <h4 className="font-semibold text-slate-700">{alt.name}</h4>
                           </div>
-                          <span className="font-mono font-bold text-gray-500">${alt.standard_cost}/unit</span>
+                          <span className="font-mono font-bold text-slate-500">${alt.standard_cost}/unit</span>
                         </div>
                       ))}
                     </div>
@@ -439,7 +439,7 @@ export default function MaterialDrillDown({
             </div>
           </div>
         ) : (
-          <p className="text-xs text-gray-400 p-6 text-center">Please select a valid material to analyze.</p>
+          <p className="text-xs text-slate-400 p-6 text-center">Please select a valid material to analyze.</p>
         )}
       </DataStateWrapper>
     </div>

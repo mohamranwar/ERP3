@@ -1,7 +1,94 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
+/* Typefaces are served from the app itself. The previous Google Fonts @import
+   was a render-blocking request to a third-party host: it fails behind a
+   corporate proxy, offline, and inside any sandboxed embed, dropping the whole
+   UI to a default system face with no warning. */
+@font-face {
+  font-family: "Instrument Sans";
+  src: url("/fonts/InstrumentSans-Regular.woff2") format("woff2");
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Sans";
+  src: url("/fonts/InstrumentSans-Bold.woff2") format("woff2");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Regular.woff2") format("woff2");
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Bold.woff2") format("woff2");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
-  --font-sans: "Inter", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  /* Neither Latin face carries Arabic, so the AR layout falls through to the
+     platform's own Arabic UI font rather than rendering tofu. */
+  --font-sans: "Instrument Sans", "Segoe UI", ui-sans-serif, system-ui,
+    "Noto Sans Arabic", "Geeza Pro", "Segoe UI Arabic", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Instrument Sans pairs a narrow word space with a wide cap height, so the
+   letterspaced uppercase micro-labels this UI uses everywhere ran their words
+   together ("FG UNDER 1 MO. COVER" read as "FGUNDER1MO.COVER"). Opening the
+   word gap in proportion to the tracking restores the word boundaries. */
+.tracking-wider,
+.tracking-widest {
+  word-spacing: 0.16em;
+}
+
+/* Tap targets. Pointer-coarse devices get a comfortable minimum on anything
+   interactive, without inflating the same controls on a mouse-driven desktop
+   where dense rows are an advantage. */
+@media (pointer: coarse) {
+  button,
+  select,
+  input[type="date"] {
+    min-height: 40px;
+  }
+  button.tap-compact,
+  select.tap-compact {
+    min-height: 32px;
+  }
+}
+
+/* Horizontal table scrolling should feel native on touch, and the scrollbar
+   should be visible enough to advertise that more columns exist. */
+.scroll-x-touch {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
+}
+.scroll-x-touch::-webkit-scrollbar {
+  height: 8px;
+}
+.scroll-x-touch::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+.scroll-x-touch::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Respect a reduced-motion preference for the drawer and any transition. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -34,7 +34,7 @@ import {
   LayoutDashboard, Layers, Calendar, Cpu, Play,
   Info, ShieldCheck, Database, Settings, LogOut,
   LineChart, FolderGit2, Truck, BarChart4, ClipboardList, Upload,
-  ChevronLeft, ChevronRight, UserCircle2, CalendarRange
+  ChevronLeft, ChevronRight, UserCircle2, CalendarRange, Menu, X
 } from 'lucide-react';
 
 type ScreenID = 
@@ -61,6 +61,11 @@ export default function App() {
   const [lang, setLang] = useState<'EN' | 'AR'>('EN');
   const [sidebarPinned, setSidebarPinned] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Below lg the sidebar is an overlay rather than a column: at 390px a 240px
+  // rail left 150px for the actual workspace. It stays closed until asked for
+  // and closes again on navigation, so a phone shows one thing at a time.
+  const [navOpen, setNavOpen] = useState(false);
 
   // The month every analysis screen reports on. Screens re-read it from the
   // client on each load, so changing it re-runs them through refreshKey.
@@ -223,36 +228,55 @@ export default function App() {
     return (
       <button
         id={`nav_btn_${id}`}
-        onClick={() => setActiveScreen(id)}
-        className={`w-full flex items-center gap-2.5 px-3 py-1.5 text-[11px] font-semibold rounded transition-all ${
-          isActive 
-            ? 'bg-blue-600 text-white shadow-xs font-bold' 
+        onClick={() => { setActiveScreen(id); setNavOpen(false); }}
+        aria-current={isActive ? 'page' : undefined}
+        className={`w-full flex items-center gap-3 px-3 py-2.5 lg:py-1.5 text-[13px] lg:text-[11px] font-semibold rounded-lg lg:rounded transition-all ${
+          isActive
+            ? 'bg-blue-600 text-white shadow-xs font-bold'
             : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
         }`}
       >
-        <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-        <span className={`truncate ${sidebarPinned ? 'inline' : 'hidden'}`}>{t(label)}</span>
+        <Icon className={`w-4 h-4 lg:w-3.5 lg:h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+        {/* The rail only collapses labels on desktop; in the drawer they always show. */}
+        <span className={`truncate ${sidebarPinned ? 'inline' : 'hidden lg:hidden max-lg:inline'}`}>{t(label)}</span>
       </button>
     );
   };
 
   return (
     <div className={`flex h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden ${lang === 'AR' ? 'text-end' : 'text-start'}`} id="main_app_workspace" dir={lang === 'AR' ? 'rtl' : 'ltr'}>
-      {/* 1. Sidebar Nav */}
-      <aside className={`bg-slate-900 flex-shrink-0 flex flex-col justify-between transition-all duration-300 ${sidebarPinned ? 'w-60' : 'w-14'}`} id="app_sidebar">
+      {/* Scrim behind the mobile drawer. Tapping it dismisses the nav. */}
+      {navOpen && (
+        <div
+          id="nav_backdrop"
+          onClick={() => setNavOpen(false)}
+          className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-[2px] lg:hidden"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* 1. Sidebar Nav - a fixed overlay below lg, an in-flow column above it */}
+      <aside
+        id="app_sidebar"
+        className={`bg-slate-900 flex flex-col justify-between transition-transform duration-300 ease-out
+          max-lg:fixed max-lg:inset-y-0 max-lg:z-50 max-lg:w-[17rem] max-lg:shadow-2xl
+          ${navOpen ? 'max-lg:translate-x-0' : 'max-lg:-translate-x-full rtl:max-lg:translate-x-full'}
+          lg:relative lg:translate-x-0 lg:flex-shrink-0 lg:transition-all
+          ${sidebarPinned ? 'lg:w-60' : 'lg:w-14'}`}
+      >
         <div className="flex flex-col flex-1 min-h-0">
           
           {/* Sidebar Brand header */}
           <div className="p-4 border-b border-slate-700 flex items-center justify-between gap-1.5">
-            <div className={`${sidebarPinned ? 'block' : 'hidden'}`}>
-              <h2 className="text-[11px] font-extrabold text-white tracking-wider uppercase">{t('Sanita Supply Planner')}</h2>
+            <div className={`${sidebarPinned ? 'block' : 'hidden max-lg:block'}`}>
+              <h2 className="text-[13px] lg:text-[11px] font-extrabold text-white tracking-wider uppercase">{t('Sanita Supply Planner')}</h2>
             </div>
 
             <div className="flex items-center gap-1">
               {/* Live Connection Badge */}
               <button 
                 onClick={() => setShowConfig(true)}
-                className={`p-1 rounded border transition-all shrink-0 ${
+                className={`tap-compact p-1 rounded border transition-all shrink-0 ${
                   dbConnected 
                     ? 'bg-emerald-950/60 border-emerald-800 text-emerald-400 hover:bg-emerald-900/50' 
                     : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
@@ -265,10 +289,19 @@ export default function App() {
               {/* Pin/Unpin Toggle Chevron Button */}
               <button
                 onClick={() => setSidebarPinned(!sidebarPinned)}
-                className="p-1 rounded border border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition-all shrink-0 cursor-pointer"
+                className="tap-compact p-1 rounded border border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition-all shrink-0 cursor-pointer max-lg:hidden"
                 title={sidebarPinned ? "Collapse Sidebar" : "Expand Sidebar"}
               >
                 {sidebarPinned ? <ChevronLeft className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+              </button>
+
+              <button
+                id="btn_close_nav"
+                onClick={() => setNavOpen(false)}
+                aria-label="Close navigation"
+                className="p-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:text-white transition-all shrink-0 cursor-pointer lg:hidden"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -278,7 +311,7 @@ export default function App() {
             
             {/* Category: Planning Desk */}
             <div className="space-y-0.5">
-              <span className={`px-3 text-[10px] font-extrabold uppercase text-slate-500 tracking-wider block mb-1 ${sidebarPinned ? 'block' : 'hidden'}`}>{t('Planning Desk')}</span>
+              <span className={`px-3 text-[10px] font-extrabold uppercase text-slate-500 tracking-wider block mb-1 ${sidebarPinned ? 'block' : 'hidden max-lg:block'}`}>{t('Planning Desk')}</span>
               <NavItem id="dashboard" label="SC KPIs Dashboard" icon={LayoutDashboard} />
               <NavItem id="bom" label="Interactive BOM" icon={Layers} />
               <NavItem id="sales_plan" label="Sales Demand Plan" icon={Calendar} />
@@ -288,7 +321,7 @@ export default function App() {
 
             {/* Category: Supply & Logistics */}
             <div className="space-y-0.5">
-              <span className={`px-3 text-[10px] font-extrabold uppercase text-slate-500 tracking-wider block mb-1 ${sidebarPinned ? 'block' : 'hidden'}`}>{t('Supply & Logistics')}</span>
+              <span className={`px-3 text-[10px] font-extrabold uppercase text-slate-500 tracking-wider block mb-1 ${sidebarPinned ? 'block' : 'hidden max-lg:block'}`}>{t('Supply & Logistics')}</span>
               <NavItem id="drill_down" label="Material Check" icon={Info} />
               <NavItem id="coverage" label="Stock Coverage" icon={ClipboardList} />
               <NavItem id="psi" label="PSI Analysis" icon={BarChart4} />
@@ -297,7 +330,7 @@ export default function App() {
 
             {/* Category: Controls */}
             <div className="space-y-0.5">
-              <span className={`px-3 text-[10px] font-extrabold uppercase text-slate-500 tracking-wider block mb-1 ${sidebarPinned ? 'block' : 'hidden'}`}>{t('Controls')}</span>
+              <span className={`px-3 text-[10px] font-extrabold uppercase text-slate-500 tracking-wider block mb-1 ${sidebarPinned ? 'block' : 'hidden max-lg:block'}`}>{t('Controls')}</span>
               <NavItem id="plan_vs_actual" label="Plan vs Actuals" icon={LineChart} />
               <NavItem id="master_data" label="Master Data" icon={FolderGit2} />
               <NavItem id="csv_importer" label="Import Hub" icon={Upload} />
@@ -310,12 +343,10 @@ export default function App() {
         <div className="px-3 py-2.5 bg-slate-900 border-t border-slate-700 flex items-center justify-between gap-1.5" id="sidebar_user_badge">
           <div className="flex items-center gap-1.5 min-w-0">
             <UserCircle2 className="w-4 h-4 text-slate-400 shrink-0" />
-            {sidebarPinned && (
-              <div className="min-w-0">
-                <p className="text-[10px] font-bold text-white truncate">{currentUser.name}</p>
-                <p className="text-[9px] font-mono uppercase text-slate-400">{currentUser.role}</p>
-              </div>
-            )}
+            <div className={`min-w-0 ${sidebarPinned ? 'block' : 'hidden max-lg:block'}`}>
+              <p className="text-[12px] lg:text-[10px] font-bold text-white truncate">{currentUser.name}</p>
+              <p className="text-[10px] lg:text-[9px] font-mono uppercase text-slate-400">{currentUser.role}</p>
+            </div>
           </div>
           <button
             onClick={logout}
@@ -334,13 +365,11 @@ export default function App() {
           >
             <span className="flex items-center gap-1.5">
               <Settings className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-              <span className={`${sidebarPinned ? 'inline' : 'hidden'}`}>{t('Database Engine')}</span>
+              <span className={`${sidebarPinned ? 'inline' : 'hidden max-lg:inline'}`}>{t('Database Engine')}</span>
             </span>
-            {sidebarPinned && (
-              <span className="text-[9px] font-mono px-1 py-0.5 bg-slate-900 text-slate-300 rounded-sm shrink-0">
-                {dbConnected ? 'SUPABASE' : 'DEMO_MODE'}
-              </span>
-            )}
+            <span className={`text-[9px] font-mono px-1 py-0.5 bg-slate-900 text-slate-300 rounded-sm shrink-0 ${sidebarPinned ? 'inline' : 'hidden max-lg:inline'}`}>
+              {dbConnected ? 'SUPABASE' : 'DEMO_MODE'}
+            </span>
           </button>
         </div>
       </aside>
@@ -349,9 +378,19 @@ export default function App() {
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
         
         {/* Universal Top Header */}
-        <header className="h-12 bg-white border-b border-slate-200 px-4 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 bg-slate-100 text-slate-700 font-mono text-[10px] font-bold uppercase rounded border border-slate-200">
+        <header className="min-h-14 lg:h-12 bg-white border-b border-slate-200 px-3 sm:px-4 flex items-center justify-between gap-2 shrink-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <button
+              id="btn_mobile_nav"
+              onClick={() => setNavOpen(true)}
+              aria-label="Open navigation"
+              aria-expanded={navOpen}
+              className="lg:hidden -ms-1 p-2 rounded-lg text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-colors shrink-0 cursor-pointer"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            <span className="px-2 py-1 bg-slate-100 text-slate-700 font-mono text-[10px] font-bold uppercase rounded border border-slate-200 truncate max-w-[45vw] sm:max-w-none">
               {/* .replaceAll (not .replace) is required here: activeScreen slugs like
                   'plan_vs_actual' have more than one underscore, and a non-global
                   replace only strips the first one, leaving "plan vs_actual" - which
@@ -359,37 +398,37 @@ export default function App() {
                   renders as a mangled, untranslated label. */}
               {t(activeScreen.replaceAll('_', ' ').replace('bom', 'Interactive BOM').replace('sales plan', 'Sales Demand Plan').replace('production plan', 'MPS Production').replace('drill down', 'Material Check').replace('coverage', 'Stock Coverage').replace('psi', 'PSI Analysis').replace('logistics', 'Logistics & Customs').replace('plan vs actual', 'Plan vs Actuals').replace('master data', 'Master Data').replace('csv importer', 'Import Hub'))}
             </span>
-            <div className="h-3 w-[1px] bg-slate-200"></div>
-            <p className="text-xs text-slate-500 font-sans font-medium">{t('Enterprise Supply Chain Platform')}</p>
+            <div className="h-3 w-[1px] bg-slate-200 hidden xl:block"></div>
+            <p className="text-xs text-slate-500 font-sans font-medium hidden xl:block truncate">{t('Enterprise Supply Chain Platform')}</p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Language Switcher */}
-            <div className="flex bg-slate-100 border border-slate-300 p-0.5 rounded-lg">
+            <div className="flex bg-slate-100 border border-slate-300 p-0.5 rounded-lg max-sm:hidden">
               <button 
                 onClick={() => setLang('EN')} 
-                className={`px-2 py-0.5 text-[10px] font-bold rounded-md transition-all cursor-pointer ${lang === 'EN' ? 'bg-white text-blue-600 shadow-2xs' : 'text-gray-500 hover:text-gray-800'}`}
+                className={`tap-compact px-2.5 py-1 text-[11px] font-bold rounded-md transition-all cursor-pointer ${lang === 'EN' ? 'bg-white text-blue-600 shadow-2xs' : 'text-slate-500 hover:text-slate-800'}`}
               >
                 EN
               </button>
               <button 
                 onClick={() => setLang('AR')} 
-                className={`px-2 py-0.5 text-[10px] font-bold rounded-md transition-all cursor-pointer ${lang === 'AR' ? 'bg-white text-blue-600 shadow-2xs' : 'text-gray-500 hover:text-gray-800'}`}
+                className={`tap-compact px-2.5 py-1 text-[11px] font-bold rounded-md transition-all cursor-pointer ${lang === 'AR' ? 'bg-white text-blue-600 shadow-2xs' : 'text-slate-500 hover:text-slate-800'}`}
               >
                 عربي
               </button>
             </div>
 
-            <div className="h-4 w-[1px] bg-slate-200"></div>
+            <div className="h-4 w-[1px] bg-slate-200 max-sm:hidden"></div>
 
             {/* Active planning period - drives every analysis screen */}
-            <div className="flex items-center gap-1.5" id="planning_period_picker">
-              <CalendarRange className="w-3.5 h-3.5 text-slate-400" />
+            <div className="flex items-center gap-1.5 min-w-0" id="planning_period_picker">
+              <CalendarRange className="w-4 h-4 text-slate-400 shrink-0 max-sm:hidden" />
               <select
                 value={planningPeriod}
                 onChange={e => handlePeriodChange(e.target.value)}
                 title="Planning period reported on by Coverage, PSI, Plan vs Actuals and the dashboard"
-                className="px-2 py-1 text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-md focus:outline-hidden focus:border-blue-500 cursor-pointer"
+                className="tap-compact px-2 py-1.5 text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-md focus:outline-hidden focus:border-blue-500 cursor-pointer max-w-[38vw] sm:max-w-none"
               >
                 {periodOptions.map(p => (
                   <option key={p} value={p}>{formatPlanningPeriod(p)}</option>
@@ -397,18 +436,21 @@ export default function App() {
               </select>
             </div>
 
-            <div className="h-4 w-[1px] bg-slate-200"></div>
+            <div className="h-4 w-[1px] bg-slate-200 hidden lg:block"></div>
 
             {/* Status indicator */}
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-              <span className={`w-2 h-2 rounded-full ${dbConnected ? 'bg-emerald-500 animate-pulse' : 'bg-blue-500'}`}></span>
-              <span className="text-[11px] font-bold text-slate-600">{dbConnected ? t('Active Production Db') : t('Sandboxed Local Mode')}</span>
+            <div
+              className="flex items-center gap-2 text-xs font-semibold text-slate-500 shrink-0"
+              title={dbConnected ? t('Active Production Db') : t('Sandboxed Local Mode')}
+            >
+              <span className={`w-2 h-2 rounded-full shrink-0 ${dbConnected ? 'bg-emerald-500 animate-pulse' : 'bg-blue-500'}`}></span>
+              <span className="text-[11px] font-bold text-slate-600 hidden lg:inline">{dbConnected ? t('Active Production Db') : t('Sandboxed Local Mode')}</span>
             </div>
           </div>
         </header>
 
         {/* Dynamic Screen Viewport */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-8">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {renderActiveScreen()}
         </div>
       </main>
@@ -421,14 +463,14 @@ export default function App() {
         */}
       {showConfig && (
         <div className="fixed inset-0 z-[4500] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" ref={configModalRef}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col border border-gray-100">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col border border-slate-100">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                 <Database className="w-4 h-4 text-blue-600" /> Database Integration Hub
               </h3>
               <button 
                 onClick={() => setShowConfig(false)} 
-                className="text-gray-400 hover:text-gray-600 text-xl font-semibold cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 text-xl font-semibold cursor-pointer"
               >
                 &times;
               </button>
@@ -447,30 +489,30 @@ export default function App() {
               )}
 
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-gray-700">Supabase Project URL</label>
+                <label className="block text-xs font-semibold text-slate-700">Supabase Project URL</label>
                 <input
                   type="url"
                   value={supUrl}
                   onChange={e => setSupUrl(e.target.value)}
                   placeholder="https://your-project.supabase.co"
                   required
-                  className="w-full p-2.5 border border-gray-300 rounded-lg text-xs font-mono bg-gray-50/50"
+                  className="w-full p-2.5 border border-slate-300 rounded-lg text-xs font-mono bg-slate-50/50"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-gray-700">Supabase Anon Key</label>
+                <label className="block text-xs font-semibold text-slate-700">Supabase Anon Key</label>
                 <input
                   type="password"
                   value={supKey}
                   onChange={e => setSupKey(e.target.value)}
                   placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                   required
-                  className="w-full p-2.5 border border-gray-300 rounded-lg text-xs font-mono bg-gray-50/50"
+                  className="w-full p-2.5 border border-slate-300 rounded-lg text-xs font-mono bg-slate-50/50"
                 />
               </div>
 
-              <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+              <div className="flex justify-between items-center pt-4 border-t border-slate-100">
                 {dbConnected ? (
                   <button
                     type="button"
@@ -481,14 +523,14 @@ export default function App() {
                     Disconnect (Reset Demo)
                   </button>
                 ) : (
-                  <div className="text-[10px] text-gray-400 font-sans">Ready to bridge local planner to live DB.</div>
+                  <div className="text-[10px] text-slate-400 font-sans">Ready to bridge local planner to live DB.</div>
                 )}
 
                 <div className="flex gap-2">
                   <button 
                     type="button" 
                     onClick={() => setShowConfig(false)} 
-                    className="px-3.5 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    className="px-3.5 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer"
                   >
                     Cancel
                   </button>

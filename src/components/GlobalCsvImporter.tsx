@@ -603,7 +603,7 @@ export default function GlobalCsvImporter({ onClose, refreshKey = 0 }: { onClose
   const hasFatalErrors = validationErrors.some(e => e.severity === 'error');
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col max-h-[85vh] font-sans" id="csv_importer_panel">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col max-h-[85vh] font-sans" id="csv_importer_panel">
       {/* Target Table Selector Ribbon */}
       <div className="px-6 py-4 bg-slate-900 text-white flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800">
         <div className="flex items-center gap-3">

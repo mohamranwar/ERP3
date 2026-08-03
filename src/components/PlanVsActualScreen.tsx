@@ -176,14 +176,14 @@ export default function PlanVsActualScreen({
         title="Plan vs Actual Analytics"
         subtitle="Evaluate forecast accuracy, production achievements, and export shipment variance ratios."
         actions={
-          <div className="flex items-center gap-1.5 bg-gray-100 p-0.5 rounded-lg" id="pva_tab_selector">
+          <div className="flex items-center gap-1.5 bg-slate-100 p-0.5 rounded-lg" id="pva_tab_selector">
             {(['sales', 'production', 'export'] as const).map(tab => (
               <button
                 key={tab}
                 id={`pva_tab_btn_${tab}`}
                 onClick={() => { setActiveTab(tab); setSearchQuery(''); }}
                 className={`px-3 py-1.5 text-xs font-bold rounded-md capitalize flex items-center gap-1.5 transition-colors cursor-pointer ${
-                  activeTab === tab ? 'bg-white text-gray-800 shadow-xs' : 'text-gray-500 hover:text-gray-700'
+                  activeTab === tab ? 'bg-white text-slate-800 shadow-xs' : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
                 {tab === 'export' ? 'Export Shipments' : `${tab} Plan`}
@@ -195,20 +195,20 @@ export default function PlanVsActualScreen({
 
       {/* Stats Summary Cards for the active planning period */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white border border-gray-200 p-5 rounded-xl shadow-xs space-y-1">
-          <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Overall Plan Target</span>
-          <h4 className="text-xl font-bold text-gray-900 font-mono">
-            {activeDataset.reduce((sum, d) => sum + d.plan_qty, 0).toLocaleString()} <span className="text-xs text-gray-400 font-sans">units</span>
+        <div className="bg-white border border-slate-200 p-5 rounded-xl shadow-xs space-y-1">
+          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Overall Plan Target</span>
+          <h4 className="text-xl font-bold text-slate-900 font-mono">
+            {activeDataset.reduce((sum, d) => sum + d.plan_qty, 0).toLocaleString()} <span className="text-xs text-slate-400 font-sans">units</span>
           </h4>
         </div>
-        <div className="bg-white border border-gray-200 p-5 rounded-xl shadow-xs space-y-1">
-          <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Overall Actual Achieved</span>
-          <h4 className="text-xl font-bold text-gray-900 font-mono">
-            {activeDataset.reduce((sum, d) => sum + d.actual_qty, 0).toLocaleString()} <span className="text-xs text-gray-400 font-sans">units</span>
+        <div className="bg-white border border-slate-200 p-5 rounded-xl shadow-xs space-y-1">
+          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Overall Actual Achieved</span>
+          <h4 className="text-xl font-bold text-slate-900 font-mono">
+            {activeDataset.reduce((sum, d) => sum + d.actual_qty, 0).toLocaleString()} <span className="text-xs text-slate-400 font-sans">units</span>
           </h4>
         </div>
-        <div className="bg-white border border-gray-200 p-5 rounded-xl shadow-xs space-y-1">
-          <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Variance & Achievement Rate</span>
+        <div className="bg-white border border-slate-200 p-5 rounded-xl shadow-xs space-y-1">
+          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Variance & Achievement Rate</span>
           {(() => {
             const plan = activeDataset.reduce((sum, d) => sum + d.plan_qty, 0);
             const act = activeDataset.reduce((sum, d) => sum + d.actual_qty, 0);
@@ -216,7 +216,7 @@ export default function PlanVsActualScreen({
             const ach = plan > 0 ? (act / plan) * 100 : 100;
             return (
               <div className="flex items-center gap-2">
-                <h4 className="text-xl font-bold text-gray-900 font-mono">
+                <h4 className="text-xl font-bold text-slate-900 font-mono">
                   {ach.toFixed(1)}%
                 </h4>
                 <span className={`text-xs px-2 py-0.5 rounded-sm font-semibold ${varQty >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>
@@ -229,7 +229,7 @@ export default function PlanVsActualScreen({
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200 font-sans">
+      <div className="flex flex-wrap items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200 font-sans">
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
@@ -243,7 +243,7 @@ export default function PlanVsActualScreen({
           <span><b>Target Period:</b> {formatPlanningPeriod(period)}</span>
         </div>
 
-        <button onClick={loadData} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors cursor-pointer" title="Refresh">
+        <button onClick={loadData} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors cursor-pointer" title="Refresh">
           <RefreshCw className="w-4 h-4" />
         </button>
       </div>
@@ -259,8 +259,8 @@ export default function PlanVsActualScreen({
               <div className="flex items-center gap-2">
                 <Cpu className="w-5 h-5 text-blue-600 shrink-0" />
                 <div>
-                  <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Machine Capacity & Hours Utilization Control Tower</h3>
-                  <p className="text-[10px] text-gray-500">Maps production volumes to actual machine hours based on standard line speeds compared to available capacity limits.</p>
+                  <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Machine Capacity & Hours Utilization Control Tower</h3>
+                  <p className="text-[10px] text-slate-500">Maps production volumes to actual machine hours based on standard line speeds compared to available capacity limits.</p>
                 </div>
               </div>
 
@@ -344,7 +344,7 @@ export default function PlanVsActualScreen({
                             {d.actual_qty.toLocaleString()}
                           </td>
                           <td className={`px-3 py-2 text-right font-mono font-bold border-r border-slate-200 ${
-                            isPositive ? 'text-emerald-600' : 'text-rose-600'
+                            isPositive ? 'text-emerald-600' : 'text-red-600'
                           }`}>
                             {isPositive ? '+' : ''}{d.variance_qty.toLocaleString()}
                           </td>
@@ -359,7 +359,7 @@ export default function PlanVsActualScreen({
                                 <div
                                   className={`h-full rounded-full ${
                                     d.achievement_percent >= 100 ? 'bg-emerald-500' :
-                                    d.achievement_percent >= 85 ? 'bg-amber-500' : 'bg-rose-500'
+                                    d.achievement_percent >= 85 ? 'bg-amber-500' : 'bg-red-500'
                                   }`}
                                   style={{ width: `${Math.min(100, d.achievement_percent)}%` }}
                                 ></div>
@@ -371,7 +371,7 @@ export default function PlanVsActualScreen({
                     })}
                     {filteredData.length === 0 && (
                       <tr>
-                        <td colSpan={7} className="px-3 py-8 text-center text-gray-400">
+                        <td colSpan={7} className="px-3 py-8 text-center text-slate-400">
                           No items match the search query.
                         </td>
                       </tr>

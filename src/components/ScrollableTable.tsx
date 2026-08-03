@@ -37,7 +37,7 @@ export default function ScrollableTable({ children, className = '' }: Scrollable
     <div className="relative w-full">
       <div 
         ref={containerRef}
-        className={`w-full overflow-x-auto border border-slate-200/80 rounded-xl bg-white ${className}`}
+        className={`scroll-x-touch w-full overflow-x-auto border border-slate-200/80 rounded-xl bg-white ${className}`}
         onScroll={checkOverflow}
       >
         {children}
@@ -45,8 +45,8 @@ export default function ScrollableTable({ children, className = '' }: Scrollable
       
       {showScrollHint && (
         <div className="flex justify-center mt-1.5 pointer-events-none animate-pulse">
-          <span className="text-[10px] text-gray-400 font-medium">
-            &larr; Scroll horizontally to view full table &rarr;
+          <span className="text-[11px] text-slate-400 font-medium">
+            &larr; Swipe to see more columns &rarr;
           </span>
         </div>
       )}

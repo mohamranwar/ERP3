@@ -139,7 +139,7 @@ export default function CsvImportHelper({ fields, onImport, title = "Import from
       <button
         id="btn_toggle_import_modal"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-xs hover:bg-gray-50 focus:outline-hidden"
+        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg shadow-xs hover:bg-slate-50 focus:outline-hidden"
       >
         <Upload className="w-3.5 h-3.5" />
         {title}
@@ -147,12 +147,12 @@ export default function CsvImportHelper({ fields, onImport, title = "Import from
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[85vh] border border-gray-100">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[85vh] border border-slate-100">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+              <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="text-gray-400 hover:text-gray-600 text-lg font-medium"
+                className="text-slate-400 hover:text-slate-600 text-lg font-medium"
               >
                 &times;
               </button>
@@ -160,7 +160,7 @@ export default function CsvImportHelper({ fields, onImport, title = "Import from
 
             <div className="p-6 overflow-y-auto space-y-4 flex-1">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-slate-700 mb-1">
                   Paste CSV Data (Include a header row as the first line)
                 </label>
                 <textarea
@@ -168,10 +168,10 @@ export default function CsvImportHelper({ fields, onImport, title = "Import from
                   value={csvText}
                   onChange={(e) => setCsvText(e.target.value)}
                   placeholder="SKU,Name,Standard Cost,MOQ&#10;RM-PLP-01,Bleached Fluff Pulp,1.5,20000&#10;RM-NWT-18,Top Sheet Nonwoven,0.8,15000"
-                  className="w-full h-32 p-3 text-xs font-mono border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:outline-hidden"
+                  className="w-full h-32 p-3 text-xs font-mono border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:outline-hidden"
                 />
                 <div className="flex justify-between items-center mt-2">
-                  <span className="text-[10px] text-gray-400">Values can be comma or tab-separated.</span>
+                  <span className="text-[10px] text-slate-400">Values can be comma or tab-separated.</span>
                   <button
                     id="btn_parse_csv"
                     onClick={handleParse}
@@ -190,19 +190,19 @@ export default function CsvImportHelper({ fields, onImport, title = "Import from
               )}
 
               {parsedHeaders.length > 0 && (
-                <div className="space-y-4 pt-2 border-t border-gray-100">
+                <div className="space-y-4 pt-2 border-t border-slate-100">
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-900 mb-2">Map CSV Columns to System Fields</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                    <h4 className="text-xs font-semibold text-slate-900 mb-2">Map CSV Columns to System Fields</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-lg border border-slate-100">
                       {fields.map(field => (
                         <div key={field.key} className="space-y-1">
-                          <label className="block text-[11px] font-medium text-gray-700">
+                          <label className="block text-[11px] font-medium text-slate-700">
                             {field.label} {field.required && <span className="text-red-500">*</span>}
                           </label>
                           <select
                             value={mappings[field.key] || ''}
                             onChange={(e) => handleMappingChange(field.key, e.target.value)}
-                            className="w-full p-1.5 text-xs bg-white border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500"
+                            className="w-full p-1.5 text-xs bg-white border border-slate-300 rounded-md focus:ring-1 focus:ring-blue-500"
                           >
                             <option value="">-- Don't Import --</option>
                             {parsedHeaders.map(h => (
@@ -216,24 +216,24 @@ export default function CsvImportHelper({ fields, onImport, title = "Import from
 
                   {preview.length > 0 && (
                     <div>
-                      <h4 className="text-xs font-semibold text-gray-900 mb-2">Data Mapping Preview (First 5 Rows)</h4>
-                      <div className="overflow-x-auto rounded-lg border border-gray-200">
-                        <table className="min-w-full divide-y divide-gray-200 text-left">
-                          <thead className="bg-gray-50">
+                      <h4 className="text-xs font-semibold text-slate-900 mb-2">Data Mapping Preview (First 5 Rows)</h4>
+                      <div className="overflow-x-auto rounded-lg border border-slate-200">
+                        <table className="min-w-full divide-y divide-slate-200 text-left">
+                          <thead className="bg-slate-50">
                             <tr>
                               {fields.map(f => (
-                                <th key={f.key} className="px-3 py-2 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                                <th key={f.key} className="px-3 py-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
                                   {f.label}
                                 </th>
                               ))}
                             </tr>
                           </thead>
-                          <tbody className="bg-white divide-y divide-gray-200 text-xs">
+                          <tbody className="bg-white divide-y divide-slate-200 text-xs">
                             {preview.map((pRow, idx) => (
-                              <tr key={idx} className="hover:bg-gray-50">
+                              <tr key={idx} className="hover:bg-slate-50">
                                 {fields.map(f => (
-                                  <td key={f.key} className="px-3 py-2 text-gray-900 whitespace-nowrap">
-                                    {pRow[f.key] !== null ? String(pRow[f.key]) : <span className="text-gray-300 font-mono">null</span>}
+                                  <td key={f.key} className="px-3 py-2 text-slate-900 whitespace-nowrap">
+                                    {pRow[f.key] !== null ? String(pRow[f.key]) : <span className="text-slate-300 font-mono">null</span>}
                                   </td>
                                 ))}
                               </tr>
@@ -247,10 +247,10 @@ export default function CsvImportHelper({ fields, onImport, title = "Import from
               )}
             </div>
 
-            <div className="flex justify-end gap-3 px-6 py-4 bg-gray-50 border-t border-gray-100">
+            <div className="flex justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-100">
               <button
                 onClick={() => setIsOpen(false)}
-                className="px-3.5 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-3.5 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50"
               >
                 Cancel
               </button>
