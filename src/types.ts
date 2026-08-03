@@ -1,0 +1,320 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+export type UserRole = 'admin' | 'planner' | 'viewer';
+
+export interface AppUser {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole; // admin = full access incl. deletes & DB settings; planner = create/edit; viewer = read-only
+  status: 'active' | 'inactive';
+}
+
+export interface Supplier {
+  id: string;
+  name: string;
+  default_lead_time_days: number;
+  default_transit_days: number;
+  default_customs_clearance_days: number;
+  status: 'active' | 'inactive';
+}
+
+export interface Channel {
+  id: string;
+  name: string;
+  status: 'active' | 'inactive';
+}
+
+export interface Machine {
+  id: string;
+  name: string;
+  description: string;
+  monthly_capacity?: number;
+}
+
+export interface ProductCategory {
+  id: string;
+  name: string;
+}
+
+export interface ProductGroup {
+  id: string;
+  name: string;
+  category_id: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  sku: string;
+  description: string;
+  group_id: string;
+  category_id: string;
+  brand: string;
+  variant: string;
+  product_line: string; // Machine assignment (e.g. SOFY, VOXY, Atlas, Pants, Import)
+  pack_type: string;
+  size: string;
+  status: 'running' | 'obsolete';
+  pcs_per_bag: number;
+  bags_per_carton: number;
+  selling_price: number;
+  standard_cost: number;
+}
+
+export interface MaterialCategory {
+  id: string;
+  name: string;
+  material_group: 'RM' | 'PK' | 'CON'; // RM = Raw Material, PK = Packaging, CON = Consumables
+}
+
+export interface Material {
+  id: string;
+  name: string;
+  sku: string;
+  description: string;
+  category_id: string;
+  supplier_id: string;
+  supplier_lead_time_days: number;
+  transit_days: number;
+  customs_clearance_days: number;
+  total_lead_time_days: number; // Computed: supplier + transit + customs
+  reorder_point_days: number; // Computed
+  safety_stock_months: number;
+  moq: number;
+  max_usage: number;
+  controller: string;
+  status: 'running' | 'obsolete';
+  standard_cost: number;
+  cost_basis: 'standard' | 'weighted_avg';
+}
+
+export interface MaterialAlternative {
+  id: string;
+  material_id: string;
+  alternative_material_id: string;
+}
+
+export interface BOMHeader {
+  id: string;
+  product_id: string;
+  description: string;
+  is_active: boolean;
+}
+
+export interface BOMSlot {
+  id: string;
+  bom_id: string;
+  slot_name: string; // E.g., "top sheet", "back sheet", "polybag"
+}
+
+export interface BOMOption {
+  id: string;
+  slot_id: string;
+  material_id: string;
+  qty_per_unit: number;
+  scrap_percent: number;
+  priority: number; // 1 = Primary, 2 = Alternate, etc.
+}
+
+export interface SalesPlan {
+  id: string;
+  product_id: string;
+  channel_id: string;
+  period_type: 'day' | 'week' | 'month';
+  period_start: string; // ISO date string (YYYY-MM-DD)
+  quantity: number;
+}
+
+export interface ProductionPlan {
+  id: string;
+  product_id: string;
+  machine_id: string;
+  period_type: 'day' | 'week' | 'month';
+  period_start: string; // ISO date string (YYYY-MM-DD)
+  quantity: number;
+}
+
+export interface SalesActual {
+  id: string;
+  product_id: string;
+  channel_id: string;
+  period_start: string;
+  quantity: number;
+}
+
+export interface ProductionActual {
+  id: string;
+  product_id: string;
+  machine_id: string;
+  period_start: string;
+  quantity: number;
+}
+
+export interface InventorySnapshot {
+  id: string;
+  item_type: 'product' | 'material';
+  item_id: string;
+  snapshot_date: string;
+  quantity: number;
+}
+
+export interface PurchaseOrder {
+  id: string;
+  material_id: string;
+  supplier_id: string;
+  order_no: string;
+  qty: number;
+  remaining_qty: number;
+  required_date: string;
+  status: 'pending' | 'in_transit' | 'completed';
+  timing: 'Normal' | 'Need to be Closed' | 'Check with Proc.';
+  po_date: string;
+  unit_price?: number;
+}
+
+export interface Shipment {
+  id: string;
+  material_id: string;
+  supplier_id: string;
+  qty: number;
+  invoice_no: string;
+  bl_no: string;
+  container_count: number;
+  ship_method: 'sea' | 'air' | 'land';
+  etd: string;
+  port_eta: string;
+  port_name: string;
+  customs_clearance_days: number;
+  factory_arrival_date: string | null; // Tentative arrival date, can be null
+  delay: number; // in days
+}
+
+export interface MRPResult {
+  id: string;
+  run_id: string;
+  run_date: string;
+  material_id: string;
+  week_start_date: string;
+  projected_available: number;
+  safety_stock: number;
+  net_requirements: number;
+  planned_order_releases: number;
+  gross_requirements?: number;
+  scheduled_receipts?: number;
+}
+
+// VIEW REPRESENTATIONS (or local client calculations mimicking these)
+
+export interface VMaterialCoverage {
+  material_id: string;
+  material_name: string;
+  sku: string;
+  category_id: string;
+  category_name: string;
+  material_group: 'RM' | 'PK' | 'CON';
+  opening_stock: number;
+  monthly_demand: number;
+  coverage_months: number; // Coverage with in-transit and pending
+  coverage_months_no_transit: number; // Coverage with stock only
+  oos_risk_flag: boolean;
+  overstock_flag: boolean;
+}
+
+export interface VProductCoverage {
+  product_id: string;
+  product_name: string;
+  sku: string;
+  product_line: string;
+  opening_stock: number;
+  monthly_demand: number;
+  coverage_months: number;
+  below_safety_flag: boolean;
+}
+
+export interface VFGPSIAnalysis {
+  row_id: string;
+  category_id: string;
+  category_name: string;
+  group_id: string;
+  group_name: string;
+  brand: string;
+  product_line: string;
+  pack_type: string;
+  size: string;
+  status: string;
+  start_stock: number;
+  sales_forecast: number;
+  actual_sales: number;
+  sales_achievement_percent: number;
+  production_plan: number;
+  actual_production: number;
+  production_achievement_percent: number;
+  expected_stock: number;
+  coverage_months: number;
+  sales_value: number;
+}
+
+export interface VBOMCostDetail {
+  product_id: string;
+  slot_id: string;
+  slot_name: string;
+  material_id: string;
+  material_name: string;
+  material_group: 'RM' | 'PK' | 'CON';
+  qty_per_unit: number;
+  scrap_percent: number;
+  unit_cost: number;
+  line_cost: number; // qty_per_unit * (1 + scrap_percent/100) * unit_cost
+  priority: number;
+}
+
+export interface VFGCost {
+  product_id: string;
+  product_name: string;
+  sku: string;
+  selling_price: number;
+  rm_cost: number;
+  pk_cost: number;
+  con_cost: number;
+  total_material_cost: number;
+  margin_per_unit: number;
+  margin_percent: number;
+}
+
+export interface VMaterialWeightedAvgCost {
+  material_id: string;
+  weighted_avg_cost: number;
+}
+
+export interface VMaterialEffectiveCost {
+  material_id: string;
+  effective_cost: number; // standard_cost or weighted_avg_cost based on cost_basis toggle
+}
+
+export interface VMaterialMonthlyProjection {
+  material_id: string;
+  period_start: string; // YYYY-MM-DD (start of month)
+  opening_stock: number;
+  plan_consumption: number;
+  in_transit_qty: number;
+  pending_po_qty: number;
+  ending_stock: number;
+  ending_coverage_days: number;
+  reorder_flag: boolean;
+}
+
+export interface VPlanVsActual {
+  item_id: string; // product_id
+  item_name: string; // product_name
+  sku: string;
+  period: string; // YYYY-MM
+  plan_qty: number;
+  actual_qty: number;
+  variance_qty: number;
+  /** null when there is no plan to measure against (0 planned units). */
+  achievement_percent: number | null;
+}
