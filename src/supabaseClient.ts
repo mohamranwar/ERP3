@@ -470,18 +470,18 @@ export async function getVMaterialCoverage(
   products.forEach(p => {
     let quantity = 0;
     if (demandBasis === 'sales') {
-      const actuals = salesActual.filter(s => s.product_id === p.id && s.period_start === period);
+      const actuals = salesActual.filter(s => s.product_id === p.id && isInPeriod(s.period_start, period));
       const totalActual = actuals.reduce((sum, s) => sum + s.quantity, 0);
       if (totalActual > 0) {
         quantity = totalActual;
       } else {
         // Fallback to forecast
-        const forecasts = salesPlan.filter(s => s.product_id === p.id && s.period_start === period);
+        const forecasts = salesPlan.filter(s => s.product_id === p.id && isInPeriod(s.period_start, period));
         quantity = forecasts.reduce((sum, s) => sum + s.quantity, 0);
       }
     } else {
       // Forecast-based
-      const forecasts = salesPlan.filter(s => s.product_id === p.id && s.period_start === period);
+      const forecasts = salesPlan.filter(s => s.product_id === p.id && isInPeriod(s.period_start, period));
       quantity = forecasts.reduce((sum, s) => sum + s.quantity, 0);
     }
     productDemandMap[p.id] = quantity;
@@ -498,8 +498,13 @@ export async function getVMaterialCoverage(
     const stockSnapshot = mSnapshots.find(i => i.snapshot_date === period) || mSnapshots[0];
     const stock = stockSnapshot ? stockSnapshot.quantity : 0;
     
-    // Monthly consumption (demand)
-    const monthlyDemand = usageMap[m.id] || m.max_usage * 15; // fallback
+    // Monthly consumption. Materials the current plan never consumes still
+    // need a basis, so master data's daily `max_usage` stands in - the same
+    // fallback getSafetyStockQty uses, and now at the same scale. It was
+    // previously multiplied by an unexplained 15, which put coverage on a
+    // half-month footing while the safety buffer used a full one, so the two
+    // screens disagreed about the same material.
+    const monthlyDemand = usageMap[m.id] || m.max_usage * DAYS_PER_MONTH;
     
     // In-transit quantity
     const transitQty = shipments
@@ -513,8 +518,8 @@ export async function getVMaterialCoverage(
 
     const totalAvailable = stock + transitQty + pendingPoQty;
 
-    const coverageMonths = monthlyDemand > 0 ? (totalAvailable / monthlyDemand) : 99;
-    const coverageMonthsNoTransit = monthlyDemand > 0 ? (stock / monthlyDemand) : 99;
+    const coverageMonths = monthsOfCover(totalAvailable, monthlyDemand);
+    const coverageMonthsNoTransit = monthsOfCover(stock, monthlyDemand);
 
     return {
       material_id: m.id,
@@ -556,16 +561,16 @@ export async function getVProductCoverage(
   products.forEach(p => {
     let quantity = 0;
     if (demandBasis === 'sales') {
-      const actuals = salesActual.filter(s => s.product_id === p.id && s.period_start === period);
+      const actuals = salesActual.filter(s => s.product_id === p.id && isInPeriod(s.period_start, period));
       const totalActual = actuals.reduce((sum, s) => sum + s.quantity, 0);
       if (totalActual > 0) {
         quantity = totalActual;
       } else {
-        const forecasts = salesPlan.filter(s => s.product_id === p.id && s.period_start === period);
+        const forecasts = salesPlan.filter(s => s.product_id === p.id && isInPeriod(s.period_start, period));
         quantity = forecasts.reduce((sum, s) => sum + s.quantity, 0);
       }
     } else {
-      const forecasts = salesPlan.filter(s => s.product_id === p.id && s.period_start === period);
+      const forecasts = salesPlan.filter(s => s.product_id === p.id && isInPeriod(s.period_start, period));
       quantity = forecasts.reduce((sum, s) => sum + s.quantity, 0);
     }
     demandMap[p.id] = quantity;
@@ -577,7 +582,7 @@ export async function getVProductCoverage(
     const stock = stockSnapshot ? stockSnapshot.quantity : 0;
     const monthlyDemand = demandMap[p.id] || 45000; // fallback
 
-    const coverageMonths = monthlyDemand > 0 ? (stock / monthlyDemand) : 99;
+    const coverageMonths = monthsOfCover(stock, monthlyDemand);
 
     return {
       product_id: p.id,
@@ -619,27 +624,30 @@ export async function getVFGPSIAnalysis(period: string = getPlanningPeriod()): P
     const start_stock = startStockSnap ? startStockSnap.quantity : 0;
 
     const sales_forecast = salesPlan
-      .filter(s => s.product_id === p.id && s.period_start === period)
+      .filter(s => s.product_id === p.id && isInPeriod(s.period_start, period))
       .reduce((sum, s) => sum + s.quantity, 0);
 
     const actual_sales = salesActual
-      .filter(s => s.product_id === p.id && s.period_start === period)
+      .filter(s => s.product_id === p.id && isInPeriod(s.period_start, period))
       .reduce((sum, s) => sum + s.quantity, 0);
 
-    const sales_achievement_percent = sales_forecast > 0 ? (actual_sales / sales_forecast) * 100 : 0;
+    // No plan means there is no target to have hit or missed. Reporting 0%
+    // painted an un-planned SKU as a total failure - the same mistake
+    // getVPlanVsActual used to make before it was changed to report null.
+    const sales_achievement_percent = sales_forecast > 0 ? (actual_sales / sales_forecast) * 100 : null;
 
     const prod_plan = productionPlan
-      .filter(s => s.product_id === p.id && s.period_start === period)
+      .filter(s => s.product_id === p.id && isInPeriod(s.period_start, period))
       .reduce((sum, s) => sum + s.quantity, 0);
 
     const actual_production = productionActual
-      .filter(s => s.product_id === p.id && s.period_start === period)
+      .filter(s => s.product_id === p.id && isInPeriod(s.period_start, period))
       .reduce((sum, s) => sum + s.quantity, 0);
 
-    const production_achievement_percent = prod_plan > 0 ? (actual_production / prod_plan) * 100 : 0;
+    const production_achievement_percent = prod_plan > 0 ? (actual_production / prod_plan) * 100 : null;
 
     const expected_stock = start_stock + prod_plan - sales_forecast;
-    const coverage_months = sales_forecast > 0 ? (expected_stock / sales_forecast) : 99;
+    const coverage_months = monthsOfCover(expected_stock, sales_forecast);
     const sales_value = sales_forecast * p.selling_price;
 
     return {
@@ -656,10 +664,14 @@ export async function getVFGPSIAnalysis(period: string = getPlanningPeriod()): P
       start_stock,
       sales_forecast,
       actual_sales,
-      sales_achievement_percent: parseFloat(sales_achievement_percent.toFixed(1)),
+      sales_achievement_percent: sales_achievement_percent === null
+        ? null
+        : parseFloat(sales_achievement_percent.toFixed(1)),
       production_plan: prod_plan,
       actual_production,
-      production_achievement_percent: parseFloat(production_achievement_percent.toFixed(1)),
+      production_achievement_percent: production_achievement_percent === null
+        ? null
+        : parseFloat(production_achievement_percent.toFixed(1)),
       expected_stock,
       coverage_months: parseFloat(coverage_months.toFixed(2)),
       sales_value
@@ -798,6 +810,36 @@ const STORAGE_PERIOD_KEY = 'sc_planner_planning_period';
 /** First day of the month containing `date`, as YYYY-MM-01. */
 function monthStart(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
+}
+
+/**
+ * Whether a plan or actual row belongs to a planning period.
+ *
+ * Planning is monthly, but `period_start` is a full date and nothing stops a
+ * row landing mid-month - the CSV importer accepts whatever the file carries.
+ * Matching on exact date equality silently dropped those rows, and because
+ * only the MRP path matched on the month, a 2026-08-15 row would drive the
+ * solver while Coverage, PSI and Plan vs Actuals all reported zero for it.
+ * Every caller now asks the same question: is this row in this month?
+ */
+export function isInPeriod(rowPeriodStart: string, period: string): boolean {
+  if (!rowPeriodStart || !period) return false;
+  return rowPeriodStart.slice(0, 7) === period.slice(0, 7);
+}
+
+/**
+ * Months of stock cover.
+ *
+ * With no demand there is no meaningful ratio, so the two cases are reported
+ * apart: stock sitting against no demand is effectively unlimited cover, while
+ * no stock and no demand is no cover at all. Returning a flat 99 for both made
+ * an empty, unused item look like the healthiest line on the screen.
+ */
+export const UNLIMITED_COVER_MONTHS = 99;
+
+export function monthsOfCover(available: number, monthlyDemand: number): number {
+  if (monthlyDemand > 0) return available / monthlyDemand;
+  return available > 0 ? UNLIMITED_COVER_MONTHS : 0;
 }
 
 export const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -1002,7 +1044,7 @@ function plannedQtyByProductForMonth(
 ): Record<string, number> {
   const byProduct: Record<string, number> = {};
   plan
-    .filter(row => row.period_start.startsWith(month))
+    .filter(row => isInPeriod(row.period_start, month))
     .forEach(row => {
       byProduct[row.product_id] = (byProduct[row.product_id] || 0) + row.quantity;
     });
@@ -1106,8 +1148,8 @@ export async function getVPlanVsActual(
   const results: VPlanVsActual[] = [];
 
   products.forEach(p => {
-    const pPlan = plan.filter(pl => pl.product_id === p.id && pl.period_start === period);
-    const pActual = actual.filter(ac => ac.product_id === p.id && ac.period_start === period);
+    const pPlan = plan.filter(pl => pl.product_id === p.id && isInPeriod(pl.period_start, period));
+    const pActual = actual.filter(ac => ac.product_id === p.id && isInPeriod(ac.period_start, period));
 
     const plan_qty = pPlan.reduce((sum, pl) => sum + pl.quantity, 0);
     const actual_qty = pActual.reduce((sum, ac) => sum + ac.quantity, 0);

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   explodeBOM,
   getPlannedPeriods,
@@ -11,6 +11,13 @@ import {
   getSafetyStockMonths,
   hasSafetyStockOverride,
   runLocalMigrations,
+  isInPeriod,
+  monthsOfCover,
+  UNLIMITED_COVER_MONTHS,
+  getVFGPSIAnalysis,
+  toDateStr,
+  daysInMonthOf,
+  getCurrentPeriods,
   SAFETY_SERVICE_FACTOR,
   DAYS_PER_MONTH,
   getPlanningPeriod,
@@ -37,8 +44,20 @@ import {
 // to the real current month. Every expectation below is derived from July 2026,
 // so pin the period rather than letting the wall clock decide what these tests
 // are measuring.
+// Some tests write to the seeded tables to exercise a case the fixture does
+// not cover. localStorage persists for the whole file, so the store is
+// snapshotted and put back afterwards - otherwise one test's extra plan row
+// silently changes every total measured after it.
+let dbSnapshot: Array<[string, string]> = [];
+
 beforeEach(() => {
   setPlanningPeriod('2026-07-01');
+  dbSnapshot = Object.keys(localStorage).map(k => [k, localStorage.getItem(k)!]);
+});
+
+afterEach(() => {
+  localStorage.clear();
+  dbSnapshot.forEach(([k, v]) => localStorage.setItem(k, v));
 });
 
 describe('getVBOMCostDetail / getVFGCost - BOM cost rollup for P1 (BabyJoy Maxi S4)', () => {
@@ -531,5 +550,149 @@ describe('local schema migration - safety stock override semantics', () => {
 
     const after = JSON.parse(localStorage.getItem('sc_db_materials')!);
     expect(after[0].safety_stock_months).toBe(3.0);
+  });
+});
+
+describe('isInPeriod - one definition of "in this month"', () => {
+  it('matches any day inside the month, not just the first', () => {
+    // The CSV importer accepts whatever date a file carries, so plan rows do
+    // not always land on the 1st.
+    expect(isInPeriod('2026-08-01', '2026-08-01')).toBe(true);
+    expect(isInPeriod('2026-08-15', '2026-08-01')).toBe(true);
+    expect(isInPeriod('2026-08-31', '2026-08-01')).toBe(true);
+  });
+
+  it('rejects neighbouring months and empty input', () => {
+    expect(isInPeriod('2026-07-31', '2026-08-01')).toBe(false);
+    expect(isInPeriod('2026-09-01', '2026-08-01')).toBe(false);
+    expect(isInPeriod('', '2026-08-01')).toBe(false);
+    expect(isInPeriod('2026-08-01', '')).toBe(false);
+  });
+
+  it('reports a mid-month plan row consistently across every screen', async () => {
+    // Previously runMRP matched on the month while coverage, PSI and plan vs
+    // actual matched on the exact date, so a row dated mid-month drove the
+    // solver and was invisible everywhere else.
+    const plans = JSON.parse(localStorage.getItem('sc_db_sales_plan')!);
+    plans.push({
+      id: 'SP_MID', product_id: 'P1', channel_id: 'CH1',
+      period_start: '2026-07-17', quantity: 10000, price: 18.5,
+    });
+    localStorage.setItem('sc_db_sales_plan', JSON.stringify(plans));
+
+    const cov = await getVProductCoverage('forecast', '2026-07-01');
+    const pva = await getVPlanVsActual('sales', '2026-07-01');
+    const psi = await getVFGPSIAnalysis('2026-07-01');
+
+    const p1cov = cov.find(r => r.product_id === 'P1')!;
+    const p1pva = pva.find(r => r.item_id === 'P1')!;
+    const p1psi = psi.find(r => r.row_id === 'P1')!;
+
+    // 275,000 seeded + 10,000 mid-month.
+    expect(p1cov.monthly_demand).toBe(285000);
+    expect(p1pva.plan_qty).toBe(285000);
+    expect(p1psi.sales_forecast).toBe(285000);
+  });
+});
+
+describe('monthsOfCover - zero-demand handling', () => {
+  it('divides normally when there is demand', () => {
+    expect(monthsOfCover(300, 100)).toBe(3);
+  });
+
+  it('separates "stock but no demand" from "nothing at all"', () => {
+    // A flat 99 for both made an empty, unused item read as the healthiest
+    // line on the coverage screen.
+    expect(monthsOfCover(500, 0)).toBe(UNLIMITED_COVER_MONTHS);
+    expect(monthsOfCover(0, 0)).toBe(0);
+  });
+
+  it('keeps a shortfall negative rather than clamping it', () => {
+    expect(monthsOfCover(-200, 100)).toBe(-2);
+  });
+
+  it('falls back to the master-data usage rate at the same scale as the buffer', async () => {
+    // A period with no plan leaves coverage without a demand basis, so
+    // max_usage (a daily rate) stands in over a full month - matching
+    // getSafetyStockQty. The two used to disagree by a factor of two.
+    const rows = await getVMaterialCoverage('forecast', '2026-12-01');
+    const mt1 = rows.find(r => r.material_id === 'MT1')!;
+    expect(mt1.monthly_demand).toBe(1200 * DAYS_PER_MONTH);
+  });
+
+  it('reports zero cover for a material with no stock and nothing incoming', async () => {
+    // Availability counts stock plus in-transit plus open POs, so all three
+    // have to be empty for this to be the "nothing at all" case.
+    const inv = JSON.parse(localStorage.getItem('sc_db_inventory_snapshots')!);
+    inv.forEach((i: any) => { if (i.item_type === 'material') i.quantity = 0; });
+    localStorage.setItem('sc_db_inventory_snapshots', JSON.stringify(inv));
+    localStorage.setItem('sc_db_shipments', '[]');
+    localStorage.setItem('sc_db_purchase_orders', '[]');
+
+    const rows = await getVMaterialCoverage('forecast', '2026-07-01');
+    expect(rows.length).toBeGreaterThan(0);
+    rows.forEach(r => expect(r.coverage_months).toBe(0));
+  });
+});
+
+describe('getVFGPSIAnalysis - PSI figures', () => {
+  it('computes expected stock, coverage and achievement for P1 in July', async () => {
+    // P1: opening stock 65,000; July forecast 275,000 (SP1..SP4);
+    // production plan 305,000; sales actual 191,000 (SA1+SA2).
+    const rows = await getVFGPSIAnalysis('2026-07-01');
+    const p1 = rows.find(r => r.row_id === 'P1')!;
+    expect(p1.sales_forecast).toBe(275000);
+    expect(p1.actual_sales).toBe(191000);
+    expect(p1.sales_achievement_percent).toBeCloseTo(69.5, 1);
+    expect(p1.expected_stock).toBe(p1.start_stock + p1.production_plan - p1.sales_forecast);
+    expect(p1.coverage_months).toBeCloseTo(p1.expected_stock / p1.sales_forecast, 2);
+  });
+
+  it('reports no achievement figure where nothing was planned', async () => {
+    // Reporting 0% painted an un-planned SKU as a total miss, which is the
+    // bug getVPlanVsActual already had fixed.
+    const rows = await getVFGPSIAnalysis('2026-12-01');
+    rows.forEach(r => {
+      expect(r.sales_achievement_percent).toBeNull();
+      expect(r.production_achievement_percent).toBeNull();
+    });
+  });
+
+  it('agrees with getVPlanVsActual on the same period', async () => {
+    const psi = await getVFGPSIAnalysis('2026-07-01');
+    const pva = await getVPlanVsActual('sales', '2026-07-01');
+    psi.forEach(row => {
+      const match = pva.find(r => r.item_id === row.row_id);
+      if (match) {
+        expect(row.sales_forecast).toBe(match.plan_qty);
+        expect(row.actual_sales).toBe(match.actual_qty);
+      }
+    });
+  });
+});
+
+describe('date helpers', () => {
+  it('formats a local date without the UTC shift toISOString introduces', () => {
+    // toISOString on a local midnight in a positive-offset zone rolls back a
+    // day, which silently moved planned release dates.
+    expect(toDateStr(new Date(2026, 7, 1))).toBe('2026-08-01');
+    expect(toDateStr(new Date(2026, 11, 31))).toBe('2026-12-31');
+  });
+
+  it('knows the calendar length of a month, including leap February', () => {
+    expect(daysInMonthOf('2026-07-01')).toBe(31);
+    expect(daysInMonthOf('2026-02-01')).toBe(28);
+    expect(daysInMonthOf('2028-02-01')).toBe(29);
+    expect(daysInMonthOf('2026-04-01')).toBe(30);
+  });
+
+  it('generates contiguous month and week buckets', () => {
+    expect(getCurrentPeriods('2026-07-01', 3, 'month')).toEqual(['2026-07-01', '2026-08-01', '2026-09-01']);
+    const weeks = getCurrentPeriods('2026-07-01', 3, 'week');
+    expect(weeks).toEqual(['2026-07-01', '2026-07-08', '2026-07-15']);
+  });
+
+  it('rolls a month bucket across a year boundary', () => {
+    expect(getCurrentPeriods('2026-12-01', 2, 'month')).toEqual(['2026-12-01', '2027-01-01']);
   });
 });

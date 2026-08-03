@@ -73,3 +73,70 @@ describe('useTableFilters', () => {
     expect(() => result.current.filtered).not.toThrow();
   });
 });
+
+describe('useTableFilters - search behaviour', () => {
+  interface Material {
+    id: string;
+    name: string;
+    sku: string;
+    supplier: string;
+  }
+  const materials: Material[] = [
+    { id: '1', name: 'GP Bleached Fluff Pulp', sku: 'RM-PLP-01', supplier: 'Saudi Pulp Co' },
+    { id: '2', name: 'Spunbond Top Sheet 15gsm', sku: 'RM-NWT-18', supplier: 'Global Polymers Ltd' },
+    { id: '3', name: 'Teemo Printed Polybag Large', sku: 'PK-PLB-28', supplier: 'Al-Aman Packaging' },
+  ];
+
+  const search = (query: string) =>
+    renderHook(() =>
+      useTableFilters<Material>(materials, ['name', 'sku', 'supplier'], {}, query, () => {})
+    );
+
+  it('matches terms that are not adjacent in the source string', async () => {
+    // "bleached pulp" is not a substring of "GP Bleached Fluff Pulp" - a single
+    // whole-query includes() test found nothing, which made multi-word search
+    // look broken to anyone who typed naturally.
+    const { result } = search('bleached pulp');
+    await waitFor(() => expect(result.current.filtered).toHaveLength(1));
+    expect(result.current.filtered[0].id).toBe('1');
+  });
+
+  it('matches terms spread across different fields', async () => {
+    const { result } = search('pulp saudi');
+    await waitFor(() => expect(result.current.filtered).toHaveLength(1));
+    expect(result.current.filtered[0].supplier).toBe('Saudi Pulp Co');
+  });
+
+  it('requires every term, not just one', async () => {
+    const { result } = search('bleached polybag');
+    await waitFor(() => expect(result.current.hasActiveSearch).toBe(true));
+    expect(result.current.filtered).toHaveLength(0);
+  });
+
+  it('ignores case and collapses extra whitespace', async () => {
+    const { result } = search('   SPUNBOND    top   ');
+    await waitFor(() => expect(result.current.filtered).toHaveLength(1));
+    expect(result.current.filtered[0].id).toBe('2');
+  });
+
+  it('still matches a plain single-term query', async () => {
+    const { result } = search('RM-NWT-18');
+    await waitFor(() => expect(result.current.filtered).toHaveLength(1));
+    expect(result.current.filtered[0].id).toBe('2');
+  });
+
+  it('filters immediately when mounted with a query already set', () => {
+    // App restores a per-screen query on navigation. Seeding the debounced
+    // copy from empty showed every row for 200ms before the filter caught up.
+    const { result } = search('polybag');
+    expect(result.current.hasActiveSearch).toBe(true);
+    expect(result.current.filtered).toHaveLength(1);
+    expect(result.current.filtered[0].id).toBe('3');
+  });
+
+  it('treats a whitespace-only query as no search at all', async () => {
+    const { result } = search('    ');
+    await waitFor(() => expect(result.current.hasActiveSearch).toBe(false));
+    expect(result.current.filtered).toHaveLength(3);
+  });
+});

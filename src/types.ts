@@ -257,10 +257,12 @@ export interface VFGPSIAnalysis {
   start_stock: number;
   sales_forecast: number;
   actual_sales: number;
-  sales_achievement_percent: number;
+  /** null when there is no plan to measure against. */
+  sales_achievement_percent: number | null;
   production_plan: number;
   actual_production: number;
-  production_achievement_percent: number;
+  /** null when there is no plan to measure against. */
+  production_achievement_percent: number | null;
   expected_stock: number;
   coverage_months: number;
   sales_value: number;
