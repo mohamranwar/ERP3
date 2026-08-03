@@ -627,9 +627,9 @@ export async function getVFGPSIAnalysis(period: string = getPlanningPeriod()): P
       .filter(s => s.product_id === p.id && isInPeriod(s.period_start, period))
       .reduce((sum, s) => sum + s.quantity, 0);
 
-    const actual_sales = salesActual
-      .filter(s => s.product_id === p.id && isInPeriod(s.period_start, period))
-      .reduce((sum, s) => sum + s.quantity, 0);
+    const salesActualRows = salesActual
+      .filter(s => s.product_id === p.id && isInPeriod(s.period_start, period));
+    const actual_sales = salesActualRows.reduce((sum, s) => sum + s.quantity, 0);
 
     // No plan means there is no target to have hit or missed. Reporting 0%
     // painted an un-planned SKU as a total failure - the same mistake
@@ -640,9 +640,9 @@ export async function getVFGPSIAnalysis(period: string = getPlanningPeriod()): P
       .filter(s => s.product_id === p.id && isInPeriod(s.period_start, period))
       .reduce((sum, s) => sum + s.quantity, 0);
 
-    const actual_production = productionActual
-      .filter(s => s.product_id === p.id && isInPeriod(s.period_start, period))
-      .reduce((sum, s) => sum + s.quantity, 0);
+    const productionActualRows = productionActual
+      .filter(s => s.product_id === p.id && isInPeriod(s.period_start, period));
+    const actual_production = productionActualRows.reduce((sum, s) => sum + s.quantity, 0);
 
     const production_achievement_percent = prod_plan > 0 ? (actual_production / prod_plan) * 100 : null;
 
@@ -664,6 +664,11 @@ export async function getVFGPSIAnalysis(period: string = getPlanningPeriod()): P
       start_stock,
       sales_forecast,
       actual_sales,
+      // Row counts, not just sums: a month nobody has reported on yet and a
+      // month that genuinely sold nothing both total zero, and only the second
+      // is a miss.
+      sales_actual_records: salesActualRows.length,
+      production_actual_records: productionActualRows.length,
       sales_achievement_percent: sales_achievement_percent === null
         ? null
         : parseFloat(sales_achievement_percent.toFixed(1)),

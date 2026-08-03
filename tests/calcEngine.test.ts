@@ -696,3 +696,52 @@ describe('date helpers', () => {
     expect(getCurrentPeriods('2026-12-01', 2, 'month')).toEqual(['2026-12-01', '2027-01-01']);
   });
 });
+
+describe('getVFGPSIAnalysis - actuals presence', () => {
+  it('counts actual rows so "not reported yet" is distinguishable from "sold nothing"', async () => {
+    const july = await getVFGPSIAnalysis('2026-07-01');
+    const p1 = july.find(r => r.row_id === 'P1')!;
+    expect(p1.sales_actual_records).toBeGreaterThan(0);
+    expect(p1.actual_sales).toBeGreaterThan(0);
+  });
+
+  it('reports zero records for a period nobody has reported on', async () => {
+    const dec = await getVFGPSIAnalysis('2026-12-01');
+    dec.forEach(r => {
+      expect(r.sales_actual_records).toBe(0);
+      expect(r.production_actual_records).toBe(0);
+    });
+  });
+
+  it('separates a genuine zero from an unreported month', async () => {
+    // A row that exists and says zero is a real miss; no row at all is not.
+    const actuals = JSON.parse(localStorage.getItem('sc_db_sales_actual')!);
+    actuals.push({
+      id: 'SA_ZERO', product_id: 'P1', channel_id: 'CH1',
+      period_start: '2026-12-01', quantity: 0, price: 18.5,
+    });
+    localStorage.setItem('sc_db_sales_actual', JSON.stringify(actuals));
+
+    const dec = await getVFGPSIAnalysis('2026-12-01');
+    const p1 = dec.find(r => r.row_id === 'P1')!;
+    expect(p1.sales_actual_records).toBe(1);
+    expect(p1.actual_sales).toBe(0);
+  });
+
+  it('is the single source the PSI screen and the dashboard both read', async () => {
+    // The PSI screen used to sum these tables itself. Both now take the same
+    // rows, so a mid-month entry cannot show up on one and not the other.
+    const plans = JSON.parse(localStorage.getItem('sc_db_production_plan')!);
+    plans.push({
+      id: 'PP_MID', product_id: 'P1', machine_id: 'M1',
+      period_start: '2026-07-22', quantity: 5000,
+    });
+    localStorage.setItem('sc_db_production_plan', JSON.stringify(plans));
+
+    const rows = await getVFGPSIAnalysis('2026-07-01');
+    const p1 = rows.find(r => r.row_id === 'P1')!;
+    // Expected stock must move with the extra mid-month production.
+    expect(p1.expected_stock).toBe(p1.start_stock + p1.production_plan - p1.sales_forecast);
+    expect(p1.production_plan).toBeGreaterThanOrEqual(5000);
+  });
+});

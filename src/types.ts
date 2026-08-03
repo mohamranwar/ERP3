@@ -257,6 +257,9 @@ export interface VFGPSIAnalysis {
   start_stock: number;
   sales_forecast: number;
   actual_sales: number;
+  /** How many actual rows exist, so "not reported yet" is distinguishable from "sold nothing". */
+  sales_actual_records: number;
+  production_actual_records: number;
   /** null when there is no plan to measure against. */
   sales_achievement_percent: number | null;
   production_plan: number;
