@@ -63,7 +63,13 @@ export default function DashboardScreen({
 
   const totalSalesForecast = useMemo(() => fgPsi.reduce((sum, item) => sum + item.sales_forecast, 0), [fgPsi]);
   const totalSalesActual = useMemo(() => fgPsi.reduce((sum, item) => sum + item.actual_sales, 0), [fgPsi]);
-  const salesAchievement = useMemo(() => totalSalesForecast > 0 ? (totalSalesActual / totalSalesForecast) * 100 : 0, [totalSalesForecast, totalSalesActual]);
+  // null when nothing is planned for the period. Reporting 0% next to an "On
+  // Target" badge told the opposite of the truth: it read as a total miss that
+  // was somehow fine, when in fact there was simply nothing to measure.
+  const salesAchievement = useMemo(
+    () => (totalSalesForecast > 0 ? (totalSalesActual / totalSalesForecast) * 100 : null),
+    [totalSalesForecast, totalSalesActual]
+  );
 
   // Sorting for lowest 20 materials matching search
   const lowestMaterials = useMemo(() => {
@@ -179,15 +185,23 @@ export default function DashboardScreen({
         <div className="bg-white border border-slate-200 rounded p-3 flex flex-col justify-between h-24 shadow-xs">
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Sales Achievement</span>
           <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-bold text-emerald-600">{salesAchievement.toFixed(1)}%</span>
-            <span className="text-[10px] px-1 bg-emerald-50 text-emerald-600 font-bold rounded border border-emerald-100">
-              On Target
+            <span className={`text-2xl font-bold ${salesAchievement === null ? 'text-slate-400' : 'text-emerald-600'}`}>
+              {salesAchievement === null ? 'No plan' : `${salesAchievement.toFixed(1)}%`}
+            </span>
+            <span className={`text-[10px] px-1 font-bold rounded border ${
+              salesAchievement === null
+                ? 'bg-slate-50 text-slate-500 border-slate-200'
+                : salesAchievement >= 85
+                  ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                  : 'bg-amber-50 text-amber-600 border-amber-100'
+            }`}>
+              {salesAchievement === null ? 'Nothing planned' : salesAchievement >= 85 ? 'On Target' : 'Behind'}
             </span>
           </div>
           <div className="w-full bg-slate-100 h-1 rounded-full">
             <div 
               className="bg-emerald-500 h-full rounded-full" 
-              style={{ width: `${Math.min(100, salesAchievement)}%` }}
+              style={{ width: `${Math.min(100, salesAchievement ?? 0)}%` }}
             ></div>
           </div>
         </div>
