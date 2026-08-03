@@ -18,6 +18,7 @@ import {
   toDateStr,
   daysInMonthOf,
   getCurrentPeriods,
+  getBomAlternates,
   SAFETY_SERVICE_FACTOR,
   DAYS_PER_MONTH,
   getPlanningPeriod,
@@ -743,5 +744,124 @@ describe('getVFGPSIAnalysis - actuals presence', () => {
     // Expected stock must move with the extra mid-month production.
     expect(p1.expected_stock).toBe(p1.start_stock + p1.production_plan - p1.sales_forecast);
     expect(p1.production_plan).toBeGreaterThanOrEqual(5000);
+  });
+});
+
+describe('getBomAlternates - approved substitutes from the BOM', () => {
+  it('finds the qualified alternate for a slot and its conversion ratio', () => {
+    // BS2 holds MT2 at priority 1 (1.2 @ 5% scrap) and MT6 at priority 2
+    // (1.25 @ 4%), so one unit of MT2 is replaced by 1.3/1.26 of MT6.
+    const alts = getBomAlternates('MT2');
+    const bs2 = alts.find(a => a.slot_id === 'BS2')!;
+    expect(bs2.alternate_material_id).toBe('MT6');
+    expect(bs2.primary_per_unit).toBeCloseTo(1.2 * 1.05, 6);
+    expect(bs2.alternate_per_unit).toBeCloseTo(1.25 * 1.04, 6);
+    expect(bs2.conversion).toBeCloseTo((1.25 * 1.04) / (1.2 * 1.05), 6);
+  });
+
+  it('returns nothing for a material whose slot has no second option', () => {
+    expect(getBomAlternates('MT1')).toEqual([]);
+  });
+
+  it('never treats the primary as its own alternate', () => {
+    getBomAlternates('MT2').forEach(a => expect(a.alternate_material_id).not.toBe('MT2'));
+  });
+});
+
+describe('runMRP - substitution proposals', () => {
+  it('proposes the faster approved alternate when the primary cannot arrive', async () => {
+    const { substitutions } = await runMRP('2026-08-01', 4, 'month');
+    const sub = substitutions.find(s => s.material_id === 'MT2')!;
+    expect(sub).toBeDefined();
+    expect(sub.alternate_material_id).toBe('MT6');
+    expect(sub.alternate_lead_time_days).toBeLessThan(sub.primary_lead_time_days);
+  });
+
+  it('raises nothing for a material that is not short', async () => {
+    const { substitutions } = await runMRP('2026-08-01', 4, 'month');
+    // MT5 opens well above its buffer, so it is never past due.
+    expect(substitutions.some(s => s.material_id === 'MT5')).toBe(false);
+  });
+
+  it('raises nothing for a short material with no approved alternate', async () => {
+    // MT1 is past due but its slot carries no second option, so there is
+    // nothing to propose - the shortage is real and unavoidable.
+    const { results, substitutions } = await runMRP('2026-08-01', 4, 'month');
+    const mt1PastDue = results
+      .filter(r => r.material_id === 'MT1')
+      .reduce((s, r) => s + (r.past_due_releases || 0), 0);
+    expect(mt1PastDue).toBeGreaterThan(0);
+    expect(substitutions.some(s => s.material_id === 'MT1')).toBe(false);
+  });
+
+  it('splits one shortfall across the slots that consume it, without double counting', async () => {
+    // MT2 is the top sheet in both product families. Before the split, each
+    // slot claimed the entire shortfall and the totals read twice too high.
+    const { results, substitutions } = await runMRP('2026-08-01', 4, 'month');
+    const actual = results
+      .filter(r => r.material_id === 'MT2')
+      .reduce((s, r) => s + (r.past_due_releases || 0), 0);
+    const attributed = substitutions
+      .filter(s => s.material_id === 'MT2')
+      .reduce((s, p) => s + p.shortfall_qty, 0);
+    expect(substitutions.filter(s => s.material_id === 'MT2').length).toBeGreaterThan(1);
+    expect(attributed).toBeCloseTo(actual, 0);
+  });
+
+  it('converts the covered quantity through both BOM lines', async () => {
+    const { substitutions } = await runMRP('2026-08-01', 4, 'month');
+    const bs2 = substitutions.find(s => s.material_id === 'MT2' && s.slot_id === 'BS2')!;
+    const conversion = (1.25 * 1.04) / (1.2 * 1.05);
+    // The engine converts the precise figure and rounds once; re-deriving from
+    // the already-rounded coverable quantity can differ by a unit.
+    expect(Math.abs(bs2.alternate_qty - bs2.coverable_qty * conversion)).toBeLessThanOrEqual(1);
+    expect(bs2.alternate_qty).toBeGreaterThan(bs2.coverable_qty);
+  });
+
+  it('reports what even the alternate cannot rescue', async () => {
+    // The alternate needs 18 days too, so the earliest bucket stays unreachable.
+    const { substitutions } = await runMRP('2026-08-01', 4, 'month');
+    const sub = substitutions.find(s => s.material_id === 'MT2')!;
+    expect(sub.uncoverable_qty).toBeGreaterThan(0);
+    expect(sub.coverable_qty + sub.uncoverable_qty).toBeCloseTo(sub.shortfall_qty, 0);
+    expect(sub.covers_from_period).not.toBeNull();
+  });
+
+  it('dates the earliest arrival from the run start plus the alternate lead time', async () => {
+    const { substitutions } = await runMRP('2026-08-01', 4, 'month');
+    const sub = substitutions.find(s => s.material_id === 'MT2')!;
+    // 2026-08-01 + 18 days.
+    expect(sub.earliest_arrival).toBe('2026-08-19');
+  });
+
+  it('reports the per-unit cost difference so the trade-off is visible', async () => {
+    // MT6 is 0.72 at 1.3/unit against MT2 at 0.80 and 1.26/unit - cheaper here,
+    // which is exactly the sort of thing a planner should be told.
+    const { substitutions } = await runMRP('2026-08-01', 4, 'month');
+    const bs2 = substitutions.find(s => s.material_id === 'MT2' && s.slot_id === 'BS2')!;
+    expect(bs2.unit_cost_delta).toBeCloseTo(1.25 * 1.04 * 0.72 - 1.2 * 1.05 * 0.8, 4);
+    expect(bs2.unit_cost_delta).toBeLessThan(0);
+  });
+
+  it('skips an obsolete alternate', async () => {
+    const mats = JSON.parse(localStorage.getItem('sc_db_materials')!);
+    mats.forEach((m: any) => { if (m.id === 'MT6') m.status = 'obsolete'; });
+    localStorage.setItem('sc_db_materials', JSON.stringify(mats));
+
+    const { substitutions } = await runMRP('2026-08-01', 4, 'month');
+    expect(substitutions.some(s => s.alternate_material_id === 'MT6')).toBe(false);
+  });
+})
+
+describe('substitution proposals - product context', () => {
+  it('names the product whose BOM each slot belongs to', async () => {
+    // BS2 and BS5 are both called "Top Sheet Surface". Without the product
+    // the two proposals are indistinguishable on screen.
+    const { substitutions } = await runMRP('2026-08-01', 4, 'month');
+    const mt2 = substitutions.filter(s => s.material_id === 'MT2');
+    expect(mt2.length).toBeGreaterThan(1);
+    const names = mt2.map(s => s.product_name);
+    expect(new Set(names).size).toBe(mt2.length);
+    names.forEach(n => expect(n).toBeTruthy());
   });
 });
