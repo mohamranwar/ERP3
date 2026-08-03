@@ -4,12 +4,33 @@
  */
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { fetchTableData, runMRP, saveRecord } from '../supabaseClient';
+import {
+  fetchTableData,
+  runMRP,
+  saveRecord,
+  getPlanningPeriod,
+  getSafetyStockMonths,
+  SAFETY_SERVICE_FACTOR,
+  MS_PER_DAY,
+  toDateStr
+} from '../supabaseClient';
 import { Material, Supplier, PurchaseOrder, MRPResult } from '../types';
-import { 
-  Play, Calendar, ClipboardCheck, LayoutGrid, ListTodo, ShoppingBag, 
-  ShieldAlert, CheckCircle2, Truck, Plus, X, Info 
+import {
+  Play, Calendar, ClipboardCheck, LayoutGrid, ListTodo, ShoppingBag,
+  ShieldAlert, CheckCircle2, Truck, Plus, X, Info, ChevronDown, ChevronRight
 } from 'lucide-react';
+
+/**
+ * Cell styling for a projected stock figure against its safety level.
+ * Red once the buffer is breached, amber while it is within 15% of it -
+ * that band is the window where a planner can still act before it bites.
+ */
+function stockCellClass(projected: number, safetyStock: number): string {
+  if (safetyStock <= 0) return 'text-blue-700';
+  if (projected < safetyStock) return 'text-red-600 bg-red-50/60';
+  if (projected < safetyStock * 1.15) return 'text-amber-700 bg-amber-50/50';
+  return 'text-blue-700';
+}
 import { useToast } from '../context/ToastConfirmContext';
 import { useAuth } from '../context/AuthContext';
 import { useTableFilters } from '../hooks/useTableFilters';
@@ -40,8 +61,9 @@ export default function MRPScreen({
   const [mrpResults, setMrpResults] = useState<MRPResult[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // MRP Run Input States
-  const [startDate, setStartDate] = useState('2026-07-20');
+  // MRP Run Input States. The run starts from the period selected in the app
+  // header, so the MRP and every other screen describe the same window.
+  const [startDate, setStartDate] = useState(() => getPlanningPeriod());
   
   // Persist grain and horizon to localStorage
   const [grain, setGrain] = useState<'week' | 'month'>(() => {
@@ -109,6 +131,9 @@ export default function MRPScreen({
   }
 
   useEffect(() => {
+    // A period change in the header bumps refreshKey; follow it so the next
+    // solver run covers the window the rest of the app is showing.
+    setStartDate(getPlanningPeriod());
     loadData();
   }, [refreshKey]);
 
@@ -157,6 +182,47 @@ export default function MRPScreen({
       .sort((a, b) => a.localeCompare(b));
   }, [activeRunResults]);
 
+  /**
+   * Inclusive start/end labels per bucket. A bucket runs until the next one
+   * begins, so the last one is closed off using the run's own grain.
+   */
+  const bucketRanges = useMemo(() => {
+    return buckets.map((start, i) => {
+      const startDateObj = new Date(start);
+      const nextStart = i + 1 < buckets.length
+        ? new Date(buckets[i + 1])
+        : grain === 'month'
+          ? new Date(startDateObj.getFullYear(), startDateObj.getMonth() + 1, 1)
+          : new Date(startDateObj.getTime() + 7 * MS_PER_DAY);
+      const endDateObj = new Date(nextStart.getTime() - MS_PER_DAY);
+      const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+      return {
+        start,
+        end: toDateStr(endDateObj),
+        label: `${fmt(startDateObj)} - ${fmt(endDateObj)}`,
+        year: startDateObj.getFullYear()
+      };
+    });
+  }, [buckets, grain]);
+
+  /** Rows keyed by material and bucket, so cells are a lookup instead of a scan. */
+  const resultLookup = useMemo(() => {
+    const map = new Map<string, MRPResult>();
+    activeRunResults.forEach(r => map.set(`${r.material_id}|${r.week_start_date}`, r));
+    return map;
+  }, [activeRunResults]);
+
+  /** Materials the planner has opened to see the full metric breakdown. */
+  const [expandedMaterials, setExpandedMaterials] = useState<Set<string>>(new Set());
+
+  const toggleMaterial = (id: string) => {
+    setExpandedMaterials(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
   const selectedRunTimestamp = () => {
     const firstMatch = activeRunResults[0];
     if (firstMatch && firstMatch.run_date) {
@@ -182,10 +248,11 @@ export default function MRPScreen({
         const mat = materials.find(m => m.id === r.material_id);
         const sup = suppliers.find(s => s.id === mat?.supplier_id);
 
-        const weekStart = new Date(r.week_start_date);
+        // The engine already placed this release in the bucket it must be
+        // ordered in, so the bucket date *is* the release date. The arrival
+        // it covers is a lead time later.
         const offsetDays = mat ? mat.total_lead_time_days : 15;
-        const releaseDate = new Date(weekStart);
-        releaseDate.setDate(weekStart.getDate() - offsetDays);
+        const arrival = new Date(new Date(r.week_start_date).getTime() + offsetDays * MS_PER_DAY);
 
         return {
           id: r.id,
@@ -195,8 +262,8 @@ export default function MRPScreen({
           quantity: r.planned_order_releases,
           supplier_id: mat ? mat.supplier_id : '',
           supplier_name: sup ? sup.name : 'Unknown',
-          required_date: r.week_start_date,
-          release_date: releaseDate.toISOString().slice(0, 10),
+          required_date: toDateStr(arrival),
+          release_date: r.week_start_date,
           controller: mat ? mat.controller : ''
         };
       })
@@ -220,7 +287,7 @@ export default function MRPScreen({
   };
 
   // Open the purchase order pre-creation dialog
-  const openCreatePoDialog = (materialId: string, qty: number, requiredDate: string) => {
+  const openCreatePoDialog = (materialId: string, qty: number, releaseDate: string) => {
     if (!hasRole('planner')) {
       showToast('Your account is read-only - Planner or Admin access is required to raise purchase orders.', 'error');
       return;
@@ -233,17 +300,17 @@ export default function MRPScreen({
       return;
     }
 
-    const weekStart = new Date(requiredDate);
+    // The grid cell is the release bucket; the goods are needed a lead time
+    // after it, which is the date the PO must be satisfied by.
     const offsetDays = mat.total_lead_time_days || 15;
-    const releaseDate = new Date(weekStart);
-    releaseDate.setDate(weekStart.getDate() - offsetDays);
+    const arrival = new Date(new Date(releaseDate).getTime() + offsetDays * MS_PER_DAY);
 
     setPoModalData({
       material: mat,
       supplier: sup,
       qty,
-      requiredDate,
-      suggestedReleaseDate: releaseDate.toISOString().slice(0, 10)
+      requiredDate: toDateStr(arrival),
+      suggestedReleaseDate: releaseDate
     });
   };
 
@@ -501,122 +568,270 @@ export default function MRPScreen({
                   <table className="min-w-full divide-y divide-gray-200 text-left text-xs font-sans">
                     <thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                       <tr>
-                        <th className="px-4 py-3 sticky left-0 bg-gray-50 z-10 min-w-[200px] border-r border-gray-100">Material Component</th>
-                        <th className="px-4 py-3 min-w-[130px] border-r border-gray-100">Time-Phased Metric</th>
-                        {buckets.map(wk => {
-                          const date = new Date(wk);
-                          const headerStr = date.toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: grain === 'month' ? undefined : '2-digit',
-                            year: grain === 'month' ? 'numeric' : undefined
-                          });
-                          return (
-                            <th key={wk} className="px-4 py-3 text-right font-mono min-w-[130px]">{headerStr}</th>
-                          );
-                        })}
+                        <th className="px-4 py-3 sticky left-0 bg-gray-50 z-10 min-w-[260px] border-r border-gray-100">Material Component</th>
+                        <th className="px-4 py-3 min-w-[150px] border-r border-gray-100">Time-Phased Metric</th>
+                        {bucketRanges.map(b => (
+                          <th key={b.start} className="px-4 py-3 text-right min-w-[150px]">
+                            <span className="block font-mono text-[11px] text-gray-600 normal-case">{b.label}</span>
+                            <span className="block font-mono text-[9px] text-gray-400 font-normal normal-case">{b.year}</span>
+                          </th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 text-xs">
                       {filteredMaterials.map(m => {
+                        const isExpanded = expandedMaterials.has(m.id);
+                        const rowFor = (wk: string) => resultLookup.get(`${m.id}|${wk}`);
+                        const shortfallBuckets = buckets.filter(wk => {
+                          const r = rowFor(wk);
+                          return r ? r.projected_available < r.safety_stock : false;
+                        }).length;
+                        const pastDue = buckets.reduce(
+                          (sum, wk) => sum + (rowFor(wk)?.past_due_releases || 0), 0
+                        );
+
                         return (
                           <React.Fragment key={m.id}>
-                            {/* Material Header Line */}
-                            <tr className="bg-slate-50/60 font-semibold border-t border-slate-200/80">
-                              <td className="px-4 py-2 sticky left-0 bg-slate-50/95 z-10 font-bold text-slate-800 border-r border-gray-100" colSpan={2}>
-                                {m.name} <span className="text-[10px] text-gray-400 font-mono font-medium font-normal ml-2">({m.sku} | MOQ: {m.moq})</span>
+                            {/* Material summary line - always visible, click to expand */}
+                            <tr
+                              className="bg-slate-50/60 font-semibold border-t border-slate-200/80 hover:bg-slate-100/70 cursor-pointer transition-colors"
+                              onClick={() => toggleMaterial(m.id)}
+                            >
+                              <td className="px-4 py-2 sticky left-0 bg-slate-50/95 z-10 font-bold text-slate-800 border-r border-gray-100">
+                                <div className="flex items-center gap-1.5">
+                                  {isExpanded
+                                    ? <ChevronDown className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                    : <ChevronRight className="w-3.5 h-3.5 text-slate-500 shrink-0" />}
+                                  <span>{m.name}</span>
+                                </div>
+                                <span className="block text-[10px] text-gray-400 font-mono font-normal mt-0.5 pl-5">
+                                  {m.sku} | MOQ {m.moq.toLocaleString()} | Lead {m.total_lead_time_days}d
+                                </span>
                               </td>
-                              {buckets.map(wk => <td key={wk} className="px-4 py-2 text-right"></td>)}
-                            </tr>
-
-                            {/* 1. Gross Requirements */}
-                            <tr className="hover:bg-slate-50/30 transition-colors">
-                              <td className="px-4 py-1.5 sticky left-0 bg-white z-10 text-slate-400 text-[11px] border-r border-gray-100"></td>
-                              <td className="px-4 py-1.5 text-slate-500 font-medium border-r border-gray-100 flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
-                                Gross Requirements
+                              <td className="px-4 py-2 border-r border-gray-100 align-middle">
+                                {/* Netting tops stock up to the safety level, so a bucket rarely
+                                    reads short. The real exposure is an order that had to be
+                                    placed before this run began - it cannot arrive on time. */}
+                                {pastDue > 0 ? (
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-50 border border-red-200 text-red-700 text-[10px] font-bold">
+                                    <ShieldAlert className="w-3 h-3" />
+                                    Order late
+                                  </span>
+                                ) : shortfallBuckets > 0 ? (
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold">
+                                    <ShieldAlert className="w-3 h-3" />
+                                    {shortfallBuckets} short
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold">
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    On plan
+                                  </span>
+                                )}
+                                {pastDue > 0 && (
+                                  <span className="block mt-1 text-[9px] font-bold text-red-600 font-mono">
+                                    {pastDue.toLocaleString()} to expedite
+                                  </span>
+                                )}
                               </td>
                               {buckets.map(wk => {
-                                const result = activeRunResults.find(r => r.material_id === m.id && r.week_start_date === wk);
-                                const gross = result?.gross_requirements || 0;
+                                const r = rowFor(wk);
+                                const proj = r ? r.projected_available : 0;
+                                const ss = r ? r.safety_stock : 0;
                                 return (
-                                  <td key={wk} className="px-4 py-1.5 text-right font-mono text-slate-600">
-                                    {gross > 0 ? gross.toLocaleString() : '-'}
+                                  <td key={wk} className={`px-4 py-2 text-right font-mono font-bold ${stockCellClass(proj, ss)}`}>
+                                    {proj.toLocaleString()}
                                   </td>
                                 );
                               })}
                             </tr>
 
-                            {/* 2. Scheduled Receipts */}
-                            <tr className="hover:bg-slate-50/30 transition-colors">
-                              <td className="px-4 py-1.5 sticky left-0 bg-white z-10 text-slate-400 text-[11px] border-r border-gray-100"></td>
-                              <td className="px-4 py-1.5 text-emerald-800 font-medium border-r border-gray-100 flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                Scheduled Receipts
-                              </td>
-                              {buckets.map(wk => {
-                                const result = activeRunResults.find(r => r.material_id === m.id && r.week_start_date === wk);
-                                const receipts = result?.scheduled_receipts || 0;
-                                return (
-                                  <td key={wk} className="px-4 py-1.5 text-right font-mono text-emerald-700 font-semibold">
-                                    {receipts > 0 ? `+${receipts.toLocaleString()}` : '-'}
+                            {isExpanded && (
+                              <>
+                                {/* 1. Gross Requirements */}
+                                <tr className="hover:bg-slate-50/30 transition-colors">
+                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-gray-100"></td>
+                                  <td className="px-4 py-1.5 text-slate-500 font-medium border-r border-gray-100">
+                                    <span className="flex items-center gap-1.5">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                                      Gross Requirements
+                                    </span>
                                   </td>
-                                );
-                              })}
-                            </tr>
+                                  {buckets.map(wk => {
+                                    const gross = rowFor(wk)?.gross_requirements || 0;
+                                    return (
+                                      <td key={wk} className="px-4 py-1.5 text-right font-mono text-slate-600">
+                                        {gross > 0 ? gross.toLocaleString() : '-'}
+                                      </td>
+                                    );
+                                  })}
+                                </tr>
 
-                            {/* 3. Projected Available Stock */}
-                            <tr className="hover:bg-slate-50/30 transition-colors bg-blue-50/5">
-                              <td className="px-4 py-1.5 sticky left-0 bg-white z-10 text-slate-400 text-[11px] border-r border-gray-100"></td>
-                              <td className="px-4 py-1.5 text-blue-800 font-semibold border-r border-gray-100 flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                                Projected Stock
-                              </td>
-                              {buckets.map(wk => {
-                                const result = activeRunResults.find(r => r.material_id === m.id && r.week_start_date === wk);
-                                const projVal = result ? result.projected_available : 0;
-                                const ssVal = result ? result.safety_stock : 5000;
-                                const isBelowSS = projVal < ssVal;
-                                return (
-                                  <td key={wk} className={`px-4 py-1.5 text-right font-mono font-bold ${isBelowSS ? 'text-red-600 bg-red-50/60' : 'text-blue-700'}`}>
-                                    {projVal.toLocaleString()}
-                                    {isBelowSS && (
-                                      <span className="block text-[8px] font-extrabold text-red-500 font-sans tracking-wide uppercase mt-0.5">Below SS ({ssVal.toLocaleString()})</span>
-                                    )}
+                                {/* 2. Scheduled Receipts */}
+                                <tr className="hover:bg-slate-50/30 transition-colors">
+                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-gray-100"></td>
+                                  <td className="px-4 py-1.5 text-emerald-800 font-medium border-r border-gray-100">
+                                    <span className="flex items-center gap-1.5">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                      Scheduled Receipts
+                                    </span>
                                   </td>
-                                );
-                              })}
-                            </tr>
+                                  {buckets.map(wk => {
+                                    const receipts = rowFor(wk)?.scheduled_receipts || 0;
+                                    return (
+                                      <td key={wk} className="px-4 py-1.5 text-right font-mono text-emerald-700 font-semibold">
+                                        {receipts > 0 ? `+${receipts.toLocaleString()}` : '-'}
+                                      </td>
+                                    );
+                                  })}
+                                </tr>
 
-                            {/* 4. Planned Order Releases */}
-                            <tr className="hover:bg-slate-50/30 transition-colors border-b border-gray-100 bg-amber-50/5">
-                              <td className="px-4 py-2 sticky left-0 bg-white z-10 text-slate-400 text-[11px] border-r border-gray-100"></td>
-                              <td className="px-4 py-2 text-amber-800 font-bold border-r border-gray-100 flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                Planned Releases
-                              </td>
-                              {buckets.map(wk => {
-                                const result = activeRunResults.find(r => r.material_id === m.id && r.week_start_date === wk);
-                                const release = result ? result.planned_order_releases : 0;
-                                return (
-                                  <td key={wk} className="px-4 py-2 text-right font-mono">
-                                    {release > 0 ? (
-                                      <div className="flex flex-col items-end gap-1">
-                                        <span className="text-amber-700 font-bold">+{release.toLocaleString()}</span>
-                                        <button
-                                          onClick={() => openCreatePoDialog(m.id, release, wk)}
-                                          className="px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-[9px] font-bold flex items-center gap-0.5 shadow-sm transition-all cursor-pointer"
-                                        >
-                                          <Plus className="w-2.5 h-2.5" />
-                                          Create PO
-                                        </button>
-                                      </div>
-                                    ) : (
-                                      <span className="text-gray-400">-</span>
-                                    )}
+                                {/* 3. Safety Stock - the level the plan is netted against */}
+                                <tr className="hover:bg-slate-50/30 transition-colors bg-amber-50/20">
+                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-gray-100"></td>
+                                  <td className="px-4 py-1.5 text-amber-900 font-medium border-r border-gray-100">
+                                    <span className="flex items-center gap-1.5">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                      Safety Stock
+                                      <span
+                                        className="text-[9px] text-amber-600 font-mono font-normal"
+                                        title={`${m.total_lead_time_days} days lead time x ${SAFETY_SERVICE_FACTOR} service factor`}
+                                      >
+                                        ({getSafetyStockMonths(m).toFixed(1)}mo)
+                                      </span>
+                                    </span>
                                   </td>
-                                );
-                              })}
-                            </tr>
+                                  {buckets.map(wk => {
+                                    const ss = rowFor(wk)?.safety_stock || 0;
+                                    return (
+                                      <td key={wk} className="px-4 py-1.5 text-right font-mono text-amber-800 border-b border-dashed border-amber-200">
+                                        {ss > 0 ? ss.toLocaleString() : '-'}
+                                      </td>
+                                    );
+                                  })}
+                                </tr>
+
+                                {/* 4. Projected Available Stock */}
+                                <tr className="hover:bg-slate-50/30 transition-colors">
+                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-gray-100"></td>
+                                  <td className="px-4 py-1.5 text-blue-800 font-semibold border-r border-gray-100">
+                                    <span className="flex items-center gap-1.5">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                      Projected Stock
+                                    </span>
+                                  </td>
+                                  {buckets.map(wk => {
+                                    const r = rowFor(wk);
+                                    const proj = r ? r.projected_available : 0;
+                                    const ss = r ? r.safety_stock : 0;
+                                    const below = proj < ss;
+                                    return (
+                                      <td key={wk} className={`px-4 py-1.5 text-right font-mono font-bold ${stockCellClass(proj, ss)}`}>
+                                        {proj.toLocaleString()}
+                                        {below && (
+                                          <span className="block text-[8px] font-extrabold text-red-500 font-sans tracking-wide uppercase mt-0.5">
+                                            {(ss - proj).toLocaleString()} below SS
+                                          </span>
+                                        )}
+                                      </td>
+                                    );
+                                  })}
+                                </tr>
+
+                                {/* 5. Net Requirements - the shortfall before MOQ rounding */}
+                                <tr className="hover:bg-slate-50/30 transition-colors">
+                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-gray-100"></td>
+                                  <td className="px-4 py-1.5 text-rose-800 font-medium border-r border-gray-100">
+                                    <span className="flex items-center gap-1.5">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                      Net Requirements
+                                    </span>
+                                  </td>
+                                  {buckets.map(wk => {
+                                    const net = rowFor(wk)?.net_requirements || 0;
+                                    return (
+                                      <td key={wk} className="px-4 py-1.5 text-right font-mono text-rose-700">
+                                        {net > 0 ? net.toLocaleString() : '-'}
+                                      </td>
+                                    );
+                                  })}
+                                </tr>
+
+                                {/* 6. Planned Receipts - when stock has to land */}
+                                <tr className="hover:bg-slate-50/30 transition-colors">
+                                  <td className="px-4 py-1.5 sticky left-0 bg-white z-10 border-r border-gray-100"></td>
+                                  <td className="px-4 py-1.5 text-indigo-800 font-medium border-r border-gray-100">
+                                    <span className="flex items-center gap-1.5">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                      Planned Receipts
+                                    </span>
+                                  </td>
+                                  {buckets.map(wk => {
+                                    const rec = rowFor(wk)?.planned_order_receipts || 0;
+                                    return (
+                                      <td key={wk} className="px-4 py-1.5 text-right font-mono text-indigo-700">
+                                        {rec > 0 ? rec.toLocaleString() : '-'}
+                                      </td>
+                                    );
+                                  })}
+                                </tr>
+
+                                {/* 7. Planned Order Releases - when to place the order */}
+                                <tr className="hover:bg-slate-50/30 transition-colors border-b border-gray-100 bg-amber-50/5">
+                                  <td className="px-4 py-2 sticky left-0 bg-white z-10 border-r border-gray-100"></td>
+                                  <td className="px-4 py-2 text-amber-800 font-bold border-r border-gray-100">
+                                    <span className="flex items-center gap-1.5">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                      Planned Releases
+                                    </span>
+                                  </td>
+                                  {buckets.map((wk, bIdx) => {
+                                    const release = rowFor(wk)?.planned_order_releases || 0;
+                                    // Releases whose date has already passed still have to be
+                                    // raised - later than ideal, but they are the most urgent
+                                    // thing on the screen. Surface them in the first bucket so
+                                    // the planner can act instead of only being told they exist.
+                                    const late = bIdx === 0 ? pastDue : 0;
+                                    if (release === 0 && late === 0) {
+                                      return <td key={wk} className="px-4 py-2 text-right font-mono text-gray-400">-</td>;
+                                    }
+                                    return (
+                                      <td key={wk} className={`px-4 py-2 text-right font-mono ${late > 0 ? 'bg-red-50/60' : ''}`}>
+                                        <div className="flex flex-col items-end gap-1">
+                                          {late > 0 && (
+                                            <>
+                                              <span className="text-[8px] font-extrabold text-red-600 font-sans tracking-wide uppercase">
+                                                Past due - expedite
+                                              </span>
+                                              <span className="text-red-700 font-bold">{late.toLocaleString()}</span>
+                                              <button
+                                                onClick={() => openCreatePoDialog(m.id, late, wk)}
+                                                className="px-2 py-0.5 bg-red-600 hover:bg-red-700 text-white rounded text-[9px] font-bold flex items-center gap-0.5 shadow-sm transition-all cursor-pointer"
+                                              >
+                                                <Plus className="w-2.5 h-2.5" />
+                                                Expedite PO
+                                              </button>
+                                            </>
+                                          )}
+                                          {release > 0 && (
+                                            <>
+                                              <span className="text-amber-700 font-bold">+{release.toLocaleString()}</span>
+                                              <button
+                                                onClick={() => openCreatePoDialog(m.id, release, wk)}
+                                                className="px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-[9px] font-bold flex items-center gap-0.5 shadow-sm transition-all cursor-pointer"
+                                              >
+                                                <Plus className="w-2.5 h-2.5" />
+                                                Create PO
+                                              </button>
+                                            </>
+                                          )}
+                                        </div>
+                                      </td>
+                                    );
+                                  })}
+                                </tr>
+                              </>
+                            )}
                           </React.Fragment>
                         );
                       })}
